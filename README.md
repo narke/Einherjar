@@ -1,19 +1,28 @@
 Roentgenium
 ===========
 
+
+What is it?
+-----------
+
 OS kernel in Asm/C/Forth.
 
-How To Test
-===========
 
-[Step 1: Get versatile sources]
+Testing
+-------
 
-$ git clone https://github.com/narke/Roentgenium.git
+Step 1: Get sources
 
-[Step 2: Compile]
+	$ git clone https://github.com/narke/Roentgenium.git
 
-$ make all
+Step 2: Compile
 
-[Step 3: Run with qemu (by using 4Mb of RAM and the generated ISO image)]
+	$ make all
 
-$ qemu -m 4 -cdrom roentgenium.iso
+Step 3: Generate an ISO image
+
+	$ make cdrom
+
+Step 4: Run with qemu (by using 4Mb of RAM and the generated ISO image)
+
+	$ qemu -m 4 -cdrom roentgenium.iso

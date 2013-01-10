@@ -10,12 +10,7 @@ KERNEL   = roentgenium.elf
 MULTIBOOT_IMAGE = roentgenium.iso
 
 # Main target
-all: $(MULTIBOOT_IMAGE)
-
-$(MULTIBOOT_IMAGE): $(KERNEL)
-	mv $(KERNEL) bootloader/grub/
-	mkisofs -R -b boot/grub/stage2_eltorito -no-emul-boot \
-	-boot-load-size 4 -boot-info-table -o $(MULTIBOOT_IMAGE) bootloader/grub/
+all: $(KERNEL)
 
 $(KERNEL): $(OBJECTS)
 	$(LD) $(LDFLAGS) -T ./linker.ld -o $@ $^
@@ -25,6 +20,11 @@ $(KERNEL): $(OBJECTS)
 
 %.o: %.S
 	$(CC) -I$(PWD) -c $< $(CFLAGS) -o $@
+
+cdrom: $(KERNEL)
+	mv $(KERNEL) bootloader/grub/
+	mkisofs -R -b boot/grub/stage2_eltorito -no-emul-boot \
+	-boot-load-size 4 -boot-info-table -o $(MULTIBOOT_IMAGE) bootloader/grub/
 
 clean:
 	$(RM) *.iso
