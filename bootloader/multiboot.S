@@ -15,13 +15,14 @@
 .long CHECKSUM
 
 # reserve initial kernel stack space
-.set STACKSIZE, 0x4000                  # that is, 16k.
-.lcomm stack, 32                        # reserve 16k stack on a doubleword boundary
+stack_bottom:
+.skip 16384                             # reserve 16 KiB stack
+stack_top:
 .comm  mbd, 4                           # we will use this in kmain
 .comm  magic, 4                         # we will use this in kmain
 
 loader:
-    movl  $(stack + STACKSIZE), %esp    # set up the stack
+    movl  $stack_top, %esp              # set up the stack, stacks grow downwards
     movl  %eax, magic                   # Multiboot magic number
     movl  %ebx, mbd                     # Multiboot data structure
 
