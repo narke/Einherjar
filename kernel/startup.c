@@ -7,27 +7,30 @@
 
 #define MULTIBOOT_BOOTLOADER_MAGIC	0x2BADB002
 
+#include <kernel/hardware/input_output/screen/vga.h>
+
+
 /**
  * The kernel entry point. All starts from here!
- * @param magic
- * @param address of grub bootloader's header
- * @return Nothing
  */
 
 void roentgenium_main(void)
 {
    extern unsigned int magic;
 
-   extern void *mbd;
+   //extern void *mbd;
 
    if ( magic != MULTIBOOT_BOOTLOADER_MAGIC )
    {
       /* Error */
       ;
    }
+   
+   // VGA scren setup
+   vga_clear();
+   vga_set_attributes(FG_BRIGHT_BLUE | BG_BLACK );
+   vga_set_position(34, 0);
+   
+   vga_display_string("Roentgenium\n");
 
-   /* Print a letter to screen to see everything is working: */
-   volatile unsigned char *videoram = (unsigned char *)0xB8000;
-   videoram[0] = 65; /* character 'A' */
-   videoram[1] = 0x07; /* light grey (7) on black (0). */
 }

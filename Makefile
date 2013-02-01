@@ -4,6 +4,7 @@ CFLAGS  = -Wall -m32 -Wa,--32 -nostdlib -nostdinc -ffreestanding -I$(PWD)
 LDFLAGS = --warn-common -melf_i386 --strip-all
 
 OBJECTS = bootloader/multiboot.o \
+      kernel/hardware/input_output/screen/vga.o \
 	  kernel/startup.o
 
 KERNEL   = roentgenium.elf
@@ -31,3 +32,4 @@ clean:
 	$(RM) bootloader/*.o
 	$(RM) bootloader/grub/roentgenium.elf
 	$(RM) kernel/*.o
+	$(RM) kernel/hardware/input_output/screen/*.o
