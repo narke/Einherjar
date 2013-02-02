@@ -15,10 +15,6 @@ uint8_t g_position_x;
 uint8_t g_position_y; 
 /** Represents a foreground/background color set */
 uint8_t g_attributes; 
-/** Foreground color */
-uint8_t foreground_color;
-/** Background color */
-uint8_t background_color;
 
 
 /**
