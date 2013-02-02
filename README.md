@@ -17,6 +17,7 @@ Step 1: Get sources
 
 Step 2: Compile and generate an ISO image
 
+	$ cd Roentgenium/kernel
 	$ make all
 
 Step 3: Run with qemu (by using 4Mb of RAM and the generated ISO image)
