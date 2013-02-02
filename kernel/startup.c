@@ -8,7 +8,7 @@
 #define MULTIBOOT_BOOTLOADER_MAGIC	0x2BADB002
 
 #include <hardware/input_output/screen/vga.h>
-
+#include <hardware/cpu/x86/mmu/gdt.h>
 
 /**
  * The kernel entry point. All starts from here!
@@ -22,8 +22,7 @@ void roentgenium_main(void)
 
    if ( magic != MULTIBOOT_BOOTLOADER_MAGIC )
    {
-      /* Error */
-      ;
+      ; /* Error */
    }
    
    // VGA scren setup
@@ -32,5 +31,10 @@ void roentgenium_main(void)
    vga_set_position(34, 0);
    
    vga_display_string("Roentgenium\n");
+   
+   // GDT
+   x86_gdt_setup();
+   
+   vga_display_string("CPU: GDT\n");
 
 }

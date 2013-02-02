@@ -8,6 +8,7 @@ BUILD_PATH      = ../build
 
 OBJECTS = $(BOOTLOADER_PATH)/multiboot.o \
       hardware/input_output/screen/vga.o \
+      hardware/cpu/x86/mmu/gdt.o \
 	  startup.o
 
 KERNEL   = $(BUILD_PATH)/roentgenium.elf
@@ -43,6 +44,7 @@ clean:
 	$(RM) $(BOOTLOADER_PATH)/grub/roentgenium.elf
 	$(RM) *.o
 	$(RM) hardware/input_output/screen/*.o
+	$(RM) hardware/cpu/x86/mmu/*.o
 	@if [ -d $(BUILD_PATH) ]; 			\
 	then 								\
 		rm -R $(BUILD_PATH); 			\
