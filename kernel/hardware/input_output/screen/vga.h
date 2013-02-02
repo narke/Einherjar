@@ -59,7 +59,7 @@
 /* Blinking */
 #define FG_BLINKING  (1 << 7)
 
-#include <kernel/libraries/types.h>
+#include <libraries/types.h>
  
 /** VGA-capable screen driver */
 	

@@ -7,7 +7,7 @@
 
 #define MULTIBOOT_BOOTLOADER_MAGIC	0x2BADB002
 
-#include <kernel/hardware/input_output/screen/vga.h>
+#include <hardware/input_output/screen/vga.h>
 
 
 /**
