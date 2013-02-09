@@ -9,6 +9,7 @@
 
 #include <hardware/input_output/screen/vga.h>
 #include <hardware/cpu/x86/mmu/gdt.h>
+#include <hardware/cpu/x86/interrupts/idt.h>
 
 /**
  * The kernel entry point. All starts from here!
@@ -16,25 +17,29 @@
 
 void roentgenium_main(void)
 {
-   extern unsigned int magic;
-
-   //extern void *mbd;
-
-   if ( magic != MULTIBOOT_BOOTLOADER_MAGIC )
-   {
-      ; /* Error */
-   }
-   
-   // VGA scren setup
-   vga_clear();
-   vga_set_attributes(FG_BRIGHT_BLUE | BG_BLACK );
-   vga_set_position(34, 0);
-   
-   vga_display_string("Roentgenium\n");
-   
-   // GDT
-   x86_gdt_setup();
-   
-   vga_display_string("CPU: GDT\n");
-
+	extern unsigned int magic;
+	
+	//extern void *mbd;
+	
+	if ( magic != MULTIBOOT_BOOTLOADER_MAGIC )
+	{
+		; /* Error */
+	}
+	
+	// VGA scren setup
+	vga_clear();
+	vga_set_attributes(FG_BRIGHT_BLUE | BG_BLACK );
+	vga_set_position(34, 0);
+	
+	vga_display_string("Roentgenium\n");
+	
+	// GDT
+	x86_gdt_setup();
+	
+	vga_display_string("CPU: GDT\n");
+	
+	// IDT
+	x86_idt_setup();
+	
+	vga_display_string("CPU: IDT\n");
 }

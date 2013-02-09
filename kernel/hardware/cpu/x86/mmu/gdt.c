@@ -46,12 +46,12 @@ void x86_gdt_setup(void)
 	/* GDT's upper limit address */
 	gdtr.limit = sizeof(gdt) - 1;
 
-    /*
-    	Setup CPU's GDT and update the segment registers.
+	/*
+		Setup CPU's GDT and update the segment registers.
     	The CS register may only be updated with a long jump
     	to an absolute address in the given segment
     	(Intel x86 manual, vol 3, section 4.8.1)
-    */
+	*/
 	__asm__ __volatile__ ("lgdt %0	\n\
                  ljmp %1,$1f      \n\
                  1:               \n\
