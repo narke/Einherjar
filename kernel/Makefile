@@ -7,10 +7,10 @@ BOOTLOADER_PATH = ../bootloader
 BUILD_PATH      = ../build
 
 OBJECTS = $(BOOTLOADER_PATH)/multiboot.o	\
-      hardware/input_output/screen/vga.o	\
-      hardware/cpu/x86/mmu/gdt.o 		\
-      hardware/cpu/x86/interrupts/idt.o 	\
-	  startup.o
+	hardware/input_output/screen/vga.o	\
+	hardware/cpu/x86/mmu/gdt.o 		\
+	hardware/cpu/x86/interrupts/idt.o 	\
+	startup.o
 
 KERNEL   = $(BUILD_PATH)/roentgenium.elf
 MULTIBOOT_IMAGE = $(BUILD_PATH)/roentgenium.iso

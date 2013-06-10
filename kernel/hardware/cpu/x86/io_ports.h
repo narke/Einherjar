@@ -35,7 +35,7 @@
         :"=a" (_value)                                          \
         :"Nd" (port)                                            \
         );                                                      \
-  _value;                                                           \
+  _value;                                                 	\
 })
 
 	

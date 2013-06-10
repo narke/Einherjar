@@ -20,13 +20,13 @@ void x86_idt_setup(void)
 		struct x86_idt_entry *idt_entry = global_idt+i;
 		
 		idt_entry->segment_selector = X86_BUILD_SEGMENT_REGISTER_VALUE(0, 
-										FALSE, 
-										KERNEL_CODE_SEGMENT);
-		idt_entry->reserved			= 0;
-		idt_entry->flags			= 0;
-		idt_entry->type				= 0x6; /* Interrupt gate (110b) */
+						FALSE, 
+						KERNEL_CODE_SEGMENT);
+		idt_entry->reserved		= 0;
+		idt_entry->flags		= 0;
+		idt_entry->type			= 0x6; /* Interrupt gate (110b) */
 		idt_entry->operation_size	= 1;   /* 32 bits instructions */
-		idt_entry->zero				= 0;
+		idt_entry->zero			= 0;
 		
 		/* This IDT entry is disabled by default */
 		x86_idt_set_handler(i, (uint32_t)NULL, 0);
@@ -34,7 +34,7 @@ void x86_idt_setup(void)
 	
 
 	idtr.base_address	= (uint32_t) global_idt;
-	idtr.limit			= sizeof(global_idt) - 1;
+	idtr.limit		= sizeof(global_idt) - 1;
 
 	asm volatile ("lidt %0\n"::"m"(idtr):"memory");
 } 

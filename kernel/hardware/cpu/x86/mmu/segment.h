@@ -8,8 +8,8 @@
 #define _SEGMENT_H_
 
 #define NULL_SEGMENT 		0 // Unused by the processor
-#define KERNEL_CODE_SEGMENT 1
-#define KERNEL_DATA_SEGMENT 2
+#define KERNEL_CODE_SEGMENT	1
+#define KERNEL_DATA_SEGMENT 	2
 #define USER_CODE_SEGMENT 	3
 #define USER_DATA_SEGMENT 	4
 #define KERNEL_TSS_SEGMENT	5 // Kernel TSS for CPL3 -> CPL0 privilege change
@@ -29,7 +29,7 @@
  * else 
  */
 #define X86_BUILD_SEGMENT_REGISTER_VALUE(desc_privilege,in_ldt,seg_index) \
-  ( (((desc_privilege) & 0x3)  << 0)  \
+  ( (((desc_privilege) & 0x3)	<< 0)  \
    | ((in_ldt & 1)              << 2) \
    | ((seg_index)               << 3) )
 
