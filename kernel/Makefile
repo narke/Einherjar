@@ -8,7 +8,7 @@ BUILD_PATH      = ../build
 
 OBJECTS = $(BOOTLOADER_PATH)/multiboot.o	\
       hardware/input_output/screen/vga.o	\
-      hardware/cpu/x86/mmu/gdt.o 			\
+      hardware/cpu/x86/mmu/gdt.o 		\
       hardware/cpu/x86/interrupts/idt.o 	\
 	  startup.o
 
@@ -20,11 +20,11 @@ all: kernel cdrom
 kernel: $(KERNEL)
 
 $(KERNEL): $(OBJECTS)
-	@if [ ! -d $(BUILD_PATH) ]; \
-	then 						\
+	@if [ ! -d $(BUILD_PATH) ]; 	\
+	then 				\
 		mkdir $(BUILD_PATH); 	\
-	else 						\
-		echo ""; 				\
+	else 				\
+		echo ""; 		\
 	fi
 	$(LD) $(LDFLAGS) -T ./linker.ld -o $@ $^
 
@@ -47,10 +47,10 @@ clean:
 	$(RM) hardware/input_output/screen/*.o
 	$(RM) hardware/cpu/x86/mmu/*.o
 	$(RM) hardware/cpu/x86/interrupts/*.o
-	@if [ -d $(BUILD_PATH) ]; 			\
-	then 								\
-		rm -R $(BUILD_PATH); 			\
+	@if [ -d $(BUILD_PATH) ]; 		\
+	then 					\
+		rm -R $(BUILD_PATH); 		\
 		echo "rm -R $(BUILD_PATH)" ;	\
-	else 								\
-		echo ""; 						\
+	else 					\
+		echo ""; 			\
 	fi

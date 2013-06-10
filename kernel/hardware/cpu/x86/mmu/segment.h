@@ -18,9 +18,9 @@
  * Builds a value for a segment register
  */
 #define X86_BUILD_SEGMENT_REGISTER_VALUE(descriptor_privilege_level, in_ldt, segment_index) \
-  (  (((descriptor_privilege_level) & 0x3)  << 0) \
-	| (((in_ldt)?1:0)            			<< 2) \
-	| ((segment_index)               		<< 3) )
+  ( (((descriptor_privilege_level) & 0x3)	<< 0) \
+	| (((in_ldt)?1:0)            		<< 2) \
+	| ((segment_index)               	<< 3) )
 #else
 /*
  * Assembler-compliant version.
@@ -29,7 +29,7 @@
  * else 
  */
 #define X86_BUILD_SEGMENT_REGISTER_VALUE(desc_privilege,in_ldt,seg_index) \
-  (  (((desc_privilege) & 0x3)  << 0) \
+  ( (((desc_privilege) & 0x3)  << 0)  \
    | ((in_ldt & 1)              << 2) \
    | ((seg_index)               << 3) )
 

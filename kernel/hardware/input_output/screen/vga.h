@@ -12,21 +12,21 @@
 #define _VGA_H_
 
 /** Video RAM starting adress */ 
-#define SCREEN_START 0xB8000
+#define SCREEN_START 		0xB8000
 /** Video screen page size: 4000 bytes or 4 Ko */
-#define SCREEN_PAGE_SIZE 0xFA0 	
+#define SCREEN_PAGE_SIZE	0xFA0 	
 /** Video screen page maximal offset = SCREEN_START + SCREEN_PAGE_SIZE = 0xB8000 + 0xFA0 = 0xB8FA0 */
 #define SCREEN_PAGE_LIMIT (SCREEN_START + SCREEN_PAGE_SIZE) 
 
 /** Number of maximal lines on a VGA screen */
-#define LINES 25
+#define LINES 	25
 /** Number of maximal columns on a VGA screen */
 #define COLUMNS 80
 
 /** VGA control register */
 #define VGA_CONTROL_REGISTER 	0x3D4
 /** VGA data register */
-#define VGA_DATA_REGISTER 		0x3D5
+#define VGA_DATA_REGISTER 	0x3D5
 
 /* Normal and Dark/Light foreground colors */
 #define FG_BLACK           0

@@ -20,8 +20,8 @@ void x86_idt_setup(void)
 		struct x86_idt_entry *idt_entry = global_idt+i;
 		
 		idt_entry->segment_selector = X86_BUILD_SEGMENT_REGISTER_VALUE(0, 
-				FALSE, 
-				KERNEL_CODE_SEGMENT);
+										FALSE, 
+										KERNEL_CODE_SEGMENT);
 		idt_entry->reserved			= 0;
 		idt_entry->flags			= 0;
 		idt_entry->type				= 0x6; /* Interrupt gate (110b) */
@@ -30,7 +30,7 @@ void x86_idt_setup(void)
 		
 		/* This IDT entry is disabled by default */
 		x86_idt_set_handler(i, (uint32_t)NULL, 0);
-	}
+	}	
 	
 
 	idtr.base_address	= (uint32_t) global_idt;
@@ -55,20 +55,20 @@ uint16_t x86_idt_set_handler(uint32_t index,
 	idt_entry = global_idt + index;
   
 	if ( handler_address != (uint32_t)NULL)
-    {
+	{
 		idt_entry->offset_low  = handler_address & 0xffff;
 		idt_entry->offset_high = (handler_address >> 16) & 0xffff;
 		idt_entry->descriptor_privilidge_level	= lowest_priviledge;
 		idt_entry->present     = 1;	/* Yes, there is a handler */
-    }
+	}
 	else
-    {
+	{
 		/* Disabling IDT entry*/
 		idt_entry->offset_low  = 0;
 		idt_entry->offset_high = 0;
 		idt_entry->descriptor_privilidge_level	= 0;
 		idt_entry->present     = 0;	/* No, there is no handler */
-    }
+	}
 
 	return KERNEL_OK;
 }

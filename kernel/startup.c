@@ -17,29 +17,28 @@
 
 void roentgenium_main(void)
 {
-	extern unsigned int magic;
+    extern unsigned int magic;
+    
+    //extern void *mbd;
+    if ( magic != MULTIBOOT_BOOTLOADER_MAGIC )
+    {
+        ; /* Error */
+    }
+    
+    // VGA scren setup
+    vga_clear();
+    vga_set_attributes(FG_BRIGHT_BLUE | BG_BLACK );
+    vga_set_position(34, 0);
 	
-	//extern void *mbd;
+    vga_display_string("Roentgenium\n");
 	
-	if ( magic != MULTIBOOT_BOOTLOADER_MAGIC )
-	{
-		; /* Error */
-	}
+    // GDT
+    x86_gdt_setup();
 	
-	// VGA scren setup
-	vga_clear();
-	vga_set_attributes(FG_BRIGHT_BLUE | BG_BLACK );
-	vga_set_position(34, 0);
+    vga_display_string("CPU: GDT\n");
 	
-	vga_display_string("Roentgenium\n");
+    // IDT
+    x86_idt_setup();
 	
-	// GDT
-	x86_gdt_setup();
-	
-	vga_display_string("CPU: GDT\n");
-	
-	// IDT
-	x86_idt_setup();
-	
-	vga_display_string("CPU: IDT\n");
+    vga_display_string("CPU: IDT\n");
 }

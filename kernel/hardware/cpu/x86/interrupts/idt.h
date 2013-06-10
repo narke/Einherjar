@@ -19,7 +19,7 @@
 /* Mapping of the IRQ lines in the IDT */
 #define X86_IRQ_BASE	32
 #define X86_IRQ_NUMBER	16
-#define X86_IRQ_MAX	X86_IRQ_BASE + X86_IRQ_NUMBER - 1)
+#define X86_IRQ_MAX	X86_IRQ_BASE + X86_IRQ_NUMBER - 1
 
 /**
  * The IDT register stores the address and size of the IDT.
@@ -72,7 +72,7 @@ void x86_idt_setup(void);
 
 /**
  * Set an interrupt handler with a callback
- * @param index 			Index in IDT
+ * @param index 		Index in IDT
  * @param handler_address	The callback which will be called
  * @param lowest_priviledge	The range value must be 0..3
  * @return KERNEL_OK on success or KERNEL_INVALID_VALUE on failure

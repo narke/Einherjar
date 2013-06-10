@@ -12,19 +12,19 @@
  * Helper macro that builds a Segment descriptor for the virtual
  * 0..4GB addresses to be mapped to the 0..4GB linear addresses.
  */
-#define BUILD_GDT_ENTRY(descr_privilege_level, is_code)				   \
-  ((struct x86_segment_descriptor) {					               \
-      .segment_limit_15_0			= 0xffff,			               \
-      .base_paged_address_15_0		= 0,                               \
-      .base_paged_address_23_16		= 0,                               \
-      .segment_type					= ((is_code)?0xb:0x3),             \
-      .descriptor_type				= 1,  /* 1=Code/Data */            \
-      .descriptor_privilege_level	= ((descr_privilege_level) & 0x3), \
-      .segment_present				= 1,                               \
-      .segment_limit_19_16			= 0xf,                             \
-      .available					= 0,                               \
-      .operand_size					= 1,  /* 32 bits instr/data */     \
-      .granularity					= 1   /* limit is in 4kB Pages */  \
+#define BUILD_GDT_ENTRY(descr_privilege_level, is_code)				\
+  ((struct x86_segment_descriptor) {						\
+      .segment_limit_15_0		= 0xffff,				\
+      .base_paged_address_15_0		= 0,					\
+      .base_paged_address_23_16		= 0,					\
+      .segment_type			= ((is_code)?0xb:0x3),			\
+      .descriptor_type			= 1,  /* 1=Code/Data */			\
+      .descriptor_privilege_level	= ((descr_privilege_level) & 0x3),	\
+      .segment_present			= 1,					\
+      .segment_limit_19_16		= 0xf,                             	\
+      .available			= 0,                               	\
+      .operand_size			= 1,  /* 32 bits instr/data */     	\
+      .granularity			= 1   /* limit is in 4kB Pages */  	\
   })
 
 
