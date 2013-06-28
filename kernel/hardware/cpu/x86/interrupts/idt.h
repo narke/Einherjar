@@ -21,6 +21,9 @@
 #define X86_IRQ_NUMBER	16
 #define X86_IRQ_MAX	X86_IRQ_BASE + X86_IRQ_NUMBER - 1
 
+/** Ring 0 priviledge level*/
+#define RING0	0
+
 /**
  * The IDT register stores the address and size of the IDT.
  *
@@ -42,27 +45,23 @@ struct x86_idtr
 struct x86_idt_entry
 {
 	/* Low dword */
-	/** 15..0, offset of the routine in the segment */
+	/** 0..15, offset of the routine in the segment */
 	uint16_t offset_low;
-	/** 31..16, the ID of the segment */
+	/** 16..31, the ID of the segment */
 	uint16_t segment_selector;
 
 	/* High dword */
-	/** 4..0 */
-	uint8_t reserved:5;
-	/** 7..5 */
-	uint8_t flags:3;
-	/** 10..8 (interrupt gate, trap gate...) */
-	uint8_t type:3;   
-	/** 11 (0=16bits instructions, 1=32bits instructions) */    
-	uint8_t operation_size:1;
-	/** 12 */
-	uint8_t zero:1;
-	/** 14..13 */
+	/** 32..39 */
+	uint8_t unused:8;
+	/** 40..43 (interrupt gate, trap gate...) */
+	uint8_t gate_type:4;   
+	/** 44 */
+	uint8_t storage_segment:1;
+	/** 45,46 */
 	uint8_t descriptor_privilidge_level:2;
-	/** 15 */
+	/** 47 */
 	uint8_t present:1;
-	/** 31..16 */ 
+	/** 48..63 */ 
 	uint16_t offset_high;
 } __attribute__((packed));
 

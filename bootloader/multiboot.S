@@ -1,6 +1,7 @@
-/* Credit: http://wiki.osdev.org/Bare_Bones */
+# @see http://wiki.osdev.org/Bare_Bones
+# Slightly modified by me
 
-.global loader                          # making entry point visible to linker
+.global multiboot_entry
 
 # setting up the Multiboot header - see GRUB docs for details
 .set ALIGN,    1<<0                     # align loaded modules on page boundaries
@@ -8,27 +9,39 @@
 .set FLAGS,    ALIGN | MEMINFO          # this is the Multiboot 'flag' field
 .set MAGIC,    0x1BADB002               # 'magic number' lets bootloader find the header
 .set CHECKSUM, -(MAGIC + FLAGS)         # checksum required
+.set STACK_SIZE, 0x4000			# our stack size is 16KiB
 
+
+# The multiboot header must come first.
+.section ".multiboot"
+
+# Multiboot header must be aligned on a 4-byte boundary
 .align 4
+
+multiboot_header:
 .long MAGIC
 .long FLAGS
-.long CHECKSUM
+.long -(MAGIC + FLAGS)
+
+# The beginning of our kernel code
+.text
+
+
+multiboot_entry:
+	movl $(stack + STACK_SIZE), %esp	# set up the stack
+	movl  %eax, magic			# Multiboot magic number
+	movl  %ebx, mbd				# Multiboot data structure
+
+	call roentgenium_main			# calling the kernel
+
+hang:
+	hlt					# something bad happened, machine halted
+	jmp hang
+
+
 
 # reserve initial kernel stack space
-stack_bottom:
-.skip 16384                             # reserve 16 KiB stack
-stack_top:
-.comm  mbd, 4                           # we will use this in kmain
-.comm  magic, 4                         # we will use this in kmain
-
-loader:
-    movl  $stack_top, %esp              # set up the stack, stacks grow downwards
-    movl  %eax, magic                   # Multiboot magic number
-    movl  %ebx, mbd                     # Multiboot data structure
-
-    call  roentgenium_main              # call kernel proper
-
-    cli
-hang:
-    hlt                                 # halt machine should kernel return
-    jmp   hang
+stack:
+.skip STACK_SIZE	# reserve 16 KiB stack
+.comm  mbd, 4		# we will use this in kernel's main
+.comm  magic, 4		# we will use this in kernel's main

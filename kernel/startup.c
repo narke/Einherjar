@@ -5,11 +5,15 @@
  * Roentgenium's kernel's main file
  */
 
-#define MULTIBOOT_BOOTLOADER_MAGIC	0x2BADB002
+#define MULTIBOOT_BOOTLOADER_MAGIC 0x2BADB002
 
+#include <libraries/return_values.h>
 #include <hardware/input_output/screen/vga.h>
 #include <hardware/cpu/x86/mmu/gdt.h>
 #include <hardware/cpu/x86/interrupts/idt.h>
+#include <hardware/cpu/x86/interrupts/isr.h>
+#include <hardware/cpu/x86/interrupts/irq.h>
+#include <hardware/timer/pit.h>
 
 /**
  * The kernel entry point. All starts from here!
@@ -18,7 +22,9 @@
 void roentgenium_main(void)
 {
     extern unsigned int magic;
-    
+
+    uint16_t ret;
+ 
     //extern void *mbd;
     if ( magic != MULTIBOOT_BOOTLOADER_MAGIC )
     {
@@ -35,10 +41,34 @@ void roentgenium_main(void)
     // GDT
     x86_gdt_setup();
 	
-    vga_display_string("CPU: GDT\n");
+    vga_display_string("CPU: GDT");
 	
     // IDT
     x86_idt_setup();
 	
-    vga_display_string("CPU: IDT\n");
+    vga_display_string(" | IDT");
+
+    // Exceptions
+    x86_exceptions_setup();
+
+    vga_display_string(" | Exceptions");
+
+    // IRQs
+    x86_irq_setup();
+
+    vga_display_string(" | IRQs");
+
+    // Timer: Raise IRQ0 at 100 Hz rate
+    ret = x86_pit_set_frequency(100);
+
+    if ( ret != KERNEL_OK )
+    {
+	vga_display_string("Kernel Panic: PIT\n");
+	return;
+    }
+
+    x86_irq_set_handler(0, timer_interrupt_handler);
+
+    // Enable interrupts
+    __asm__ __volatile__ ("sti");
 }

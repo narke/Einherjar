@@ -10,6 +10,11 @@ OBJECTS = $(BOOTLOADER_PATH)/multiboot.o	\
 	hardware/input_output/screen/vga.o	\
 	hardware/cpu/x86/mmu/gdt.o 		\
 	hardware/cpu/x86/interrupts/idt.o 	\
+	hardware/cpu/x86/interrupts/isr_stubs.o	\
+	hardware/cpu/x86/interrupts/isr.o	\
+	hardware/cpu/x86/interrupts/irq_stubs.o	\
+	hardware/cpu/x86/interrupts/irq.o	\
+	hardware/timer/pit.o			\
 	startup.o
 
 KERNEL   = $(BUILD_PATH)/roentgenium.elf
@@ -23,8 +28,6 @@ $(KERNEL): $(OBJECTS)
 	@if [ ! -d $(BUILD_PATH) ]; 	\
 	then 				\
 		mkdir $(BUILD_PATH); 	\
-	else 				\
-		echo ""; 		\
 	fi
 	$(LD) $(LDFLAGS) -T ./linker.ld -o $@ $^
 
@@ -33,6 +36,9 @@ $(KERNEL): $(OBJECTS)
 
 %.o: %.S
 	$(CC) -I$(PWD) -c $< $(CFLAGS) -o $@
+
+%.o: %.asm
+	nasm -f elf $<
 
 cdrom: 
 	mv $(KERNEL) $(BOOTLOADER_PATH)/grub/
@@ -47,10 +53,9 @@ clean:
 	$(RM) hardware/input_output/screen/*.o
 	$(RM) hardware/cpu/x86/mmu/*.o
 	$(RM) hardware/cpu/x86/interrupts/*.o
+	$(RM) hardware/timer/*.o
 	@if [ -d $(BUILD_PATH) ]; 		\
 	then 					\
 		rm -R $(BUILD_PATH); 		\
 		echo "rm -R $(BUILD_PATH)" ;	\
-	else 					\
-		echo ""; 			\
 	fi

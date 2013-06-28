@@ -13,11 +13,11 @@
 #define _GDT_H_
 
 
-/** Represents a segment descriptor data type */
-struct x86_segment_descriptor
+/** Describes a GDT entry */
+struct x86_gdt_entry
 {
 	/* Lowest dword */
-  	/** Segment Limit: bits 15..0 */
+  	/** Segment Limit: bits 15:0 */
   	uint16_t segment_limit_15_0;
   	/** Base Address: bits 15..0  */
   	uint16_t base_paged_address_15_0;

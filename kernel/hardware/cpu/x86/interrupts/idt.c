@@ -15,25 +15,25 @@ void x86_idt_setup(void)
 	struct x86_idtr idtr;
 	uint16_t i;
 	
-	for ( i = 0; i < INTERRUPTIONS_MAX_LIMIT; i++ )
+	for (i = 0; i < INTERRUPTIONS_MAX_LIMIT; i++)
 	{
 		struct x86_idt_entry *idt_entry = global_idt+i;
 		
-		idt_entry->segment_selector = X86_BUILD_SEGMENT_REGISTER_VALUE(0, 
-						FALSE, 
-						KERNEL_CODE_SEGMENT);
-		idt_entry->reserved		= 0;
-		idt_entry->flags		= 0;
-		idt_entry->type			= 0x6; /* Interrupt gate (110b) */
-		idt_entry->operation_size	= 1;   /* 32 bits instructions */
-		idt_entry->zero			= 0;
+		idt_entry->segment_selector 	= 0x08;
+		idt_entry->unused		= 0;
+		
+		/* = 0xE for i386 32-bit interrupt gate */
+		idt_entry->gate_type		= 0xE;
+		
+		/* = 0 for interrupt gates */
+		idt_entry->storage_segment	= 0;
 		
 		/* This IDT entry is disabled by default */
 		x86_idt_set_handler(i, (uint32_t)NULL, 0);
 	}	
 	
 
-	idtr.base_address	= (uint32_t) global_idt;
+	idtr.base_address	= (uint32_t)global_idt;
 	idtr.limit		= sizeof(global_idt) - 1;
 
 	asm volatile ("lidt %0\n"::"m"(idtr):"memory");
@@ -54,8 +54,9 @@ uint16_t x86_idt_set_handler(uint32_t index,
   
 	idt_entry = global_idt + index;
   
-	if ( handler_address != (uint32_t)NULL)
+	if (handler_address != (uint32_t)NULL)
 	{
+		/* Enabling IDT entry*/
 		idt_entry->offset_low  = handler_address & 0xffff;
 		idt_entry->offset_high = (handler_address >> 16) & 0xffff;
 		idt_entry->descriptor_privilidge_level	= lowest_priviledge;

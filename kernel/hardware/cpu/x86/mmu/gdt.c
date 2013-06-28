@@ -13,7 +13,7 @@
  * 0..4GB addresses to be mapped to the 0..4GB linear addresses.
  */
 #define BUILD_GDT_ENTRY(descr_privilege_level, is_code)				\
-  ((struct x86_segment_descriptor) {						\
+  ((struct x86_gdt_entry) {						\
       .segment_limit_15_0		= 0xffff,				\
       .base_paged_address_15_0		= 0,					\
       .base_paged_address_23_16		= 0,					\
@@ -28,8 +28,8 @@
   })
 
 
-static struct x86_segment_descriptor gdt[] = {
-	[NULL_SEGMENT]  = (struct x86_segment_descriptor){ 0, },
+static struct x86_gdt_entry gdt[] = {
+	[NULL_SEGMENT]  = (struct x86_gdt_entry){ 0, },
 	[KERNEL_CODE_SEGMENT] = BUILD_GDT_ENTRY(0, 1),
 	[KERNEL_DATA_SEGMENT] = BUILD_GDT_ENTRY(0, 0),
 	[USER_CODE_SEGMENT]   = BUILD_GDT_ENTRY(3, 1),

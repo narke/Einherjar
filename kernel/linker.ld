@@ -1,8 +1,19 @@
-ENTRY (loader)
+ENTRY (multiboot_entry)
 
 SECTIONS
 {
+    /* Roentgenium is loaded at 0x00100000 */
     . = 0x00100000;
+    
+    .multiboot :
+    {
+        /* The multiboot header must come within the first 8K of
+	our kernel  */
+	*(.multiboot);
+	
+	/* 32 bit aligned as required by the multiboot specs */	
+	LONG(0);
+    }
 
     .text ALIGN (0x1000) :
     {
