@@ -34,9 +34,6 @@ $(KERNEL): $(OBJECTS)
 %.o: %.c
 	$(CC) -c $< -o $@ $(CFLAGS)
 
-%.o: %.S
-	$(CC) -I$(PWD) -c $< $(CFLAGS) -o $@
-
 %.o: %.asm
 	nasm -f elf $<
 
