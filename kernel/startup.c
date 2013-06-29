@@ -14,6 +14,7 @@
 #include <hardware/cpu/x86/interrupts/isr.h>
 #include <hardware/cpu/x86/interrupts/irq.h>
 #include <hardware/timer/pit.h>
+#include <hardware/input_output/keyboard/keyboard.h>
 
 /**
  * The kernel entry point. All starts from here!
@@ -25,7 +26,6 @@ void roentgenium_main(void)
 
     uint16_t ret;
  
-    //extern void *mbd;
     if ( magic != MULTIBOOT_BOOTLOADER_MAGIC )
     {
         ; /* Error */
@@ -67,7 +67,11 @@ void roentgenium_main(void)
 	return;
     }
 
-    x86_irq_set_handler(0, timer_interrupt_handler);
+    // Timer interrupt, momentarily disabled
+    //x86_irq_set_handler(IRQ_TIMER, timer_interrupt_handler);
+
+    // Keyboard interrupt
+    x86_irq_set_handler(IRQ_KEYBOARD, keyboard_interrupt_handler);
 
     // Enable interrupts
     __asm__ __volatile__ ("sti");

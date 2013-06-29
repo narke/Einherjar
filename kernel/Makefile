@@ -6,15 +6,16 @@ LDFLAGS = --warn-common -melf_i386 --strip-all
 BOOTLOADER_PATH = ../bootloader
 BUILD_PATH      = ../build
 
-OBJECTS = $(BOOTLOADER_PATH)/multiboot.o	\
-	hardware/input_output/screen/vga.o	\
-	hardware/cpu/x86/mmu/gdt.o 		\
-	hardware/cpu/x86/interrupts/idt.o 	\
-	hardware/cpu/x86/interrupts/isr_stubs.o	\
-	hardware/cpu/x86/interrupts/isr.o	\
-	hardware/cpu/x86/interrupts/irq_stubs.o	\
-	hardware/cpu/x86/interrupts/irq.o	\
-	hardware/timer/pit.o			\
+OBJECTS = $(BOOTLOADER_PATH)/multiboot.o		\
+	hardware/input_output/screen/vga.o		\
+	hardware/cpu/x86/mmu/gdt.o 			\
+	hardware/cpu/x86/interrupts/idt.o 		\
+	hardware/cpu/x86/interrupts/isr_stubs.o		\
+	hardware/cpu/x86/interrupts/isr.o		\
+	hardware/cpu/x86/interrupts/irq_stubs.o		\
+	hardware/cpu/x86/interrupts/irq.o		\
+	hardware/timer/pit.o				\
+	hardware/input_output/keyboard/keyboard.o	\
 	startup.o
 
 KERNEL   = $(BUILD_PATH)/roentgenium.elf
@@ -51,6 +52,7 @@ clean:
 	$(RM) hardware/cpu/x86/mmu/*.o
 	$(RM) hardware/cpu/x86/interrupts/*.o
 	$(RM) hardware/timer/*.o
+	$(RM) hardware/input_output/keyboard/*.o
 	@if [ -d $(BUILD_PATH) ]; 		\
 	then 					\
 		rm -R $(BUILD_PATH); 		\
