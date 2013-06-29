@@ -4,9 +4,9 @@
 #include <libraries/types.h>
 
 #define PIC_MASTER_COMMAND 0x20
-#define PIC_MASTER_DATA	 	0x21
+#define PIC_MASTER_DATA	   0x21
 #define PIC_SLAVE_COMMAND  0xA0
-#define PIC_SLAVE_DATA	 	0xA1
+#define PIC_SLAVE_DATA	   0xA1
 
 extern void irq0();
 extern void irq1();
@@ -91,23 +91,23 @@ void x86_irq_setup(void)
 {
     pic_setup();
 
-    x86_idt_set_handler(32, (uint32_t)irq0, 0);
-    x86_idt_set_handler(33, (uint32_t)irq1, 0);
-    x86_idt_set_handler(34, (uint32_t)irq2, 0);
-    x86_idt_set_handler(35, (uint32_t)irq3, 0);
-    x86_idt_set_handler(36, (uint32_t)irq4, 0);
-    x86_idt_set_handler(37, (uint32_t)irq5, 0);
-    x86_idt_set_handler(38, (uint32_t)irq6, 0);
-    x86_idt_set_handler(39, (uint32_t)irq7, 0);
+    x86_idt_set_handler(32, (uint32_t)irq0, RING0);
+    x86_idt_set_handler(33, (uint32_t)irq1, RING0);
+    x86_idt_set_handler(34, (uint32_t)irq2, RING0);
+    x86_idt_set_handler(35, (uint32_t)irq3, RING0);
+    x86_idt_set_handler(36, (uint32_t)irq4, RING0);
+    x86_idt_set_handler(37, (uint32_t)irq5, RING0);
+    x86_idt_set_handler(38, (uint32_t)irq6, RING0);
+    x86_idt_set_handler(39, (uint32_t)irq7, RING0);
 
-    x86_idt_set_handler(40, (uint32_t)irq8, 0);
-    x86_idt_set_handler(41, (uint32_t)irq9, 0);
-    x86_idt_set_handler(42, (uint32_t)irq10, 0);
-    x86_idt_set_handler(43, (uint32_t)irq11, 0);
-    x86_idt_set_handler(44, (uint32_t)irq12, 0);
-    x86_idt_set_handler(45, (uint32_t)irq13, 0);
-    x86_idt_set_handler(46, (uint32_t)irq14, 0);
-    x86_idt_set_handler(47, (uint32_t)irq15, 0);
+    x86_idt_set_handler(40, (uint32_t)irq8,  RING0);
+    x86_idt_set_handler(41, (uint32_t)irq9,  RING0);
+    x86_idt_set_handler(42, (uint32_t)irq10, RING0);
+    x86_idt_set_handler(43, (uint32_t)irq11, RING0);
+    x86_idt_set_handler(44, (uint32_t)irq12, RING0);
+    x86_idt_set_handler(45, (uint32_t)irq13, RING0);
+    x86_idt_set_handler(46, (uint32_t)irq14, RING0);
+    x86_idt_set_handler(47, (uint32_t)irq15, RING0);
 }
 
 
@@ -129,7 +129,6 @@ void irq_handler(struct regs *r)
     void (*handler)(struct regs *r);
 
     /* Find out if we have a custom handler to run for this
-
     *  IRQ, and then finally, run it */
     handler = irq_routines[r->interrupt_number - 32];
 

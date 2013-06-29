@@ -39,7 +39,7 @@ hang:
 	jmp hang
 
 
-
+section .bss nobits align=4
 ; reserve initial kernel stack space
 stack:
 resb STACK_SIZE		; reserve 16 KiB stack
