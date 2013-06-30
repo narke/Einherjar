@@ -7,14 +7,14 @@
 
 #define MULTIBOOT_BOOTLOADER_MAGIC 0x2BADB002
 
-#include <libraries/return_values.h>
-#include <hardware/input_output/screen/vga.h>
-#include <hardware/cpu/x86/mmu/gdt.h>
-#include <hardware/cpu/x86/interrupts/idt.h>
-#include <hardware/cpu/x86/interrupts/isr.h>
-#include <hardware/cpu/x86/interrupts/irq.h>
-#include <hardware/timer/pit.h>
-#include <hardware/input_output/keyboard/keyboard.h>
+#include <arch/all/return_values.h>
+#include <arch/x86-pc/input_output/screen/vga.h>
+#include <arch/x86/mmu/gdt.h>
+#include <arch/x86/interrupts/idt.h>
+#include <arch/x86/interrupts/isr.h>
+#include <arch/x86/interrupts/irq.h>
+#include <arch/x86-pc/timer/pit.h>
+#include <arch/x86-pc/input_output/keyboard/keyboard.h>
 
 /**
  * The kernel entry point. All starts from here!

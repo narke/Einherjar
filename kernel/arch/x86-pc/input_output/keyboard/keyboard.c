@@ -1,13 +1,14 @@
 /**
  * @file keyboard.c
  * @author Konstantin Tcholokachvili
+ * @date 2007, 2013
  * Keyboard handling
  */
 
 #include "keyboard.h"
-#include <libraries/types.h>
-#include <hardware/cpu/x86/io_ports.h>
-#include <hardware/input_output/screen/vga.h>
+#include <arch/all/types.h>
+#include <arch/x86/io_ports.h>
+#include <arch/x86-pc/input_output/screen/vga.h>
 
 
 uchar_t keymap[] = {

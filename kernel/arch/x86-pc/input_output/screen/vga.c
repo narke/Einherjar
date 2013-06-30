@@ -1,12 +1,12 @@
 /** 
  * @file vga.c
- * @date 2007
  * @author Konstantin Tcholokachvili
+ * @date 2007
  * VGA screen handling functions 
  */ 
 
 #include "vga.h"
-#include "../keyboard/keyboard.h"
+#include <arch/x86-pc/input_output/keyboard/keyboard.h>
 
 
 /** Position X on the screen */

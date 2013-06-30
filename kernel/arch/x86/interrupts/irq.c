@@ -1,7 +1,14 @@
+/**
+ * @file irq.c
+ * @author Konstantin Tcholokachvili
+ * @date 2013
+ * IRQs routines and PIC handling 
+ */
+
 #include "irq.h"
-#include <hardware/cpu/x86/io_ports.h>
-#include <hardware/cpu/x86/interrupts/idt.h>
-#include <libraries/types.h>
+#include <arch/x86/io_ports.h>
+#include <arch/x86/interrupts/idt.h>
+#include <arch/all/types.h>
 
 #define PIC_MASTER_COMMAND 0x20
 #define PIC_MASTER_DATA	   0x21

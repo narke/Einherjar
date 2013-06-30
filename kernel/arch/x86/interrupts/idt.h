@@ -10,7 +10,7 @@
 #ifndef _IDT_H_
 #define _IDT_H_
 
-#include <libraries/types.h>
+#include <arch/all/types.h>
 
 /** Maximum number of interruptions which can be handled */
 #define INTERRUPTIONS_MAX_LIMIT	256

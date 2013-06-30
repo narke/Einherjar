@@ -1,7 +1,14 @@
+/**
+ * @file pit.c
+ * @author Konstantin Tcholokachvili
+ * @date 2013
+ * Programmable Interrupt Timer
+ */
+
 #include "pit.h"
-#include <libraries/return_values.h>
-#include <hardware/cpu/x86/io_ports.h>
-#include <hardware/input_output/screen/vga.h>
+#include <arch/all/return_values.h>
+#include <arch/x86/io_ports.h>
+#include <arch/x86-pc/input_output/screen/vga.h>
 
 /** 82C54's clock's maximal frequency */
 #define MAX_FREQUENCY 1193180

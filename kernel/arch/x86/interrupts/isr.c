@@ -1,6 +1,13 @@
-#include <hardware/cpu/x86/interrupts/idt.h>
-#include <hardware/input_output/screen/vga.h>
-#include <libraries/types.h>
+/**
+ * @file isr.c
+ * @author Konstantin Tcholokachvili
+ * @date 2013
+ * Exceptions handling
+ */
+
+#include <arch/x86/interrupts/idt.h>
+#include <arch/x86-pc/input_output/screen/vga.h>
+#include <arch/all/types.h>
 #include "isr.h"
 
 #define EXCEPTIONS_NUMBER 32

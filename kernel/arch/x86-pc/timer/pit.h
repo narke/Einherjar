@@ -1,8 +1,15 @@
+/**
+ * @file pit.h
+ * @author Konstantin Tcholokachvili
+ * @date 2013
+ * Programmable Interrupt Timer
+ */
+
 #ifndef _PIT_H_
 #define _PIT_H_
 
-#include <libraries/types.h>
-#include <hardware/cpu/x86/registers.h>
+#include <arch/all/types.h>
+#include <arch/x86/registers.h>
 
 /**
  * @file pit.h Programmable Interval Timer

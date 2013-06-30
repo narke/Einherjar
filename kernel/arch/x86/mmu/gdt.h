@@ -7,7 +7,7 @@
  * @date 2013
  */
 
-#include <libraries/types.h>
+#include <arch/all/types.h>
 
 #ifndef _GDT_H_
 #define _GDT_H_
