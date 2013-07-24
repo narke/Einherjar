@@ -6,8 +6,8 @@
  */
 
 #include "irq.h"
-#include <arch/x86/io_ports.h>
-#include <arch/x86/interrupts/idt.h>
+#include <arch/x86-all/io_ports.h>
+#include <arch/x86-all/interrupts/idt.h>
 #include <arch/all/types.h>
 
 #define PIC_MASTER_COMMAND 0x20

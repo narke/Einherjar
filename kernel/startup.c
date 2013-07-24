@@ -7,12 +7,12 @@
 
 #define MULTIBOOT_BOOTLOADER_MAGIC 0x2BADB002
 
-#include <arch/all/return_values.h>
+#include <arch/all/status.h>
 #include <arch/x86-pc/input_output/screen/vga.h>
-#include <arch/x86/mmu/gdt.h>
-#include <arch/x86/interrupts/idt.h>
-#include <arch/x86/interrupts/isr.h>
-#include <arch/x86/interrupts/irq.h>
+#include <arch/x86-all/mmu/gdt.h>
+#include <arch/x86-all/interrupts/idt.h>
+#include <arch/x86-all/interrupts/isr.h>
+#include <arch/x86-all/interrupts/irq.h>
 #include <arch/x86-pc/timer/pit.h>
 #include <arch/x86-pc/input_output/keyboard/keyboard.h>
 

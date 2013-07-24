@@ -5,8 +5,8 @@
  */
 
 #include "idt.h"
-#include <arch/x86/mmu/segment.h>
-#include <arch/all/return_values.h>
+#include <arch/x86-all/mmu/segment.h>
+#include <arch/all/status.h>
 
 static struct x86_idt_entry global_idt[INTERRUPTIONS_MAX_LIMIT];
 

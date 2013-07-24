@@ -6,8 +6,8 @@
  */
 
 #include "pit.h"
-#include <arch/all/return_values.h>
-#include <arch/x86/io_ports.h>
+#include <arch/all/status.h>
+#include <arch/x86-all/io_ports.h>
 #include <arch/x86-pc/input_output/screen/vga.h>
 
 /** 82C54's clock's maximal frequency */

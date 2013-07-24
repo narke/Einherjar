@@ -7,7 +7,7 @@
 
 #include "keyboard.h"
 #include <arch/all/types.h>
-#include <arch/x86/io_ports.h>
+#include <arch/x86-all/io_ports.h>
 #include <arch/x86-pc/input_output/screen/vga.h>
 
 

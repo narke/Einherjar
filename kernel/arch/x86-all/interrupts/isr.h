@@ -8,7 +8,7 @@
 #ifndef _ISR_H_
 #define _ISR_H_
 
-#include <arch/x86/registers.h>
+#include <arch/x86-all/registers.h>
 
 void x86_exceptions_setup(void);
 

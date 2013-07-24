@@ -8,12 +8,12 @@ BUILD_PATH      = ../build
 
 OBJECTS = $(BOOTLOADER_PATH)/multiboot.o		\
 	arch/x86-pc/input_output/screen/vga.o		\
-	arch/x86/mmu/gdt.o 			\
-	arch/x86/interrupts/idt.o 		\
-	arch/x86/interrupts/isr_stubs.o		\
-	arch/x86/interrupts/isr.o		\
-	arch/x86/interrupts/irq_stubs.o		\
-	arch/x86/interrupts/irq.o		\
+	arch/x86-all/mmu/gdt.o 				\
+	arch/x86-all/interrupts/idt.o 			\
+	arch/x86-all/interrupts/isr_stubs.o		\
+	arch/x86-all/interrupts/isr.o			\
+	arch/x86-all/interrupts/irq_stubs.o		\
+	arch/x86-all/interrupts/irq.o			\
 	arch/x86-pc/timer/pit.o				\
 	arch/x86-pc/input_output/keyboard/keyboard.o	\
 	startup.o
@@ -49,8 +49,8 @@ clean:
 	$(RM) $(BOOTLOADER_PATH)/iso/roentgenium.elf
 	$(RM) *.o
 	$(RM) arch/x86-pc/input_output/screen/*.o
-	$(RM) arch/x86/mmu/*.o
-	$(RM) arch/x86/interrupts/*.o
+	$(RM) arch/x86-all/mmu/*.o
+	$(RM) arch/x86-all/interrupts/*.o
 	$(RM) arch/x86-pc/timer/*.o
 	$(RM) arch/x86-pc/input_output/keyboard/*.o
 	@if [ -d $(BUILD_PATH) ]; 		\

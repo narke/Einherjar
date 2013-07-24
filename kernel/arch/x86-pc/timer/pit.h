@@ -9,7 +9,7 @@
 #define _PIT_H_
 
 #include <arch/all/types.h>
-#include <arch/x86/registers.h>
+#include <arch/x86-all/registers.h>
 
 /**
  * @file pit.h Programmable Interval Timer

@@ -8,7 +8,7 @@
 #ifndef _IRQ_H_
 #define _IRQ_H_
 
-#include <arch/x86/registers.h>
+#include <arch/x86-all/registers.h>
 
 #define IRQ_TIMER	  0
 #define IRQ_KEYBOARD	  1

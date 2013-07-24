@@ -5,7 +5,7 @@
  * Exceptions handling
  */
 
-#include <arch/x86/interrupts/idt.h>
+#include <arch/x86-all/interrupts/idt.h>
 #include <arch/x86-pc/input_output/screen/vga.h>
 #include <arch/all/types.h>
 #include "isr.h"
