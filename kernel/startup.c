@@ -1,7 +1,8 @@
 /**
- * @file startup.c
  * @author Konstantin Tcholokachvili
  * @date 2013
+ * @license MIT License
+ * 
  * Roentgenium's kernel's main file
  */
 

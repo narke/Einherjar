@@ -2,6 +2,8 @@
  * @file keyboard.c
  * @author Konstantin Tcholokachvili
  * @date 2007, 2013
+ * @license MIT License
+ *
  * Keyboard handling
  */
 

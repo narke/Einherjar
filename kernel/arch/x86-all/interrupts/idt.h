@@ -1,14 +1,16 @@
+#ifndef _IDT_H_
+#define _IDT_H_
+
 /**
  * @file idt.h
  * @author Konstantin Tcholokachvili
- * @see IA-32 Intel Architecture Software Developer's Manual, Volume 3 [Chapter 3]
- * @note The chosen segmentation mechanism model is Basic Flat Model as
- * paging allows closer control
  * @date 2013
+ * @license MIT License
+ *
+ * @see IA-32 Intel Architecture Software Developer's Manual, Volume 3 [Chapter 3]
+ * @note The chosen segmentation mechanism model is Basic Flat Model as Paging allows closer control
  */
 
-#ifndef _IDT_H_
-#define _IDT_H_
 
 #include <arch/all/types.h>
 
@@ -80,4 +82,4 @@ uint16_t x86_idt_set_handler(uint32_t index,
 			      uint32_t handler_address,
 			      uint32_t lowest_priviledge);
 
-#endif 
+#endif // _IDT_H_

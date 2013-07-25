@@ -1,11 +1,13 @@
-#ifndef _RETURN_VALUES_H_
-#define _RETURN_VALUES_H_
-
+#ifndef _STATUS_H_
+#define _STATUS_H_
 
 /**
- * @file return_values.h
+ * @file status.h
  * @author Konstantin Tcholokachvili
  * @date 2007, 2011, 2013
+ * @license MIT License
+ * 
+ * Values which are returned from kernel functions
  */
  
  
@@ -19,4 +21,4 @@
 #define KERNEL_UNRESOLVED_VIRTUAL_ADDRESS   7
 #define KERNEL_INTERNAL_FATAL_ERROR         255 
 
-#endif // _RETURN_VALUES_H_
+#endif // _STATUS_H_

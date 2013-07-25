@@ -1,7 +1,8 @@
 /** 
- * @file vga.c
  * @author Konstantin Tcholokachvili
  * @date 2007, 2013
+ * @license MIT License
+ * 
  * VGA screen handling functions 
  */ 
 
@@ -17,11 +18,6 @@ uint8_t g_position_y;
 uint8_t g_attributes; 
 
 
-/**
- * @brief Clears the screen
- * @param None
- * @return None
- */
 void vga_clear(void)
 {
 	uint8_t *video;
@@ -40,12 +36,6 @@ void vga_clear(void)
 }
 
 
-
-/**
- * @brief Scrolls up the screen by X lines
- * @param nb_lines describes number of lines to be scrolled
- * @return None
- */
 void vga_scroll_up(uint8_t nb_lines)
 {
 	uint8_t *video;
@@ -67,12 +57,6 @@ void vga_scroll_up(uint8_t nb_lines)
 }
 
 
-/**
- * @brief Set the starting position to display a character
- * @param x Position X
- * @param y Position Y
- * @return None
- */
 void vga_set_position(uint8_t x, uint8_t y)
 {
 	g_position_x = x;
@@ -80,22 +64,12 @@ void vga_set_position(uint8_t x, uint8_t y)
 }
 
 
-/**
- * @brief Set the starting position to display a character
- * @param attributes Attributes of VGA: foreground color/background color/blinking
- * @return None
- */
 void vga_set_attributes(uint8_t attributes)
 {
 	g_attributes = attributes;
 }
 
 
-/**
- * @brief Displays a string
- * @param str
- * @return None
- */
 void vga_display_string(const char* str)
 {
 	while(*str != 0)
@@ -105,11 +79,6 @@ void vga_display_string(const char* str)
 }
 
 
-/**
- * @brief Displays a character
- * @param character
- * @return None
- */
 void vga_display_character(uchar_t character)
 {
 	uint8_t* video;

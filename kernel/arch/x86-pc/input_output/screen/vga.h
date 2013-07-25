@@ -1,15 +1,18 @@
+#ifndef _VGA_H_
+#define _VGA_H_
+
 /** 
  * @file vga.h
  * @author Konstantin Tcholokachvili
- * An VGA-capable screen and constants definitions
- * @date 2007
+ * @date 2007, 2013
+ * @license MIT License
+ *
  * @see http://sos.enix.org [FR]
  * @see http://webster.cs.ucr.edu/AoA/DOS/ch23/CH23-1.html [EN]
- * @see http://my.execpc.com/~geezer [EN] 
- */ 
-
-#ifndef _VGA_H_
-#define _VGA_H_
+ * @see http://my.execpc.com/~geezer [EN]
+ *
+ * VGA-capable screen constants and functions
+ */
 
 /** Video RAM starting adress */ 
 #define SCREEN_START 		0xB8000
@@ -63,22 +66,38 @@
  
 /** VGA-capable screen driver */
 	
-/** Clear the screen (by setting it black) */
+/** Clear the screen (by setting it to black) */
 void vga_clear(void);
 
-/** Scroll up the screen by a given number of lines */
+/** Scroll up the screen by a given number of lines 
+ *
+ * @param nb_lines Number of lines to scroll up
+ */
 void vga_scroll_up(uint8_t nb_lines);
 
-/** Set the X and Y position where the next string would be displayed */
+/** Set the X and Y position where the next string would be displayed 
+ *
+ * @param x X position
+ * @param y Y position
+ */
 void vga_set_position(uint8_t x, uint8_t y);
 
-/** Set attributes: foreground/background colors and blinking */
+/** Set attributes: foreground/background colors and blinking
+ *
+ * @param attributes Attributes byte corresponding to foreground/background colors and blinking
+ */
 void vga_set_attributes(uint8_t attributes);
 
-/** Displays a formatted string */							
+/** Displays a formatted string 
+ * 
+ * @param str String to display
+ */							
 void vga_display_string(const char* str);
 
-/** Displays a character */
+/** Displays a character 
+ *
+ * @param character Character to display or a special character to handle
+ */
 void vga_display_character(uchar_t character);
 
-#endif
+#endif // _VGA_H_

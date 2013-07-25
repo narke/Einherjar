@@ -1,7 +1,8 @@
 /**
- * @file pit.c
  * @author Konstantin Tcholokachvili
  * @date 2013
+ * @license MIT License
+ * 
  * Programmable Interrupt Timer
  */
 

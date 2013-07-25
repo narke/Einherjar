@@ -1,7 +1,9 @@
 /**
- * @file idt.c
  * @author Konstantin Tcholokachvili
  * @date 2013
+ * @license MIT License
+ *
+ * Handling interruptions descriptor table
  */
 
 #include "idt.h"

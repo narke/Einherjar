@@ -1,3 +1,11 @@
+/**
+* @author Konstantin Tcholokachvili
+* @date 2013
+* @license MIT License
+*
+* Tiny C library for the kernel land
+*/
+
 #include <arch/x86-pc/input_output/screen/vga.h>
 #include "klibc.h"
 
@@ -61,9 +69,9 @@ static void itoa(int value, char *str, int base)
 }
 
 
-uint32_t printf(const char *format, ...)
+void printf(const char *format, ...)
 {
-	uint32_t c;
+	uint8_t c;
 	char buffer[20];
 
 	char **arg = (char **)&format;
@@ -111,6 +119,4 @@ uint32_t printf(const char *format, ...)
 		}
 			
 	}
-
-	return 0;
 }

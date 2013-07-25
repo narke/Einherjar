@@ -1,7 +1,8 @@
 /**
- * @file isr.c
  * @author Konstantin Tcholokachvili
  * @date 2013
+ * @license MIT License
+ * 
  * Exceptions handling
  */
 

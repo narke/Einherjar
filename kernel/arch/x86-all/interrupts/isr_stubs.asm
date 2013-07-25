@@ -1,9 +1,10 @@
 
 ; @file isr_stubs.asm
 ; @author Konstantin Tcholokachvili
-; Interrupt Service Routines (ISRs)
 ; @see http://www.osdever.net/bkerndev/Docs/isrs.htm
 ; @date 2013
+;
+; Interrupt Service Routines (ISRs)
 
 global isr0
 global isr1

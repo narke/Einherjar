@@ -1,7 +1,8 @@
 /**
- * @file irq.c
  * @author Konstantin Tcholokachvili
  * @date 2013
+ * @license MIT License
+ *
  * IRQs routines and PIC handling 
  */
 

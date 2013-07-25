@@ -1,12 +1,15 @@
+#ifndef _IRQ_H_
+#define _IRQ_H_
+
 /**
  * @file irq.h
  * @author Konstantin Tcholokachvili
  * @date 2013
+ * @license MIT License
+ * 
  * IRQs constants and functions
  */
 
-#ifndef _IRQ_H_
-#define _IRQ_H_
 
 #include <arch/x86-all/registers.h>
 
@@ -27,8 +30,20 @@
 #define IRQ_HARDDISK      14
 #define IRQ_RESERVED_5    15
 
-extern void x86_irq_set_handler(int irq, void (*handler)(struct regs *r));
-extern void x86_irq_unset_handler(int irq);
-extern void x86_irq_setup(void);
+/** Set an IRQ handler function
+ *
+ * @param irq IRQ number
+ * @param handler A callback function which will be called when the IRQ is raised
+ */
+void x86_irq_set_handler(int irq, void (*handler)(struct regs *r));
 
-#endif
+/** Unset an IRQ handler function
+ * 
+ * @param irq IRQ number
+ */
+void x86_irq_unset_handler(int irq);
+
+/** Setup IRQs handling */
+void x86_irq_setup(void);
+
+#endif // _IRQ_H_

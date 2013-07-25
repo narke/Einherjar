@@ -1,8 +1,9 @@
 ; @file irq_stubs.asm
 ; @author Konstantin Tcholokachvili
-; Interrupt Request Routines (ISRs)
 ; @see http://www.osdever.net/bkerndev/Docs/irqs.htm
 ; @date 2013
+;
+; Interrupt Request Routines (ISRs)
 
 
 global irq0

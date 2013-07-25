@@ -1,11 +1,12 @@
 #ifndef _TYPES_H_
 #define _TYPES_H_
 
-
 /**
  * @file types.h
  * @author Konstantin Tcholokachvili
  * @date 2007
+ * @license MIT License
+ * 
  * Basic types definition
  */
 
@@ -24,6 +25,6 @@ typedef signed long int         sint32_t; 	/* 32 bits signed */
 typedef signed short int        sint16_t; 	/* 16 bits signed */
 typedef signed char             sint8_t;	/* 8  bits signed */
 
-#endif 
+#endif // _TYPES_H_
 
 

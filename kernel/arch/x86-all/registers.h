@@ -1,7 +1,11 @@
 #ifndef _REGISTERS_H_
 #define _REGISTERS_H_
 
-/* This defines what the stack looks like after an ISR was running */
+/**
+ * @struct regs
+ * 
+ * This defines what the stack looks like after an ISR was running
+ */
 struct regs
 {
     unsigned int gs, fs, es, ds;
@@ -10,4 +14,4 @@ struct regs
     unsigned int eip, cs, eflags, user_esp, ss;    
 };
 
-#endif
+#endif // _REGISTERS_H_

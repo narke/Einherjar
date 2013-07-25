@@ -1,18 +1,23 @@
+#ifndef _SEGMENT_H_
+#define _SEGMENT_H_
+
 /**
  * @file segment.h
  * @author Konstantin Tcholokachvili
  * @date 2013
+ * @license MIT License
+ * 
+ * x86 Segment
  */
 
-#ifndef _SEGMENT_H_
-#define _SEGMENT_H_
-
-#define NULL_SEGMENT 		0 // Unused by the processor
+/** Unused by the processor */
+#define NULL_SEGMENT 		0
 #define KERNEL_CODE_SEGMENT	1
 #define KERNEL_DATA_SEGMENT 	2
 #define USER_CODE_SEGMENT 	3
 #define USER_DATA_SEGMENT 	4
-#define KERNEL_TSS_SEGMENT	5 // Kernel TSS for CPL3 -> CPL0 privilege change
+/** Kernel TSS for CPL3 -> CPL0 privilege change */
+#define KERNEL_TSS_SEGMENT	5
 
 /**
  * Builds a value for a segment register

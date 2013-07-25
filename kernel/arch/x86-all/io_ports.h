@@ -5,6 +5,8 @@
 /**	
  * @file io_ports.h
  * @author Konstantin Tcholokachvili
+ * @@date 2007
+ * @license MIT License
  * 
  * x86 I/O space access functions.
  */
@@ -39,4 +41,4 @@
 })
 
 	
-#endif 
+#endif // _IO_PORTS_H_ 

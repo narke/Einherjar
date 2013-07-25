@@ -1,7 +1,9 @@
 /**
- * @file gdt.c
  * @author Konstantin Tcholokachvili
  * @date 2013
+ * @license MIT License
+ *
+ * GDT setup 
  */
 
 #include "gdt.h"
