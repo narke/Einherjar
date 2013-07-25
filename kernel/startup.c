@@ -15,6 +15,7 @@
 #include <arch/x86-all/interrupts/irq.h>
 #include <arch/x86-pc/timer/pit.h>
 #include <arch/x86-pc/input_output/keyboard/keyboard.h>
+#include <arch/all/klibc.h>
 
 /**
  * The kernel entry point. All starts from here!
@@ -36,34 +37,34 @@ void roentgenium_main(void)
     vga_set_attributes(FG_BRIGHT_BLUE | BG_BLACK );
     vga_set_position(34, 0);
 	
-    vga_display_string("Roentgenium\n");
+    printf("Roentgenium\n");
 	
     // GDT
     x86_gdt_setup();
 	
-    vga_display_string("CPU: GDT");
+    printf("CPU: GDT");
 	
     // IDT
     x86_idt_setup();
 	
-    vga_display_string(" | IDT");
+    printf(" | IDT");
 
     // Exceptions
     x86_exceptions_setup();
 
-    vga_display_string(" | Exceptions");
+    printf(" | Exceptions");
 
     // IRQs
     x86_irq_setup();
 
-    vga_display_string(" | IRQs");
+    printf(" | IRQs\n");
 
     // Timer: Raise IRQ0 at 100 Hz rate
     ret = x86_pit_set_frequency(100);
 
     if ( ret != KERNEL_OK )
     {
-	vga_display_string("Kernel Panic: PIT\n");
+	printf("Kernel Panic: PIT\n");
 	return;
     }
 

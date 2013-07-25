@@ -16,6 +16,7 @@ OBJECTS = $(BOOTLOADER_PATH)/multiboot.o		\
 	arch/x86-all/interrupts/irq.o			\
 	arch/x86-pc/timer/pit.o				\
 	arch/x86-pc/input_output/keyboard/keyboard.o	\
+	arch/all/klibc.o				\
 	startup.o
 
 KERNEL   = $(BUILD_PATH)/roentgenium.elf
@@ -53,6 +54,7 @@ clean:
 	$(RM) arch/x86-all/interrupts/*.o
 	$(RM) arch/x86-pc/timer/*.o
 	$(RM) arch/x86-pc/input_output/keyboard/*.o
+	$(RM) arch/all/*.o
 	@if [ -d $(BUILD_PATH) ]; 		\
 	then 					\
 		rm -R $(BUILD_PATH); 		\

@@ -1,7 +1,7 @@
 /** 
  * @file vga.c
  * @author Konstantin Tcholokachvili
- * @date 2007
+ * @date 2007, 2013
  * VGA screen handling functions 
  */ 
 
@@ -43,10 +43,10 @@ void vga_clear(void)
 
 /**
  * @brief Scrolls up the screen by X lines
- * @param param_nb_lines describes number of lines to be scrolled
+ * @param nb_lines describes number of lines to be scrolled
  * @return None
  */
-void vga_scroll_up(uint8_t param_nb_lines)
+void vga_scroll_up(uint8_t nb_lines)
 {
 	uint8_t *video;
 	uint8_t *tmp;
@@ -55,7 +55,7 @@ void vga_scroll_up(uint8_t param_nb_lines)
 		video < (uint8_t*)SCREEN_PAGE_LIMIT; 
 		video++)
 	{
-		tmp = (uint8_t*)(video + param_nb_lines * COLUMNS * 2);
+		tmp = (uint8_t*)(video + nb_lines * COLUMNS * 2);
 		
 		if (tmp < (uint8_t*)SCREEN_PAGE_LIMIT)
 			*video = *tmp;
@@ -63,22 +63,31 @@ void vga_scroll_up(uint8_t param_nb_lines)
 			*video = 0;
 	}
 	
-	g_position_y = g_position_y - param_nb_lines;
+	g_position_y = g_position_y - nb_lines;
 }
 
 
-
-void vga_set_position(uint8_t param_x, uint8_t param_y)
+/**
+ * @brief Set the starting position to display a character
+ * @param x Position X
+ * @param y Position Y
+ * @return None
+ */
+void vga_set_position(uint8_t x, uint8_t y)
 {
-	g_position_x = param_x;
-	g_position_y = param_y;
+	g_position_x = x;
+	g_position_y = y;
 }
 
 
-
-void vga_set_attributes(uint8_t param_attributes)
+/**
+ * @brief Set the starting position to display a character
+ * @param attributes Attributes of VGA: foreground color/background color/blinking
+ * @return None
+ */
+void vga_set_attributes(uint8_t attributes)
 {
-	g_attributes = param_attributes;
+	g_attributes = attributes;
 }
 
 
@@ -91,33 +100,21 @@ void vga_display_string(const char* str)
 {
 	while(*str != 0)
 	{		
-		__do_character(*str, g_attributes);
-		str++;
+		vga_display_character(*str++);
 	}
 }
 
 
 /**
  * @brief Displays a character
- * @param param_character
+ * @param character
  * @return None
  */
-void vga_display_character(uchar_t param_character)
-{
-	__do_character(param_character, g_attributes);
-}
-
-
-/**
- * @brief Treat special characters
- * @param param_character
- * @return None
- */
-void __do_character(uchar_t param_character, uchar_t param_attributes)
+void vga_display_character(uchar_t character)
 {
 	uint8_t* video;
 	
-	switch( param_character )
+	switch(character)
 	{
 		case KBD_CR_NL: /* Carriage return or new line */
 			g_position_x = 0;
@@ -144,8 +141,8 @@ void __do_character(uchar_t param_character, uchar_t param_attributes)
 			
 		default: /* Other characters */
 			video = (uchar_t*)(SCREEN_START + 2 * g_position_x + COLUMNS * 2 * g_position_y);
-			*video = param_character;
-			*(video+1) = param_attributes;
+			*video = character;
+			*(video+1) = g_attributes;
 
 			g_position_x++;
 		

@@ -67,22 +67,18 @@
 void vga_clear(void);
 
 /** Scroll up the screen by a given number of lines */
-void vga_scroll_up(uint8_t param_nb_lines);
+void vga_scroll_up(uint8_t nb_lines);
 
 /** Set the X and Y position where the next string would be displayed */
-void vga_set_position(uint8_t param_x, uint8_t param_y);
+void vga_set_position(uint8_t x, uint8_t y);
 
 /** Set attributes: foreground/background colors and blinking */
-void vga_set_attributes(uint8_t param_attributes);
+void vga_set_attributes(uint8_t attributes);
 
 /** Displays a formatted string */							
 void vga_display_string(const char* str);
 
 /** Displays a character */
-void vga_display_character(uchar_t param_character);
-
-/** character display helper function */
-void __do_character(uchar_t param_character, uchar_t param_attributes);
-
+void vga_display_character(uchar_t character);
 
 #endif
