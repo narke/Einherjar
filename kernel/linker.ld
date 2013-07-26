@@ -16,6 +16,9 @@ SECTIONS
 	/* 32 bit aligned as required by the multiboot specs */	
 	LONG(0);
     }
+    . = ALIGN(0x1000);
+    /** Start of the kernel */
+    __kernel_start = .;
 
     .text ALIGN (0x1000) :
     {
@@ -39,4 +42,7 @@ SECTIONS
         *(.bss)
         ebss = .;
     }
+
+    /* End of the kernel */
+    __kernel_end = .;
 }

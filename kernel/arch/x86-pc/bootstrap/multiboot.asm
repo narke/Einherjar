@@ -29,8 +29,8 @@ section .text
 global multiboot_entry
 multiboot_entry:
 	mov esp, stack + STACK_SIZE	; set up the stack
-	mov [magic], eax		; multiboot magic number
-	mov [multiboot_info], ebx	; multiboot data structure
+	mov [magic], ebx		; multiboot magic number
+	mov [multiboot_info], eax	; multiboot data structure
 
 	call roentgenium_main		; calling the kernel
 
@@ -41,7 +41,6 @@ hang:
 
 section .bss nobits align=4
 ; reserve initial kernel stack space
-stack:
-resb STACK_SIZE		; reserve 16 KiB stack
-multiboot_info: resd 1	; we will use this in kernel's main
-magic: resd 1		; we will use this in kernel's main
+stack: 		resb STACK_SIZE	; reserve 16 KiB stack
+multiboot_info: resd 1		; we will use this in kernel's main
+magic: 		resd 1		; we will use this in kernel's main

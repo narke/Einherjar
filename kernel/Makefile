@@ -17,6 +17,7 @@ OBJECTS = $(BOOTLOADER_PATH)/multiboot.o		\
 	arch/x86-pc/timer/pit.o				\
 	arch/x86-pc/input_output/keyboard/keyboard.o	\
 	arch/all/klibc.o				\
+	memory_manager/physical_memory.o		\
 	startup.o
 
 KERNEL   = $(BUILD_PATH)/roentgenium.elf

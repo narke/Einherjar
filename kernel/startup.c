@@ -17,29 +17,41 @@
 #include <arch/x86-pc/timer/pit.h>
 #include <arch/x86-pc/input_output/keyboard/keyboard.h>
 #include <arch/all/klibc.h>
+#include <arch/x86-pc/bootstrap/multiboot.h>
+#include <memory_manager/physical_memory.h>
 
 /**
  * The kernel entry point. All starts from here!
  */
 
-void roentgenium_main(void)
+void roentgenium_main(uint32_t magic, uint32_t address)
 {
-    extern unsigned int magic;
-
-    uint16_t ret;
- 
-    if ( magic != MULTIBOOT_BOOTLOADER_MAGIC )
-    {
-        ; /* Error */
-    }
+    uint16_t retval;
+    multiboot_info_t *mbi;
+    mbi = (multiboot_info_t *)address;
     
+    // Memory manager variables
+    uint32_t physical_addresses_bottom;
+    uint32_t physical_addresses_top;
+    uint32_t ram_size;
+
+    // RAMFS
+    uint32_t ramfs_start = 0;
+    uint32_t ramfs_end = 0;
+
     // VGA scren setup
     vga_clear();
     vga_set_attributes(FG_BRIGHT_BLUE | BG_BLACK );
     vga_set_position(34, 0);
 	
     printf("Roentgenium\n");
-	
+
+    // RAM size
+    ram_size = (unsigned int)mbi->mem_upper;
+
+    printf("RAM is %dMB (upper mem = %x kB)\n", 
+		(ram_size >> 10) + 1, ram_size);
+
     // GDT
     x86_gdt_setup();
 	
@@ -61,9 +73,9 @@ void roentgenium_main(void)
     printf(" | IRQs\n");
 
     // Timer: Raise IRQ0 at 100 Hz rate
-    ret = x86_pit_set_frequency(100);
+    retval = x86_pit_set_frequency(100);
 
-    if ( ret != KERNEL_OK )
+    if (retval != KERNEL_OK)
     {
 	printf("Kernel Panic: PIT\n");
 	return;
@@ -74,6 +86,26 @@ void roentgenium_main(void)
 
     // Keyboard interrupt
     x86_irq_set_handler(IRQ_KEYBOARD, keyboard_interrupt_handler);
+
+    printf("Modules: %d \n", mbi->mods_count);
+
+    ramfs_start = *((uint32_t*)mbi->mods_addr);
+    ramfs_end = *(uint32_t*)(mbi->mods_addr + 4);
+
+    // Memory manager: physical memory management
+    retval = physical_memory_setup((mbi->mem_upper<<10) + (1<<20),
+		&physical_addresses_bottom,
+		&physical_addresses_top,
+		ramfs_start,
+		ramfs_end);
+
+    if (retval != KERNEL_OK)
+    {
+	printf("Kernel Panic: Physical pages management \n");
+	return;
+    }
+
+    printf("Memory Manager: Physical pages management\n");
 
     // Enable interrupts
     __asm__ __volatile__ ("sti");
