@@ -9,7 +9,6 @@
 #include "pit.h"
 #include <arch/all/status.h>
 #include <arch/x86-all/io_ports.h>
-#include <arch/x86-pc/input_output/screen/vga.h>
 
 /** 82C54's clock's maximal frequency */
 #define MAX_FREQUENCY 1193180
