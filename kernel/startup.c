@@ -6,8 +6,6 @@
  * Roentgenium's kernel's main file
  */
 
-#define MULTIBOOT_BOOTLOADER_MAGIC 0x2BADB002
-
 #include <arch/all/status.h>
 #include <arch/x86-pc/input_output/screen/vga.h>
 #include <arch/x86-all/mmu/gdt.h>
@@ -75,14 +73,10 @@ void roentgenium_main(uint32_t magic, uint32_t address)
     // Timer: Raise IRQ0 at 100 Hz rate
     retval = x86_pit_set_frequency(100);
 
-    if (retval != KERNEL_OK)
-    {
-	printf("Kernel Panic: PIT\n");
-	return;
-    }
+    assert(retval == KERNEL_OK);
 
     // Timer interrupt, momentarily disabled
-    //x86_irq_set_handler(IRQ_TIMER, timer_interrupt_handler);
+    x86_irq_set_handler(IRQ_TIMER, timer_interrupt_handler);
 
     // Keyboard interrupt
     x86_irq_set_handler(IRQ_KEYBOARD, keyboard_interrupt_handler);
@@ -99,11 +93,7 @@ void roentgenium_main(uint32_t magic, uint32_t address)
 		ramfs_start,
 		ramfs_end);
 
-    if (retval != KERNEL_OK)
-    {
-	printf("Kernel Panic: Physical pages management \n");
-	return;
-    }
+    assert(retval == KERNEL_OK);
 
     printf("Memory Manager: Physical pages management\n");
 

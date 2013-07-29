@@ -13,19 +13,33 @@
 #include "types.h"
 
 /**
+ * Assert an expression
+ *
+ * @param expression The expression to evaluate 
+ */
+#define assert(expression) 				\
+	({ 						\
+		int result = (int)(expression);		\
+		if (!result)				\
+		{					\
+			/* Disable interrupts on x86 */	\
+			asm("cli\n");			\
+			printf("%s@%s:%d Assertion: " # expression " - failed\n",	\
+				 __PRETTY_FUNCTION__, __FILE__, __LINE__);		\
+			/* Infinite loop and x86 processor halting */	\
+			while (1) asm("hlt");		\
+		}					\
+	 })
+	
+ 
+
+/**
  * Formatted display of numbers and strings
  * 
  * @format Describes the format: %d,%x or %s
  * @... Variable number of variables ;-)
  */
 void printf(const char *format, ...);
-
-/**
- * Assert an expression
- *
- * @param expression The expression to evaluate 
- */
-void assert(uint32_t expression);
 
 /**
  * Set the content of a memory zone to a specific value

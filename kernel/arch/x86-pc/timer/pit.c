@@ -67,16 +67,15 @@ uint16_t x86_pit_set_frequency(uint32_t frequency)
 
 void timer_interrupt_handler(struct regs *r)
 {
-    static int tick = 0;
-    static int sec = 0;
+    static int ticks = 0;
+    static int seconds = 0;
 
-    tick++;
-    vga_display_string("Tick\n");
+    ticks++;
 
-    if (tick % 100 == 0)
+    if (ticks % 100 == 0)
     {
-        sec++;
-        tick = 0;
+        seconds++;
+        ticks = 0;
     }
 }
 

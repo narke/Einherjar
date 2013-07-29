@@ -56,6 +56,7 @@ clean:
 	$(RM) arch/x86-pc/timer/*.o
 	$(RM) arch/x86-pc/input_output/keyboard/*.o
 	$(RM) arch/all/*.o
+	$(RM) memory_manager/*.o
 	@if [ -d $(BUILD_PATH) ]; 		\
 	then 					\
 		rm -R $(BUILD_PATH); 		\

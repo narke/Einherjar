@@ -122,20 +122,6 @@ void printf(const char *format, ...)
 }
 
 
-void assert(uint32_t expression)
-{
-	if (!expression)
-	{
-		/* Disable interrupts on x86 */
-		asm("cli\n");
-		
-		printf("%s:%d - Assertion FAILED", __FILE__, __LINE__);
-		
-		/* Halt the processor */
-		for (;;) asm("hlt;");
-	}
-}
-
 
 void *memset(void *dst, sint32_t c, uint32_t length)
 {
