@@ -17,6 +17,7 @@
 #include <arch/all/klibc.h>
 #include <arch/x86-pc/bootstrap/multiboot.h>
 #include <memory_manager/physical_memory.h>
+#include <arch/x86-all/mmu/paging.h>
 
 /**
  * The kernel entry point. All starts from here!
@@ -95,7 +96,12 @@ void roentgenium_main(uint32_t magic, uint32_t address)
 
     assert(retval == KERNEL_OK);
 
-    printf("Memory Manager: Physical pages management\n");
+    printf("Memory Manager: Physical pages");
+
+    // Paging
+    paging_setup();
+
+    printf(" | Paging\n");
 
     // Enable interrupts
     __asm__ __volatile__ ("sti");
