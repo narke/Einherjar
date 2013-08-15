@@ -7,8 +7,8 @@
  */
 
 #include <arch/x86-all/interrupts/idt.h>
-#include <arch/x86-pc/input_output/screen/vga.h>
 #include <arch/all/types.h>
+#include <arch/all/klibc.h>
 #include "isr.h"
 
 #define EXCEPTIONS_NUMBER 32
@@ -141,8 +141,8 @@ void x86_exception_handler(struct regs *r)
 {
     if (r->interrupt_number < EXCEPTIONS_NUMBER)
     {
-        //vga_display_string(exception_messages[r->interrupt_number]);
-        vga_display_string(" Exception. System Halted!\n");
+        printf("%s", exception_messages[r->interrupt_number]);
+        printf("%s\n", "Exception. System Halted!");
         for (;;);
     }
 }
