@@ -4,7 +4,7 @@
 /**
  * @file types.h
  * @author Konstantin Tcholokachvili
- * @date 2007
+ * @date 2007, 2013
  * @license MIT License
  * 
  * Basic types definition
@@ -24,6 +24,13 @@ typedef signed long long int    sint64_t;	/* 64 bits signed */
 typedef signed long int         sint32_t; 	/* 32 bits signed */
 typedef signed short int        sint16_t; 	/* 16 bits signed */
 typedef signed char             sint8_t;	/* 8  bits signed */
+
+/** Physical address */
+typedef unsigned int		paddr_t;
+
+/** Virtual address */
+typedef unsigned int		vaddr_t;
+
 
 #endif // _TYPES_H_
 

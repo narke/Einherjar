@@ -48,9 +48,9 @@ static uint32_t g_physical_memory_used_pages;
 
 
 
-uint32_t physical_memory_setup(uint32_t ram_size, 
-		uint32_t *out_kernel_base, 
-		uint32_t *out_kernel_top,
+uint16_t physical_memory_setup(uint32_t ram_size, 
+		paddr_t *out_kernel_base, 
+		paddr_t *out_kernel_top,
 		uint32_t ramfs_start,
 		uint32_t ramfs_end)
 {
@@ -277,7 +277,7 @@ uint32_t physical_memory_page_reference_at(uint32_t page_physical_address)
 }
 
 
-uint32_t physical_memory_page_unreference(uint32_t page_physical_address)
+uint16_t physical_memory_page_unreference(uint32_t page_physical_address)
 {
 	/* By default we assume that the page is still used */
 	uint32_t retval = FALSE;

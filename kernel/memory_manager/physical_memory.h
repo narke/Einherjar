@@ -73,9 +73,9 @@
  * kernel_core_base -> kernel_identity_mapping_bottom
  * kernel_core_top -> kernel_identity_mapping_top
  */
-uint32_t physical_memory_setup(uint32_t ram_size,
-		/* out */uint32_t *kernel_core_base,
-		/* out */uint32_t *kernel_core_top,
+uint16_t physical_memory_setup(uint32_t ram_size,
+		/* out */paddr_t *kernel_core_base,
+		/* out */paddr_t *kernel_core_top,
 		uint32_t ramfs_start,
 		uint32_t ramfs_end);
 
@@ -113,7 +113,7 @@ uint32_t physical_memory_page_reference_at(uint32_t page_physical_address);
  * 		   FALSE = the page is still in use
  * 	 	   <0 = the page address is invalid
  */
-uint32_t physical_memory_page_unreference(uint32_t page_physical_address);
+uint16_t physical_memory_page_unreference(uint32_t page_physical_address);
 
 
 #endif // _PHYSICAL_MEMORY_H_

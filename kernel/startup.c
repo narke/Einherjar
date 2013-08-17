@@ -30,8 +30,8 @@ void roentgenium_main(uint32_t magic, uint32_t address)
     mbi = (multiboot_info_t *)address;
     
     // Memory manager variables
-    uint32_t physical_addresses_bottom;
-    uint32_t physical_addresses_top;
+    paddr_t physical_addresses_bottom;
+    paddr_t physical_addresses_top;
     uint32_t ram_size;
 
     // RAMFS
@@ -99,7 +99,10 @@ void roentgenium_main(uint32_t magic, uint32_t address)
     printf("Memory Manager: Physical pages");
 
     // Paging
-    paging_setup();
+    retval = x86_paging_setup(physical_addresses_bottom,
+		              physical_addresses_top);
+
+    assert(retval == KERNEL_OK);
 
     printf(" | Paging\n");
 
