@@ -122,7 +122,6 @@ void printf(const char *format, ...)
 }
 
 
-
 void *memset(void *dst, sint32_t c, uint32_t length)
 {
 	char *p;
@@ -135,3 +134,16 @@ void *memset(void *dst, sint32_t c, uint32_t length)
 	return p;
 }
 
+
+void *memcpy(void *dst, const void *src, size_t n)
+{
+	char *dst8 = (char *)dst;
+	const char *src8 = (char *)src;
+	
+	while (n--)
+	{
+		*dst8++ = *src8++;
+	}
+
+	return dst;
+}

@@ -44,10 +44,19 @@ void printf(const char *format, ...);
 /**
  * Set the content of a memory zone to a specific value
  *
- * @param dst Memory zone destination
+ * @param dst Memory destination zone
  * @param c Specific value which will written to the memory zone
  * @param length the size of the memory zone
  */
 void *memset(void *dst, sint32_t c, uint32_t length);
+
+/**
+ * Copy memory area
+ *
+ * @param dst Memory destination zone
+ * @param src Memory source
+ * @param n Number of bytes to copy
+ */
+void *memcpy(void *dst, const void *src, size_t n);
 
 #endif // _KLIBC_H_
