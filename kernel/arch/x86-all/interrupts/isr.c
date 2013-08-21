@@ -141,8 +141,7 @@ void x86_exception_handler(struct regs *r)
 {
     if (r->interrupt_number < EXCEPTIONS_NUMBER)
     {
-        printf("%s", exception_messages[r->interrupt_number]);
-        printf("%s\n", "Exception. System Halted!");
+        printf(">> Exception: %s. System Halted! <<\n", exception_messages[r->interrupt_number]);
         for (;;);
     }
 }
