@@ -17,6 +17,9 @@
 #define VM_FLAG_WRITE (1<<1)
 #define VM_FLAG_EXEC  (1<<2) // Not supported on x86
 
+/** May block because of new page table allocation */
+#define VM_FLAG_ATOMIC (1<<31)
+
 /** Virtual address where mirroring is taking place */
 #define PAGING_MIRROR_VIRTUAL_ADDRESS 0x3fc00000 // 1GB - 4MB
 

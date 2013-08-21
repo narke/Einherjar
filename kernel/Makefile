@@ -19,6 +19,9 @@ OBJECTS = $(BOOTLOADER_PATH)/multiboot.o		\
 	arch/all/klibc.o				\
 	memory_manager/physical_memory.o		\
 	arch/x86-all/mmu/paging.o			\
+	memory_manager/virtual_memory.o			\
+	memory_manager/memory_mapping.o			\
+	memory_manager/dlmalloc.o			\
 	startup.o
 
 KERNEL   = $(BUILD_PATH)/roentgenium.elf

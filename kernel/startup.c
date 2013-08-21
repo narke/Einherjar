@@ -18,6 +18,7 @@
 #include <arch/x86-pc/bootstrap/multiboot.h>
 #include <memory_manager/physical_memory.h>
 #include <arch/x86-all/mmu/paging.h>
+#include <memory_manager/virtual_memory.h>
 
 /**
  * The kernel entry point. All starts from here!
@@ -87,7 +88,7 @@ void roentgenium_main(uint32_t magic, uint32_t address)
     ramfs_start = *((uint32_t*)mbi->mods_addr);
     ramfs_end = *(uint32_t*)(mbi->mods_addr + 4);
 
-    // Memory manager: physical memory management
+    // Memory management: Physical memory management
     retval = physical_memory_setup((mbi->mem_upper<<10) + (1<<20),
 		&physical_addresses_bottom,
 		&physical_addresses_top,
@@ -96,15 +97,21 @@ void roentgenium_main(uint32_t magic, uint32_t address)
 
     assert(retval == KERNEL_OK);
 
-    printf("Memory Manager: Physical pages");
+    printf("Memory Manager: Physical memory");
 
-    // Paging
+    // Memory management: Paging
     retval = x86_paging_setup(physical_addresses_bottom,
 		              physical_addresses_top);
 
     assert(retval == KERNEL_OK);
 
-    printf(" | Paging\n");
+    printf(" | Paging");
+
+    // Memory Management: Virtual memory
+    vmm_setup(physical_addresses_bottom,
+              physical_addresses_top);
+
+    printf(" | Virtual memory\n");
 
     // Enable interrupts
     __asm__ __volatile__ ("sti");

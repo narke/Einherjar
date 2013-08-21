@@ -7,6 +7,8 @@
 */
 
 #include <arch/x86-pc/input_output/screen/vga.h>
+#include <memory_manager/memory_mapping.h>
+
 #include "klibc.h"
 
 static void itoa(int value, char *str, int base)
@@ -146,4 +148,17 @@ void *memcpy(void *dst, const void *src, size_t n)
 	}
 
 	return dst;
+}
+
+
+void *malloc(size_t size)
+{
+        void *ptr = dlmalloc(size);
+        return ptr;
+}
+
+
+void free(void *ptr)
+{
+	dlfree(ptr);
 }

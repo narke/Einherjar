@@ -59,4 +59,20 @@ void *memset(void *dst, sint32_t c, uint32_t length);
  */
 void *memcpy(void *dst, const void *src, size_t n);
 
+/**
+ * Allocate memory
+ * 
+ * @param size Number of bytes to allocate
+ * @return The address of the allocated memory region
+ */
+void *malloc(size_t size);
+
+/**
+ * Deallocate memory
+ *
+ * @param ptr Address to release
+ */
+void free(void *ptr);
+
+
 #endif // _KLIBC_H_
