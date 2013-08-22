@@ -107,6 +107,9 @@ static void* free_memory_range_lookup(uint32_t size)
 	if (size <= 0)
 		return NULL;
 
+	// Take into account the size of memory_range structure
+	size += sizeof(struct memory_range);
+
 	SLIST_FOREACH(mem_range, &free_memory_range_head, next)
 	{	
 		if (size == mem_range->size)
