@@ -23,8 +23,6 @@
 #define X86_IRQ_NUMBER	16
 #define X86_IRQ_MAX	X86_IRQ_BASE + X86_IRQ_NUMBER - 1
 
-/** Ring 0 priviledge level*/
-#define RING0	0
 
 /**
  * The IDT register stores the address and size of the IDT.

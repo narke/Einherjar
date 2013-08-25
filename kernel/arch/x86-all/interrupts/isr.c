@@ -7,8 +7,11 @@
  */
 
 #include <arch/x86-all/interrupts/idt.h>
+#include <arch/x86-all/mmu/segment.h>
 #include <arch/all/types.h>
 #include <arch/all/klibc.h>
+#include <arch/x86-all/process/syscalls.h>
+
 #include "isr.h"
 
 #define EXCEPTIONS_NUMBER 32
@@ -47,7 +50,7 @@ extern void isr30();
 extern void isr31();
 
 
-void x86_exceptions_setup(void)
+void x86_isr_setup(void)
 {
     x86_idt_set_handler(0,  (uint32_t)isr0,  RING0);
     x86_idt_set_handler(1,  (uint32_t)isr1,  RING0);
@@ -137,12 +140,17 @@ char *exception_messages[] =
 *  serviced as a 'locking' mechanism to prevent an IRQ from
 *  happening and messing up kernel data structures */
 
-void x86_exception_handler(struct regs *r)
+void x86_isr_handler(struct regs *r)
 {
     if (r->interrupt_number < EXCEPTIONS_NUMBER)
     {
         printf(">> Exception: %s. System Halted! <<\n", exception_messages[r->interrupt_number]);
         for (;;);
+    }
+
+    if (r->interrupt_number == SYSCALL_ID)
+    {
+	syscall_handler(r);
     }
 }
 

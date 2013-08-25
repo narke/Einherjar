@@ -6,10 +6,12 @@
  * IRQs routines and PIC handling 
  */
 
-#include "irq.h"
 #include <arch/x86-all/io_ports.h>
 #include <arch/x86-all/interrupts/idt.h>
+#include <arch/x86-all/mmu/segment.h>
 #include <arch/all/types.h>
+
+#include "irq.h"
 
 #define PIC_MASTER_COMMAND 0x20
 #define PIC_MASTER_DATA	   0x21

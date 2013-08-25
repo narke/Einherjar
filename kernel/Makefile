@@ -22,6 +22,8 @@ OBJECTS = $(BOOTLOADER_PATH)/multiboot.o		\
 	memory_manager/virtual_memory.o			\
 	memory_manager/memory_mapping.o			\
 	memory_manager/dlmalloc.o			\
+	arch/x86-all/process/tss.o			\
+	arch/x86-all/process/syscalls.o			\
 	startup.o
 
 KERNEL   = $(BUILD_PATH)/roentgenium.elf
@@ -61,6 +63,7 @@ clean:
 	$(RM) arch/x86-pc/input_output/keyboard/*.o
 	$(RM) arch/all/*.o
 	$(RM) memory_manager/*.o
+	$(RM) arch/x86-all/process/*.o
 	@if [ -d $(BUILD_PATH) ]; 		\
 	then 					\
 		rm -R $(BUILD_PATH); 		\

@@ -12,10 +12,10 @@
 
 #include <arch/x86-all/registers.h>
 
-/** Setup exceptions handling */
-void x86_exceptions_setup(void);
+/** Setup interruption service request handling */
+void x86_isr_setup(void);
 
-/** Exception handler function */
-void x86_exception_handler(struct regs *r);
+/** Interruption service request handler */
+void x86_isr_handler(struct regs *r);
 
 #endif // _ISR_H_

@@ -21,4 +21,11 @@ void *heap_alloc(size_t size, uint32_t flags);
 /** Free memory by releasing some heap */
 void heap_free(void *ptr);
 
+void map_pages(uint32_t base_address,
+                      uint32_t top_address,
+                      bool_t is_user_page);
+
+void unmap_pages(uint32_t base_address,
+                        uint32_t top_address);
+
 #endif // _VIRTUAL_MEMORY_H_

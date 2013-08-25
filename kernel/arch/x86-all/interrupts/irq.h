@@ -30,6 +30,14 @@
 #define IRQ_HARDDISK      14
 #define IRQ_RESERVED_5    15
 
+
+#define X86_IRQs_DISABLE(flags) \
+    ({asm volatile("pushfl ; popl %0":"=g"(flags)::"memory"); asm("cli\n");})
+
+#define X86_IRQs_ENABLE(flags) \
+    asm volatile("push %0; popfl"::"g"(flags):"memory");
+
+
 /** Set an IRQ handler function
  *
  * @param irq IRQ number

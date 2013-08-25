@@ -25,8 +25,9 @@ struct memory_range
 };
 
 
-static void map_pages(uint32_t base_address, 
-		      uint32_t top_address)
+void map_pages(uint32_t base_address, 
+	       uint32_t top_address,
+	       bool_t is_user_page)
 {
 	uint32_t page_virtual_address;
 	uint32_t page_physical_address;
@@ -36,13 +37,13 @@ static void map_pages(uint32_t base_address,
 	     page_virtual_address < top_address;
 	     page_virtual_address = page_virtual_address + X86_PAGE_SIZE)
 	{
-		page_physical_address = physical_memory_page_reference_new(FALSE);
+		page_physical_address = physical_memory_page_reference_new();
 
 		assert(page_physical_address != (uint32_t)NULL);
 
 		retval = x86_paging_map(page_physical_address, 
 					page_virtual_address,
-					FALSE /* Not a user page */, 
+					is_user_page, 
 					VM_FLAG_ATOMIC
 					| VM_FLAG_READ
 					| VM_FLAG_WRITE);
@@ -57,8 +58,7 @@ static void map_pages(uint32_t base_address,
 }
 
 
-static void unmap_pages(uint32_t base_address,
-                        uint32_t top_address)
+void unmap_pages(uint32_t base_address, uint32_t top_address)
 {
         uint32_t page_virtual_address;
 
@@ -186,7 +186,8 @@ void *heap_alloc(size_t size, uint32_t flags)
 
 	// Allocate necessary physical pages and map them into virtual memory
 	map_pages(mem_range->base_address, mem_range->base_address
-					   + mem_range->size);
+					   + mem_range->size,
+					   FALSE);
 
 	return (void *)mem_range->base_address;	
 }
@@ -228,7 +229,7 @@ void vmm_setup(uint32_t kernel_base, uint32_t kernel_top)
 	g_heap = kernel_top;
 
 	// Map the heap on one page at the beginning
-	map_pages(g_heap, g_heap + X86_PAGE_SIZE);
+	map_pages(g_heap, g_heap + X86_PAGE_SIZE, FALSE);
 
 	/* Virtual addresses: 16kB - Video :: FREE */
 	create_memory_range(TRUE,

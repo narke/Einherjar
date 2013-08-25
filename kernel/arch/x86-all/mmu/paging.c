@@ -208,7 +208,7 @@ uint16_t x86_paging_map(paddr_t page_physical_address,
 		/* Map the page table in the mirrored page directory */
 		pd[index_in_pd].present  = TRUE;
 		pd[index_in_pd].rw    = 1; /* Ignored in supervisor mode, see IA32 Manual, Volume 3, section 4.12 */
-		pd[index_in_pd].mode  = 0;
+		pd[index_in_pd].mode  = (is_user_page)?1:0;
 		pd[index_in_pd].page_table_base_address = ((uint32_t)pt_ppage) >> 12;
       
 		/* Invalidate TLB for the page we just added */

@@ -11,7 +11,7 @@
 
 #include "klibc.h"
 
-static void itoa(int value, char *str, int base)
+static void itoa(unsigned int value, char *str, int base)
 {
 	uint8_t i = 0;
 	uint8_t j = 0;

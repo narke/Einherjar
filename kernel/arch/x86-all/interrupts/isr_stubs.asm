@@ -38,6 +38,7 @@ global isr28
 global isr29
 global isr30
 global isr31
+global isr128 ; system call handler
 
 
 ;  0: Divide By Zero Exception
@@ -291,17 +292,23 @@ isr31:
     jmp isr_common_stub
 
 
+; 128: System calls
+isr128:
+    cli
+    push byte 0
+    push 128
+    jmp isr_common_stub
 
 
 ; We call a C function in here. We need to let the assembler know
-; that 'x86_exception_handler' exists in another file
+; that 'x86_isr_handler' exists in another file
 
-extern x86_exception_handler
+extern x86_isr_handler
 
 
 
 ; This is our common ISR stub. It saves the processor state, sets
-; up for kernel mode segments, calls the C-level exception handler,
+; up for kernel mode segments, calls the C-level isr handler,
 ; and finally restores the stack frame.
 
 isr_common_stub:
@@ -317,7 +324,7 @@ isr_common_stub:
     mov gs, ax
     mov eax, esp	; Push us the stack
     push eax
-    mov eax, x86_exception_handler
+    mov eax, x86_isr_handler
     call eax		; A special call, preserves the 'eip' register
     pop eax
     pop gs
