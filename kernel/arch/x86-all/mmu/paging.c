@@ -17,9 +17,9 @@
 /** Page directory */
 struct x86_page_directory
 {
-	uint32_t present:1;		/**< 1=present in RAM, 0=absent */
-	uint32_t rw:1;			/**< 1=read and write, 0=read-only */
-	uint32_t mode:1;		/**< 1=user mode page, 0=kernel mode page */
+	uint32_t present:1;			/**< 1=present in RAM, 0=absent */
+	uint32_t rw:1;				/**< 1=read and write, 0=read-only */
+	uint32_t mode:1;			/**< 1=user mode page, 0=kernel mode page */
 	uint32_t write_through:1;	/**< 1=write-through,  0=write-back */
 	uint32_t cache_disable:1; 	/**< 1=caching disabled, 0=caching enabled */
 	uint32_t accessed:1;		/**< 1=read from or written to */
@@ -34,25 +34,25 @@ struct x86_page_directory
 /** Page table */
 struct x86_page_table
 {
-	uint32_t present:1;		/**< 1=present in RAM, 0=absent */
-	uint32_t rw:1;			/**< 1=read and write, 0=read-only */
-	uint32_t mode:1;		/**< 1=user mode page, 0=kernel mode page */
+	uint32_t present:1;			/**< 1=present in RAM, 0=absent */
+	uint32_t rw:1;				/**< 1=read and write, 0=read-only */
+	uint32_t mode:1;			/**< 1=user mode page, 0=kernel mode page */
 	uint32_t write_through:1;	/**< 1=write-through,  0=write-back */
 	uint32_t cache_disable:1;	/**< 1=caching disabled, 0=caching enabled */
 	uint32_t accessed:1;		/**< 1=read from or written to */
-	uint32_t dirty:1;		/**< 1=has been written */
+	uint32_t dirty:1;			/**< 1=has been written */
 	uint32_t reserved:1; 		/**< reserved by Intel, must be 0 */
-	uint32_t global_page:1;		/**< page table not invalided in TLB 
-					     (if PGE is set in CR4) when CR3 is 
-					     loaded or task switch is made*/
+	uint32_t global_page:1;		/**< page table not invalidated in TLB 
+								(if PGE is set in CR4) when CR3 is 
+								loaded or task switch is made*/
 	uint32_t available:3;		/**< freely available for any use */	
 	uint32_t page_base_address:20; 	/**< physical address of a page table */
 }__attribute__((packed));
 
 
 /** Flush the TLB */
-#define invlpg(virtual_address) 					\
-  do { 									\
+#define invlpg(virtual_address)											\
+  do {																	\
       asm volatile("invlpg %0"::"m"(*((unsigned *)(virtual_address)))); \
   } while(0)
 
@@ -80,12 +80,11 @@ static uint32_t identity_mapping(struct x86_page_directory *page_directory,
 		{
 			/* No, allocate it */
 			physical_memory_page_reference_at((uint32_t)page_table);
-        	}
+        }
 		else
 		{
-			/* The previous test must be always true because
-		           the setup function scans pages in increasing
-		           order */
+			/* The previous test must be always true because 
+			 * the setup function scans pages in increasing order */
 			assert(FALSE);
 		}
 	}
@@ -95,9 +94,7 @@ static uint32_t identity_mapping(struct x86_page_directory *page_directory,
 		page_table = (struct x86_page_table*)physical_memory_page_reference_new();
 
 		if (!page_table)
-		{
 			return -KERNEL_NO_MEMORY;
-		}
 
 		memset((void*)page_table, 0x0, X86_PAGE_SIZE);
 
@@ -129,29 +126,29 @@ uint16_t x86_paging_setup(paddr_t identity_mapping_base, paddr_t identity_mappin
 
 	/* Identity map from identity_mapping_base to identity_mapping_top */
 	for (physical_address = identity_mapping_base;
-	     physical_address < identity_mapping_top;
-	     physical_address = physical_address + X86_PAGE_SIZE)
-        {
-		if (identity_mapping(page_directory, 
-				     physical_address, 
-				     physical_address))
+			physical_address < identity_mapping_top;
+			physical_address = physical_address + X86_PAGE_SIZE)
+	{
+		if (identity_mapping(page_directory,
+					physical_address,
+					physical_address))
 		{
 			return -KERNEL_NO_MEMORY;
 		}
-        }
+    }
 
 	/* Identity map the video area */
 	for (physical_address = BIOS_VIDEO_START;
-	     physical_address < BIOS_VIDEO_END;
-	     physical_address = physical_address + X86_PAGE_SIZE)
-        {
-		if (identity_mapping(page_directory, 
-				     physical_address, 
-				     physical_address))
+			physical_address < BIOS_VIDEO_END;
+			physical_address = physical_address + X86_PAGE_SIZE)
+	{
+		if (identity_mapping(page_directory,
+					physical_address,
+					physical_address))
 		{
 			return -KERNEL_NO_MEMORY;
 		}
-        }
+	}
 
 	/* Setup the mirroring */
 	page_directory[VIRTUAL_ADDRESS_TO_PAGE_DIRECTORY_INDEX(PAGING_MIRROR_VIRTUAL_ADDRESS)].present = TRUE;
@@ -163,9 +160,9 @@ uint16_t x86_paging_setup(paddr_t identity_mapping_base, paddr_t identity_mappin
 	// The CR3 register must point to the page directory
 	asm volatile("mov %0, %%cr3":: "b"(page_directory));
 	// A bit must be "swithed on" in the register cr0 to enable paging
-	asm volatile("mov %%cr0, %0": "=b"(cr0)); // read cr0
-	cr0 |= PAGING_FLAG;  			  // switching paging bit on
-	asm volatile("mov %0, %%cr0":: "b"(cr0)); // write back	
+	asm volatile("mov %%cr0, %0": "=b"(cr0));	// read cr0
+	cr0 |= PAGING_FLAG;							// switching paging bit on
+	asm volatile("mov %0, %%cr0":: "b"(cr0));	// write back	
 
 	return KERNEL_OK;
 }
@@ -182,8 +179,8 @@ uint16_t x86_paging_map(paddr_t page_physical_address,
 	/* Get the page directory of the current context */
 	struct x86_page_directory *pd = (struct x86_page_directory*)
 		(PAGING_MIRROR_VIRTUAL_ADDRESS
-		+ X86_PAGE_SIZE * 
-		VIRTUAL_ADDRESS_TO_PAGE_DIRECTORY_INDEX(PAGING_MIRROR_VIRTUAL_ADDRESS));
+		 + X86_PAGE_SIZE * 
+		 VIRTUAL_ADDRESS_TO_PAGE_DIRECTORY_INDEX(PAGING_MIRROR_VIRTUAL_ADDRESS));
 
 	/* Address of the page table in the mirroring */
 	struct x86_page_table *pt = (struct x86_page_table*) 
@@ -191,19 +188,17 @@ uint16_t x86_paging_map(paddr_t page_physical_address,
 
 	/* Check mirroring boundaries */
 	if ((page_virtual_address >= PAGING_MIRROR_VIRTUAL_ADDRESS)
-		&& (page_virtual_address < PAGING_MIRROR_VIRTUAL_ADDRESS + PAGING_MIRROR_SIZE))
+			&& (page_virtual_address < PAGING_MIRROR_VIRTUAL_ADDRESS + PAGING_MIRROR_SIZE))
 		return -KERNEL_INVALID_VALUE;
 
 	/* Is a page present at this address? */
-	if (! pd[index_in_pd].present)
+	if (!pd[index_in_pd].present)
 	{
 		/* No, allocate a new one */
 		uint32_t pt_ppage = physical_memory_page_reference_new();
       
 		if (!pt_ppage)
-		{
 			return -KERNEL_NO_MEMORY;
-		}
 
 		/* Map the page table in the mirrored page directory */
 		pd[index_in_pd].present  = TRUE;
@@ -228,13 +223,13 @@ uint16_t x86_paging_map(paddr_t page_physical_address,
 	{
 		/* Yes, unmap it */
 		physical_memory_page_unreference(pt[index_in_pt].page_base_address << 12);
-    	}
+    }
     
 	/* Map the page in the page table */
 	pt[index_in_pt].present = TRUE;
-	pt[index_in_pt].rw   = (flags & VM_FLAG_WRITE)?1:0;	
+	pt[index_in_pt].rw		= (flags & VM_FLAG_WRITE)?1:0;	
 	pt[index_in_pt].mode    = 0;
-	pt[index_in_pt].page_base_address   = page_physical_address >> 12;
+	pt[index_in_pt].page_base_address	= page_physical_address >> 12;
 
 	/* It will be mapped to the current address space */
 	physical_memory_page_reference_at(page_physical_address);
@@ -256,11 +251,12 @@ uint16_t x86_paging_unmap(vaddr_t page_virtual_address)
 	/* Get the PD of the current context */
 	struct x86_page_directory *pd = (struct x86_page_directory*)
 		(PAGING_MIRROR_VIRTUAL_ADDRESS
-		+ X86_PAGE_SIZE*VIRTUAL_ADDRESS_TO_PAGE_DIRECTORY_INDEX(PAGING_MIRROR_VIRTUAL_ADDRESS));
+		 + X86_PAGE_SIZE
+		 * VIRTUAL_ADDRESS_TO_PAGE_DIRECTORY_INDEX(PAGING_MIRROR_VIRTUAL_ADDRESS));
 
 	/* Get the address of the page table in the mirroring */
-	struct x86_page_table *pt = (struct x86_page_table*) (PAGING_MIRROR_VIRTUAL_ADDRESS
-					   + X86_PAGE_SIZE*index_in_pd);
+	struct x86_page_table *pt = (struct x86_page_table*)
+		(PAGING_MIRROR_VIRTUAL_ADDRESS + X86_PAGE_SIZE*index_in_pd);
 
 	/* Is a page mapped at this address ? */
 	if (!pd[index_in_pd].present)

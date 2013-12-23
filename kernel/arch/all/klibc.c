@@ -7,7 +7,7 @@
 */
 
 #include <arch/x86-pc/input_output/screen/vga.h>
-#include <memory_manager/memory_mapping.h>
+#include <memory_manager/virtual_memory.h>
 
 #include "klibc.h"
 

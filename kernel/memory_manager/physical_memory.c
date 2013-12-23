@@ -57,7 +57,7 @@ uint16_t physical_memory_setup(uint32_t ram_size,
 
 	/** Physical pages descriptors array's address */
 
-	uint32_t higher_end_address;
+	//uint32_t higher_end_address;
 	
 	// TODO higher_end_address = (ramfs_end < ((uint32_t)&__kernel_end)) ? ramfs_end : (uint32_t)&__kernel_end;
 

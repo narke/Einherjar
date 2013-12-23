@@ -64,10 +64,10 @@ void roentgenium_main(uint32_t magic, uint32_t address)
 	
     printf(" | IDT");
 
-    // ISRs: Exceptions + System call handler
+    // ISRs: Exceptions
     x86_isr_setup();
 
-    printf(" | Exceptions + System call");
+    printf(" | Exceptions");
 
     // IRQs
     x86_irq_setup();
@@ -92,26 +92,26 @@ void roentgenium_main(uint32_t magic, uint32_t address)
 
     // Memory management: Physical memory management
     retval = physical_memory_setup((mbi->mem_upper<<10) + (1<<20),
-		&physical_addresses_bottom,
-		&physical_addresses_top,
-		ramfs_start,
-		ramfs_end);
+				&physical_addresses_bottom,
+				&physical_addresses_top,
+				ramfs_start,
+				ramfs_end);
 
     assert(retval == KERNEL_OK);
 
     printf("Memory Manager: Physical memory");
 
     // Memory management: Paging
-    retval = x86_paging_setup(physical_addresses_bottom,
-		              physical_addresses_top);
+    retval = x86_paging_setup(physical_addresses_bottom, 
+				physical_addresses_top);
 
     assert(retval == KERNEL_OK);
 
     printf(" | Paging");
 
     // Memory Management: Virtual memory
-    vmm_setup(physical_addresses_bottom,
-              physical_addresses_top);
+    virtual_memory_setup(physical_addresses_bottom,
+				physical_addresses_top);
 
     printf(" | Virtual memory\n");
 
