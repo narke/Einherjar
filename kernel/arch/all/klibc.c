@@ -153,12 +153,11 @@ void *memcpy(void *dst, const void *src, size_t n)
 
 void *malloc(size_t size)
 {
-        void *ptr = dlmalloc(size);
-        return ptr;
+    return heap_alloc(size);
 }
 
 
 void free(void *ptr)
 {
-	dlfree(ptr);
+	heap_free(ptr);
 }

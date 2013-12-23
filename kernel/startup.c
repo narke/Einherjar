@@ -22,7 +22,6 @@
 #include <arch/x86-all/process/tss.h>
 #include <arch/x86-all/process/syscalls.h>
 
-
 /**
  * The kernel entry point. All starts from here!
  */
@@ -120,66 +119,8 @@ void roentgenium_main(uint32_t magic, uint32_t address)
     __asm__ __volatile__ ("sti");
 
 
-    x86_tss_setup();
-    syscalls_setup();
-
-
-    // Trying to go in user mode
-#define USTACK_NPAGES 8
-    
-    int i, stack_top_uaddr;
-    int nb_threads = 1;
-
-    for (i = 0, stack_top_uaddr = 0xfffffffc ;
-        i < nb_threads ;
-        i++, stack_top_uaddr -= (USTACK_NPAGES + 4)*X86_PAGE_SIZE)
-    {
-	int p;
-	unsigned int stack_base = PAGE_ALIGN_LOWER_ADDRESS(stack_top_uaddr);
-
-	for (p = 0 ; p < USTACK_NPAGES ; p++, stack_base -= X86_PAGE_SIZE)
-	{
-		uint32_t page_physical_address;
-		uint32_t retval;
-
-		page_physical_address = physical_memory_page_reference_new();
-		assert(page_physical_address != (uint32_t)NULL);
-
-		retval = x86_paging_map(page_physical_address, 
-					stack_base,
-					TRUE,
-					VM_FLAG_READ | VM_FLAG_WRITE);
-
-		assert(retval == KERNEL_OK);
-
-		retval = physical_memory_page_unreference(page_physical_address);
-		assert(retval == 0);
-	}
-    }
-
-    x86_tss_set_kernel_stack(stack_top_uaddr);
-
-
-    asm volatile("  \
-     	cli; \
-     	mov $0x23, %ax; \
-     	mov %ax, %ds; \
-     	mov %ax, %es; \
-     	mov %ax, %fs; \
-     	mov %ax, %gs; \
-                   \
-     	mov %esp, %eax; \
-     	pushl $0x23; \
-     	pushl %eax; \
-     	pushf; \
-     	pop %eax;\
-     	orl $0x200, %eax;\
-     	push %eax;\
-     	pushl $0x1B;\
-     	push $1f;\
-     	iret; \
-   	1: \
-     	");
-
-    syscall_vga_display_string("Userland function executed via a system call\n");
+    char *msg = malloc(sizeof(char)*7);
+    msg = "kernel";
+    printf("%s\n", msg);
+    free(msg);
 }

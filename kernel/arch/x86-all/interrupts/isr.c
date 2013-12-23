@@ -10,7 +10,6 @@
 #include <arch/x86-all/mmu/segment.h>
 #include <arch/all/types.h>
 #include <arch/all/klibc.h>
-#include <arch/x86-all/process/syscalls.h>
 
 #include "isr.h"
 
@@ -146,11 +145,6 @@ void x86_isr_handler(struct regs *r)
     {
         printf(">> Exception: %s. System Halted! <<\n", exception_messages[r->interrupt_number]);
         for (;;);
-    }
-
-    if (r->interrupt_number == SYSCALL_ID)
-    {
-	syscall_handler(r);
     }
 }
 

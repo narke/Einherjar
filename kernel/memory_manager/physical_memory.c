@@ -15,7 +15,7 @@ struct physical_page_descriptor
 	*/
 	uint32_t reference_counter;
 
-	TAILQ_ENTRY(physical_page_descriptor) physical_pages_descriptors;
+	TAILQ_ENTRY(physical_page_descriptor) next;
 };
 
 TAILQ_HEAD(, physical_page_descriptor) used_pages_head;
@@ -59,9 +59,9 @@ uint16_t physical_memory_setup(uint32_t ram_size,
 
 	uint32_t higher_end_address;
 	
-	higher_end_address = (ramfs_end < ((uint32_t)&__kernel_end)) ? ramfs_end : (uint32_t)&__kernel_end;
+	// TODO higher_end_address = (ramfs_end < ((uint32_t)&__kernel_end)) ? ramfs_end : (uint32_t)&__kernel_end;
 
-	#define PAGE_DESCRIPTORS_ARRAY_ADDRESS PAGE_ALIGN_UPPER_ADDRESS(higher_end_address)
+	#define PAGE_DESCRIPTORS_ARRAY_ADDRESS PAGE_ALIGN_UPPER_ADDRESS((uint32_t)&__kernel_end)
   
 	struct physical_page_descriptor *physical_page_descr;
 
@@ -82,9 +82,10 @@ uint16_t physical_memory_setup(uint32_t ram_size,
 	g_physical_memory_total_pages = 0;
 	g_physical_memory_used_pages = 0;
 
+	/* Update the addresses managed by the physical memory allocator */
 	*out_kernel_base = PAGE_ALIGN_LOWER_ADDRESS((uint32_t)(& __kernel_start));
 	*out_kernel_top = PAGE_DESCRIPTORS_ARRAY_ADDRESS
-			+ PAGE_ALIGN_UPPER_ADDRESS( (ram_size >> X86_PAGE_SHIFT)
+			+ PAGE_ALIGN_UPPER_ADDRESS((ram_size >> X86_PAGE_SHIFT)
 			* sizeof(struct physical_page_descriptor));
 
 	/* Is there enough memory to fit the kenel? */
@@ -114,7 +115,7 @@ uint16_t physical_memory_setup(uint32_t ram_size,
 
 		physical_page_address < g_physical_memory_top;
 
-		physical_page_address = physical_page_address + X86_PAGE_SIZE, 
+		physical_page_address += X86_PAGE_SIZE, 
 		physical_page_descr++)
 	{
 		memset(physical_page_descr, 0x0, sizeof(struct physical_page_descriptor));
@@ -173,18 +174,19 @@ uint16_t physical_memory_setup(uint32_t ram_size,
 		/* Actually does the insertion in the used/free page lists */
 		g_physical_memory_total_pages++;
 
+//printf("AKTION = %d\n", MARK_FREE);
 		switch (action)
 		{
-			case MARK_FREE:
+			case MARK_FREE://printf("Action = %d\n", action);
 				physical_page_descr->reference_counter = 0;
-				TAILQ_INSERT_HEAD(&free_pages_head, physical_page_descr, physical_pages_descriptors);
+				TAILQ_INSERT_TAIL(&free_pages_head, physical_page_descr, next);
 				break;
 
 			case MARK_RAMFS:
 			case MARK_KERNEL:
 			case MARK_HARDWARE:
 				physical_page_descr->reference_counter = 1;
-				TAILQ_INSERT_HEAD(&used_pages_head, physical_page_descr, physical_pages_descriptors);
+				TAILQ_INSERT_TAIL(&used_pages_head, physical_page_descr, next);
 				g_physical_memory_used_pages++;
 				break;
 
@@ -201,13 +203,13 @@ uint16_t physical_memory_setup(uint32_t ram_size,
 uint32_t physical_memory_page_reference_new()
 {
 	struct physical_page_descriptor *physical_page_descr;
-
+	
 	if (TAILQ_EMPTY(&free_pages_head))
 		return (uint32_t)NULL;
 
 	/* Get a free page */
 	physical_page_descr = TAILQ_FIRST(&free_pages_head);
-	TAILQ_REMOVE(&free_pages_head, physical_page_descr, physical_pages_descriptors);
+	TAILQ_REMOVE(&free_pages_head, physical_page_descr, next);
 
 	/* The page should not to be already used */
 	assert(physical_page_descr->reference_counter == 0);
@@ -216,7 +218,7 @@ uint32_t physical_memory_page_reference_new()
 	physical_page_descr->reference_counter++;
 
 	/* Put the page in the used pages list */
-	TAILQ_INSERT_TAIL(&used_pages_head, physical_page_descr, physical_pages_descriptors);
+	TAILQ_INSERT_TAIL(&used_pages_head, physical_page_descr, next);
 
 	g_physical_memory_used_pages++;
 
@@ -252,7 +254,7 @@ uint32_t physical_memory_page_reference_at(uint32_t page_physical_address)
 	struct physical_page_descriptor *physical_page_descr
 		= physical_memory_get_page_descriptor_at_address(page_physical_address);
 
-	if (! physical_page_descr)
+	if (!physical_page_descr)
 		return -KERNEL_INVALID_VALUE;
 
 	/* Increment the reference count for the page */
@@ -262,10 +264,10 @@ uint32_t physical_memory_page_reference_at(uint32_t page_physical_address)
     	if (physical_page_descr->reference_counter == 1)
     	{
     		/* No, the page is being used only from now so remove it from free pages list */
-		TAILQ_REMOVE(&free_pages_head, physical_page_descr, physical_pages_descriptors);
+		TAILQ_REMOVE(&free_pages_head, physical_page_descr, next);
 
 		/* And move it to used pages list */
-		TAILQ_INSERT_TAIL(&used_pages_head, physical_page_descr, physical_pages_descriptors);
+		TAILQ_INSERT_TAIL(&used_pages_head, physical_page_descr, next);
 		g_physical_memory_used_pages++;
 
 		/* The page is newly referenced */
@@ -299,12 +301,12 @@ uint16_t physical_memory_page_unreference(uint32_t page_physical_address)
 	if (physical_page_descr->reference_counter == 0)
     	{
 		/* Yes, remove it from used pages */
-		TAILQ_REMOVE(&used_pages_head, physical_page_descr, physical_pages_descriptors);
+		TAILQ_REMOVE(&used_pages_head, physical_page_descr, next);
 
 		g_physical_memory_used_pages--;
 
 		/* And move it to free pages list */
-		TAILQ_INSERT_HEAD(&free_pages_head, physical_page_descr, physical_pages_descriptors);
+		TAILQ_INSERT_TAIL(&free_pages_head, physical_page_descr, next);
 
 		/* Indicates that the unreferencing operation ended successfully */
 		retval = TRUE;

@@ -34,6 +34,9 @@ typedef unsigned int		vaddr_t;
 /** Memory size of an object */
 typedef unsigned int		size_t;
 
+/** Return status **/
+typedef int 			ret_t;
+
 /** Offset type */
 typedef signed int		off_t;
 
