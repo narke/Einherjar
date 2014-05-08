@@ -10,19 +10,21 @@
 #define KERNEL_VMM_BASE 0x4000 /* 16kB */
 #define KERNEL_VMM_TOP  PAGING_MIRROR_VIRTUAL_ADDRESS /* 1GB - 4MB */
 
-SLIST_HEAD(, memory_range) free_memory_ranges;
-SLIST_HEAD(, memory_range) used_memory_ranges;
-
-// Heap's address will start at kernel's top address, see vmm_setup()
-uint32_t g_heap = 0;
+TAILQ_HEAD(, memory_range) free_memory_ranges;
+TAILQ_HEAD(, memory_range) used_memory_ranges;
 
 struct memory_range
 {
 	uint32_t base_address;
 	uint32_t size;
 
-	SLIST_ENTRY(memory_range) next;
+	TAILQ_ENTRY(memory_range) next;
 };
+
+
+uint32_t heap_start	=	0x0;
+uint32_t heap_used	=	0x0;
+uint32_t heap_limit	=	0x3fffff;
 
 
 void map_pages(uint32_t base_address, 
@@ -49,7 +51,7 @@ void map_pages(uint32_t base_address,
 		assert(retval == KERNEL_OK);
 
 		/* This page is already mapped, so it can be unreferenced.
-		   It's reference_counter should = 1 at this step
+		   It's reference_counter should = 1 at this step 
 		   when mapped first time */
 		physical_memory_page_unreference(page_physical_address);
 	}
@@ -69,187 +71,122 @@ void unmap_pages(uint32_t base_address, uint32_t top_address)
 }
 
 
-static void create_memory_range(bool_t is_free, 
-				uint32_t base_virtual_address,
-				uint32_t top_virtual_address)
+void *heap_alloc(size_t size)
 {
 	struct memory_range *mem_range;
+	struct memory_range *place;
+	uint32_t address;
 
-	mem_range = (struct memory_range *)g_heap;
-	
-	assert(mem_range != NULL);
-
-	// Update next free address
-	g_heap += sizeof(struct memory_range);
-
-	mem_range->base_address = base_virtual_address;
-	mem_range->size = (top_virtual_address - base_virtual_address);
-
-	if (is_free)
-	{
-		SLIST_INSERT_HEAD(&free_memory_ranges, mem_range, next);
-	}
-	else
-	{
-		SLIST_INSERT_HEAD(&used_memory_ranges, mem_range, next);
-	}	
-}
-
-static void *memory_ranges_management(struct memory_range *free_range,
-				     uint32_t size,
-				     bool_t resize)
-{
-	struct memory_range *new;
-	struct memory_range *remainder;
-
-	if (!resize)
-	{
-		/* The free memory range meets the exact disired memory
-		   allocation size */
-		SLIST_REMOVE(&free_memory_ranges, free_range, memory_range, next);
-
-		SLIST_INSERT_HEAD(&used_memory_ranges, free_range, next);
-
-		return (void*)free_range->base_address;
-	}
-	else
-	{
-		/* The memory range must be resized */
-		                       
-		// Detach a new range
-		new = (struct memory_range *)free_range;
-		new->base_address = free_range->base_address;
-		new->size = size;
-
-		// Create the remainder range
-		remainder = (struct memory_range *)free_range->base_address + size;
-		remainder->base_address = free_range->base_address + size;
-		remainder->size = free_range->size - size;
-
-		// Remove the original range from free memory list 
-		SLIST_REMOVE(&free_memory_ranges, free_range, memory_range, next);
-
-		// Add the remainder range to the free memory list
-		SLIST_INSERT_HEAD(&free_memory_ranges, remainder, next);
-
-		// And the new range to the used memory list
-		SLIST_INSERT_HEAD(&used_memory_ranges, new, next);
-
-		return (void*)new->base_address;
-	}
-}
-
-static void *free_memory_range_lookup(uint32_t size)
-{
-	struct memory_range *mem_range;
-
-	if (size <= 0)
+	if (size <= 0 || TAILQ_EMPTY(&free_memory_ranges))
 		return NULL;
 
-	// Take into account the size of memory_range structure
-	size += sizeof(struct memory_range);
-
-	SLIST_FOREACH(mem_range, &free_memory_ranges, next)
+	// First round: matching for the exact space
+	TAILQ_FOREACH(mem_range, &free_memory_ranges, next)
 	{
-		if (size == mem_range->size)
+		if (mem_range->size == size)
 		{
-			return memory_ranges_management(mem_range, size, FALSE);
+			TAILQ_REMOVE(&free_memory_ranges, mem_range, next);
+			TAILQ_INSERT_TAIL(&used_memory_ranges, mem_range, next);
+			
+			return (void *)mem_range->base_address;
 		}
-		else if (size < mem_range->size)
+
+	}
+	
+	// Second round: First-fit method
+	/*TAILQ_FOREACH(mem_range, &free_memory_ranges, next)
+	{
+		if (mem_range->size >= size)
 		{
-			return memory_ranges_management(mem_range, size, TRUE);
+			// Resize the current memory range
+			mem_range->size = mem_range->size - size;
+
+			// Allocate a new chunk
+			place = (struct memory_range *)heap_start + heap_used;
+			heap_used += sizeof(struct memory_range);
+
+			place->base_address = mem_range->base_address + mem_range->size;
+			place->size			= size;
+			
+			// Update the list
+			TAILQ_INSERT_TAIL(&used_memory_ranges, place, next);
+
+			return (void *)place->base_address;
 		}
+	}*/
+
+	// At the end of the used memory
+	if ((heap_used + size) < heap_limit)
+	{
+		place = (struct memory_range *)heap_start + heap_used;
+		heap_used += sizeof(struct memory_range);
+
+		address = heap_start + heap_used;
+		heap_used += size;
+
+		place->base_address = address;
+		place->size = size;
+
+		TAILQ_INSERT_TAIL(&used_memory_ranges, place, next);
+
+		return (void *)place->base_address;
 	}
 
 	return NULL;
 }
 
 
-void *heap_alloc(size_t size)
-{
-	struct memory_range *mem_range;	
-
-	if (size <= 0 || SLIST_EMPTY(&free_memory_ranges))
-		return NULL;
-   
-	// Find a suitable free memory range
-    mem_range = free_memory_range_lookup(size);
-
-	if (!mem_range)
-		return NULL;
-
-	// Allocate necessary physical pages and map them into virtual memory
-	map_pages(mem_range->base_address, mem_range->base_address 
-				+ mem_range->size,
-				FALSE);
-
-	return (void *)mem_range->base_address;	
-}
-
-
-void heap_free(void *ptr)
+void heap_free(void *address)
 {
 	struct memory_range *mem_range;
-	
-	if (ptr == NULL)
+
+	if (address == NULL)
 		return;
-	
-	SLIST_FOREACH(mem_range, &used_memory_ranges, next)
+
+	TAILQ_FOREACH(mem_range, &used_memory_ranges, next)
 	{
-		if (mem_range->base_address == (unsigned int)ptr)
+		if (mem_range->base_address == (uint32_t)address)
 		{
-			SLIST_REMOVE(&used_memory_ranges, mem_range, memory_range, next);
-			
-			unmap_pages(mem_range->base_address, 
-						mem_range->base_address + mem_range->size);
-			
-			SLIST_INSERT_HEAD(&free_memory_ranges, mem_range, next);
+			TAILQ_REMOVE(&used_memory_ranges, mem_range, next);
+
+			unmap_pages(mem_range->base_address,
+				mem_range->base_address + mem_range->size);
+
+			TAILQ_INSERT_TAIL(&free_memory_ranges, mem_range, next);
 		}
 	}
 }
 
 
-static void heap_setup(uint32_t heap_start_address)
+static void heap_setup(uint32_t kernel_top_address)
 {
-	/* The heap starts at free addresses after the end of the kernel
-           and it's datastructures */
-	g_heap = PAGE_ALIGN_UPPER_ADDRESS(heap_start_address);
+	struct memory_range *free_range;
 
-    // Map the heap on one page at the beginning
-	map_pages(g_heap, g_heap + X86_PAGE_SIZE, FALSE);
+	heap_start = PAGE_ALIGN_UPPER_ADDRESS(kernel_top_address);
+
+	free_range = (struct memory_range *)heap_start;
+	heap_start += sizeof(struct memory_range);
+
+	free_range->base_address = heap_start;
+	free_range->size		 = KERNEL_VMM_TOP - heap_start;
+
+	TAILQ_INSERT_TAIL(&free_memory_ranges, free_range, next);
+
+	heap_used = heap_used + sizeof(struct memory_range);
 }
 
 
-void virtual_memory_setup(uint32_t kernel_base, uint32_t kernel_top)
+void virtual_memory_setup(uint32_t kernel_base, 
+						  uint32_t kernel_top, 
+						  uint32_t ram_size)
 {
-	SLIST_INIT(&free_memory_ranges);
-	SLIST_INIT(&used_memory_ranges);
+	TAILQ_INIT(&free_memory_ranges);
+	TAILQ_INIT(&used_memory_ranges);
+
+	map_pages(PAGE_ALIGN_UPPER_ADDRESS(kernel_top),
+			  PAGE_ALIGN_LOWER_ADDRESS(kernel_top + ram_size * 1024),
+			  FALSE);
 
 	heap_setup(kernel_top);
-
-	/* Virtual addresses: 16kB - Video :: FREE */
-	create_memory_range(TRUE,
-		KERNEL_VMM_BASE,
-		PAGE_ALIGN_LOWER_ADDRESS(BIOS_VIDEO_START));
-
-	/* Virtual addresses: Video hardware mapping :: RESERVED */
-	create_memory_range(FALSE,
-		PAGE_ALIGN_LOWER_ADDRESS(BIOS_VIDEO_START),
-		PAGE_ALIGN_UPPER_ADDRESS(BIOS_VIDEO_END));
-
-	/* Virtual addresses: Video - Kernel :: FREE */
-	create_memory_range(TRUE,
-		PAGE_ALIGN_UPPER_ADDRESS(BIOS_VIDEO_END),
-		PAGE_ALIGN_LOWER_ADDRESS(kernel_base));
-
-	/* Virtual addresses: Kernel code/data :: RESERVED */
-	create_memory_range(FALSE,
-	       PAGE_ALIGN_LOWER_ADDRESS(kernel_base),
-	       PAGE_ALIGN_UPPER_ADDRESS(kernel_top));
-
-	/* Virtual addresses: heap's first page - virtual memory top :: FREE */
-	create_memory_range(TRUE,
-	       PAGE_ALIGN_UPPER_ADDRESS(kernel_top),
-	       KERNEL_VMM_TOP);
 }
 

@@ -92,10 +92,10 @@ void roentgenium_main(uint32_t magic, uint32_t address)
 
     // Memory management: Physical memory management
     retval = physical_memory_setup((mbi->mem_upper<<10) + (1<<20),
-				&physical_addresses_bottom,
-				&physical_addresses_top,
-				ramfs_start,
-				ramfs_end);
+			&physical_addresses_bottom,
+			&physical_addresses_top,
+			ramfs_start,
+			ramfs_end);
 
     assert(retval == KERNEL_OK);
 
@@ -103,7 +103,7 @@ void roentgenium_main(uint32_t magic, uint32_t address)
 
     // Memory management: Paging
     retval = x86_paging_setup(physical_addresses_bottom, 
-				physical_addresses_top);
+			physical_addresses_top);
 
     assert(retval == KERNEL_OK);
 
@@ -111,7 +111,8 @@ void roentgenium_main(uint32_t magic, uint32_t address)
 
     // Memory Management: Virtual memory
     virtual_memory_setup(physical_addresses_bottom,
-				physical_addresses_top);
+			physical_addresses_top,
+			ram_size);
 
     printf(" | Virtual memory\n");
 
