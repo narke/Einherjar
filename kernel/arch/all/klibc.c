@@ -11,6 +11,7 @@
 
 #include "klibc.h"
 
+
 static void itoa(unsigned int value, char *str, int base)
 {
 	uint8_t i = 0;
@@ -151,6 +152,26 @@ void *memcpy(void *dst, const void *src, size_t n)
 }
 
 
+char *strzcpy(register char *dst, register const char *src, register int len)
+{
+	int i;
+	
+	if (len <= 0)
+		return dst;
+	
+	for (i = 0; i < len; i++)
+	{
+		dst[i] = src[i];
+		
+		if(src[i] == '\0')
+			return dst;
+	}
+	
+	dst[len-1] = '\0';
+	return dst;
+}
+
+
 void *malloc(size_t size)
 {
     return heap_alloc(size);
@@ -161,3 +182,19 @@ void free(void *ptr)
 {
 	heap_free(ptr);
 }
+
+
+void display_fatal_error()
+{
+  asm("cli\n"); /* disable interrupts -- x86 only */ \
+
+  vga_set_position(0, 23);
+  vga_set_attributes(BG_BLACK | FG_RED);
+
+  printf("Fatal error!\n");
+
+  /* Infinite loop: processor halted */
+  for ( ; ; )
+    asm("hlt\n");
+}
+

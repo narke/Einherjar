@@ -4,7 +4,7 @@
 /**
  * @file pit.h
  * @author Konstantin Tcholokachvili
- * @date 2013
+ * @date 2013, 2014
  * @license MIT License
  *
  * @see [en] i82C54's datasheet
@@ -15,7 +15,6 @@
  */
 
 #include <arch/all/types.h>
-#include <arch/x86-all/registers.h>
 
 /** 
  * Changes timer interrupt frequency from the default one (18.222 Hz)
@@ -30,7 +29,7 @@ uint16_t x86_pit_set_frequency(uint32_t frequency);
 *
 * @param id
 */
-void timer_interrupt_handler(struct regs *r);
+void timer_interrupt_handler(int number);
 
 #endif // _PIT_H_
 

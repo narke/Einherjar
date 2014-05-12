@@ -22,9 +22,9 @@ struct memory_range
 };
 
 
-uint32_t heap_start	=	0x0;
-uint32_t heap_used	=	0x0;
-uint32_t heap_limit	=	0x3fffff;
+uint32_t heap_start = 0x0;
+uint32_t heap_used  = 0x0;
+uint32_t heap_limit = 0x3fffff;
 
 
 void map_pages(uint32_t base_address, 
@@ -176,9 +176,9 @@ static void heap_setup(uint32_t kernel_top_address)
 }
 
 
-void virtual_memory_setup(uint32_t kernel_base, 
-						  uint32_t kernel_top, 
-						  uint32_t ram_size)
+void virtual_memory_setup(uint32_t kernel_base,
+		uint32_t kernel_top,
+		uint32_t ram_size)
 {
 	TAILQ_INIT(&free_memory_ranges);
 	TAILQ_INIT(&used_memory_ranges);

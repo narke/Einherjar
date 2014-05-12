@@ -26,20 +26,19 @@ typedef signed short int        sint16_t; 	/**< 16 bits signed */
 typedef signed char             sint8_t;	/**< 8  bits signed */
 
 /** Physical address */
-typedef unsigned int		paddr_t;
+typedef unsigned int			paddr_t;
 
 /** Virtual address */
-typedef unsigned int		vaddr_t;
+typedef unsigned int			vaddr_t;
 
 /** Memory size of an object */
-typedef unsigned int		size_t;
+typedef unsigned int			size_t;
 
 /** Return status **/
-typedef int 			ret_t;
+typedef int						ret_t;
 
 /** Offset type */
-typedef signed int		off_t;
+typedef signed int				off_t;
 
 #endif // _TYPES_H_
-
 

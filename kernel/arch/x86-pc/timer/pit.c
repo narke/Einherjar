@@ -6,9 +6,13 @@
  * Programmable Interrupt Timer
  */
 
-#include "pit.h"
+
 #include <arch/all/status.h>
 #include <arch/x86-all/io_ports.h>
+#include <arch/x86-all/interrupts/irq.h>
+#include <process/scheduler.h>
+
+#include "pit.h"
 
 /** 82C54's clock's maximal frequency */
 #define MAX_FREQUENCY 1193180
@@ -33,7 +37,7 @@ uint16_t x86_pit_set_frequency(uint32_t frequency)
 {
 	uint32_t divisor;
 	
-	if ( frequency <= 0  || frequency > MAX_FREQUENCY )
+	if (frequency <= 0 || frequency > MAX_FREQUENCY)
 		return -KERNEL_INVALID_VALUE;
 
 	/* Ticks per second
@@ -64,10 +68,11 @@ uint16_t x86_pit_set_frequency(uint32_t frequency)
 	return KERNEL_OK;
 }
 
-void timer_interrupt_handler(struct regs *r)
+void timer_interrupt_handler(int number)
 {
     static int ticks = 0;
     static int seconds = 0;
+	uint32_t flags;
 
     ticks++;
 
@@ -76,6 +81,10 @@ void timer_interrupt_handler(struct regs *r)
         seconds++;
         ticks = 0;
     }
+
+	X86_IRQs_DISABLE(flags);
+	schedule();
+	X86_IRQs_ENABLE(flags);
 }
 
 

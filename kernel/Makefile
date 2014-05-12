@@ -6,25 +6,30 @@ LDFLAGS = --warn-common -melf_i386 --strip-all
 BOOTLOADER_PATH = arch/x86-pc/bootstrap
 BUILD_PATH      = ../build
 
-OBJECTS = $(BOOTLOADER_PATH)/multiboot.o	\
-	arch/x86-pc/input_output/screen/vga.o	\
-	arch/x86-all/mmu/gdt.o 					\
-	arch/x86-all/interrupts/idt.o 			\
-	arch/x86-all/interrupts/isr_stubs.o		\
-	arch/x86-all/interrupts/isr.o			\
-	arch/x86-all/interrupts/irq_stubs.o		\
-	arch/x86-all/interrupts/irq.o			\
-	arch/x86-pc/timer/pit.o					\
+OBJECTS = $(BOOTLOADER_PATH)/multiboot.o			\
+	arch/x86-pc/input_output/screen/vga.o			\
+	arch/x86-all/mmu/gdt.o							\
+	arch/x86-all/interrupts/idt.o					\
+	arch/x86-all/interrupts/isr_stubs.o				\
+	arch/x86-all/interrupts/isr.o					\
+	arch/x86-all/interrupts/pic.o					\
+	arch/x86-all/interrupts/irq_stubs.o				\
+	arch/x86-all/interrupts/irq.o					\
+	arch/x86-pc/timer/pit.o							\
 	arch/x86-pc/input_output/keyboard/keyboard.o	\
-	arch/all/klibc.o						\
-	memory_manager/physical_memory.o		\
-	arch/x86-all/mmu/paging.o				\
-	memory_manager/virtual_memory.o			\
-	test_suite/physical_memory_test.o		\
+	arch/all/klibc.o								\
+	memory_manager/physical_memory.o				\
+	arch/x86-all/mmu/paging.o						\
+	memory_manager/virtual_memory.o					\
+	arch/x86-all/process/cpu_context.o				\
+	arch/x86-all/process/cpu_context_switch.o		\
+	process/thread.o								\
+	process/scheduler.o								\
+	test_suite/threading_test.o						\
 	startup.o
 
-KERNEL   = $(BUILD_PATH)/roentgenium.elf
-MULTIBOOT_IMAGE = $(BUILD_PATH)/roentgenium.iso
+KERNEL			= $(BUILD_PATH)/roentgenium.elf
+MULTIBOOT_IMAGE	= $(BUILD_PATH)/roentgenium.iso
 
 all: kernel cdrom
 
@@ -39,6 +44,9 @@ $(KERNEL): $(OBJECTS)
 
 %.o: %.c
 	$(CC) -c $< -o $@ $(CFLAGS)
+
+%.o: %.S
+	$(CC) -I$(PWD) -c $< $(CFLAGS) -o $@
 
 %.o: %.asm
 	nasm -f elf $<
@@ -61,6 +69,7 @@ clean:
 	$(RM) arch/all/*.o
 	$(RM) memory_manager/*.o
 	$(RM) arch/x86-all/process/*.o
+	$(RM) process/*.o
 	$(RM) test_suite/*.o
 	@if [ -d $(BUILD_PATH) ]; 		\
 	then 							\

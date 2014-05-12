@@ -23,6 +23,6 @@
  *
  * @param r Registers status during the interrupt
  */
-void keyboard_interrupt_handler(struct regs *r);
+void keyboard_interrupt_handler(int number);
 
 #endif // _KEYBOARD_H_

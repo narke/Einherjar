@@ -1,6 +1,6 @@
 /**
  * @author Konstantin Tcholokachvili
- * @date 2013
+ * @date 2013, 2014
  * @license MIT License
  * 
  * Roentgenium's kernel's main file
@@ -19,8 +19,20 @@
 #include <memory_manager/physical_memory.h>
 #include <arch/x86-all/mmu/paging.h>
 #include <memory_manager/virtual_memory.h>
-#include <arch/x86-all/process/tss.h>
-#include <arch/x86-all/process/syscalls.h>
+#include <process/thread.h>
+#include <process/scheduler.h>
+#include <test_suite/threading_test.h>
+
+
+
+static void idle_thread()
+{
+	while (1)
+	{
+		asm("hlt\n");
+	}
+}
+
 
 /**
  * The kernel entry point. All starts from here!
@@ -31,6 +43,9 @@ void roentgenium_main(uint32_t magic, uint32_t address)
     uint16_t retval;
     multiboot_info_t *mbi;
     mbi = (multiboot_info_t *)address;
+
+	extern unsigned int x86_kernel_stack_bottom;
+	extern unsigned int x86_kernel_stack_size;
     
     // Memory manager variables
     paddr_t physical_addresses_bottom;
@@ -51,8 +66,8 @@ void roentgenium_main(uint32_t magic, uint32_t address)
     // RAM size
     ram_size = (unsigned int)mbi->mem_upper;
 
-    printf("RAM is %dMB (upper mem = %x kB)\n", 
-		(ram_size >> 10) + 1, ram_size);
+    printf("RAM is %dMB (upper mem = %x kB)\n",
+			(ram_size >> 10) + 1, ram_size);
 
     // GDT
     x86_gdt_setup();
@@ -80,10 +95,10 @@ void roentgenium_main(uint32_t magic, uint32_t address)
     assert(retval == KERNEL_OK);
 
     // Timer interrupt, momentarily disabled
-    x86_irq_set_handler(IRQ_TIMER, timer_interrupt_handler);
+    x86_irq_set_routine(IRQ_TIMER, timer_interrupt_handler);
 
     // Keyboard interrupt
-    x86_irq_set_handler(IRQ_KEYBOARD, keyboard_interrupt_handler);
+    x86_irq_set_routine(IRQ_KEYBOARD, keyboard_interrupt_handler);
 
     printf("Modules: %d \n", mbi->mods_count);
 
@@ -102,7 +117,7 @@ void roentgenium_main(uint32_t magic, uint32_t address)
     printf("Memory Manager: Physical memory");
 
     // Memory management: Paging
-    retval = x86_paging_setup(physical_addresses_bottom, 
+    retval = x86_paging_setup(physical_addresses_bottom,
 			physical_addresses_top);
 
     assert(retval == KERNEL_OK);
@@ -116,12 +131,23 @@ void roentgenium_main(uint32_t magic, uint32_t address)
 
     printf(" | Virtual memory\n");
 
+	// Kernel threads
+	retval = threading_setup(x86_kernel_stack_bottom,
+			x86_kernel_stack_bottom	+ x86_kernel_stack_size);
+
+	assert(retval == KERNEL_OK);
+
+	printf("Kernel threads\n");
+
+	// Scheduler
+	scheduler_setup();
+
+	// Declare the idle thread
+	assert(thread_create("idle", idle_thread, NULL) != NULL);
+
     // Enable interrupts
     __asm__ __volatile__ ("sti");
 
-
-    char *msg = malloc(sizeof(char)*7);
-    msg = "kernel";
-    printf("%s\n", msg);
-    free(msg);
+	printf("\nTesting threads:\n");
+	test_kernel_threads();
 }

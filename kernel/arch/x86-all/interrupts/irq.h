@@ -2,19 +2,18 @@
 #define _IRQ_H_
 
 /**
- * @file irq.h
- * @author Konstantin Tcholokachvili
- * @date 2013
- * @license MIT License
- * 
- * IRQs constants and functions
- */
+* @file irq.h
+* @author Konstantin Tcholokachvili
+* @date 2013, 2014
+* @license MIT License
+*
+* IRQs constants and functions
+*/
 
+#include <arch/all/types.h>
 
-#include <arch/x86-all/registers.h>
-
-#define IRQ_TIMER	  0
-#define IRQ_KEYBOARD	  1
+#define IRQ_TIMER         0
+#define IRQ_KEYBOARD      1
 #define IRQ_SLAVE_PIC     2
 #define IRQ_COM2          3
 #define IRQ_COM1          4
@@ -32,26 +31,20 @@
 
 
 #define X86_IRQs_DISABLE(flags) \
-    ({asm volatile("pushfl ; popl %0":"=g"(flags)::"memory"); asm("cli\n");})
+	({asm volatile("pushfl ; popl %0":"=g"(flags)::"memory"); asm("cli\n");})
 
 #define X86_IRQs_ENABLE(flags) \
-    asm volatile("push %0; popfl"::"g"(flags):"memory");
+	asm volatile("push %0; popfl"::"g"(flags):"memory");
 
 
-/** Set an IRQ handler function
- *
- * @param irq IRQ number
- * @param handler A callback function which will be called when the IRQ is raised
- */
-void x86_irq_set_handler(int irq, void (*handler)(struct regs *r));
+typedef void (*x86_irq_handler_t)(int irq_level);
 
-/** Unset an IRQ handler function
- * 
- * @param irq IRQ number
- */
-void x86_irq_unset_handler(int irq);
-
-/** Setup IRQs handling */
 void x86_irq_setup(void);
+
+/* The routine is set by IDT and called on interruptions.
+ * If the routine is NULL then it's disabled. */
+uint16_t x86_irq_set_routine(uint32_t irq_level, x86_irq_handler_t routine);
+
+x86_irq_handler_t x86_irq_get_routine(uint32_t irq_level);
 
 #endif // _IRQ_H_

@@ -7,11 +7,11 @@
  * Keyboard handling
  */
 
-#include "keyboard.h"
 #include <arch/all/types.h>
 #include <arch/x86-all/io_ports.h>
 #include <arch/x86-pc/input_output/screen/vga.h>
 
+#include "keyboard.h"
 
 uchar_t keymap[] = {
 0x1B,	0x1B,	0x1B,	0x1B,	/*	esc	(0x01)	*/
@@ -113,7 +113,7 @@ uchar_t keymap[] = {
 0xFF,	0xFF,	0xFF,	0xFF	/*	(0x61)	*/	
 };
 
-void keyboard_interrupt_handler(struct regs *r) 
+void keyboard_interrupt_handler(int number) 
 {
 	uchar_t i;
 

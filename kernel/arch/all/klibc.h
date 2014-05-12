@@ -17,19 +17,19 @@
  *
  * @param expression The expression to evaluate 
  */
-#define assert(expression) 				\
-	({ 						\
-		int result = (int)(expression);		\
-		if (!result)				\
-		{					\
-			/* Disable interrupts on x86 */	\
-			asm("cli\n");			\
+#define assert(expression)												\
+	({																	\
+		int result = (int)(expression);									\
+		if (!result)													\
+		{																\
+			/* Disable interrupts on x86 */								\
+			asm("cli\n");												\
 			printf("%s@%s:%d Assertion: " # expression " - failed\n",	\
-				 __PRETTY_FUNCTION__, __FILE__, __LINE__);		\
-			/* Infinite loop and x86 processor halting */	\
-			while (1) asm("hlt");		\
-		}					\
-	 })
+				__PRETTY_FUNCTION__, __FILE__, __LINE__);				\
+			/* Infinite loop and x86 processor halting */				\
+			while (1) asm("hlt");										\
+		}																\
+	})
 	
  
 
@@ -67,6 +67,9 @@ void *memcpy(void *dst, const void *src, size_t n);
  */
 void *malloc(size_t size);
 
+/* String copy */
+char *strzcpy(register char *dst, register const char *src, register int len);
+
 /**
  * Deallocate memory
  *
@@ -74,5 +77,6 @@ void *malloc(size_t size);
  */
 void free(void *ptr);
 
+void display_fatal_error();
 
 #endif // _KLIBC_H_
