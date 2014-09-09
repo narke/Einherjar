@@ -5,7 +5,9 @@ Roentgenium
 What is it?
 -----------
 
-OS kernel in Asm/C/Forth.
+A prototype of a real-time operating system.
+This will be a ColorForth computing environment, without separating
+the operating system from the programming language and applications.
 
 
 Testing
