@@ -138,20 +138,6 @@ void *memset(void *dst, sint32_t c, uint32_t length)
 }
 
 
-void *memcpy(void *dst, const void *src, size_t n)
-{
-	char *dst8 = (char *)dst;
-	const char *src8 = (char *)src;
-	
-	while (n--)
-	{
-		*dst8++ = *src8++;
-	}
-
-	return dst;
-}
-
-
 char *strzcpy(register char *dst, register const char *src, register int len)
 {
 	int i;

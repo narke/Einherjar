@@ -5,41 +5,42 @@ LDFLAGS = --warn-common -melf_i386 --strip-all
 
 BOOTLOADER_PATH = arch/x86-pc/bootstrap
 BUILD_PATH      = ../build
+INITRD_PATH     = arch/x86-pc/bootstrap/iso
 
-OBJECTS = $(BOOTLOADER_PATH)/multiboot.o			\
-	arch/x86-pc/input_output/screen/vga.o			\
-	arch/x86-all/mmu/gdt.o							\
-	arch/x86-all/interrupts/idt.o					\
-	arch/x86-all/interrupts/isr_stubs.o				\
-	arch/x86-all/interrupts/isr.o					\
-	arch/x86-all/interrupts/pic.o					\
-	arch/x86-all/interrupts/irq_stubs.o				\
-	arch/x86-all/interrupts/irq.o					\
-	arch/x86-pc/timer/pit.o							\
-	arch/x86-pc/input_output/keyboard/keyboard.o	\
-	arch/all/klibc.o								\
-	memory_manager/physical_memory.o				\
-	arch/x86-all/mmu/paging.o						\
-	memory_manager/virtual_memory.o					\
-	arch/x86-all/process/cpu_context.o				\
-	arch/x86-all/process/cpu_context_switch.o		\
-	process/thread.o								\
-	process/scheduler.o								\
-	test_suite/threading_test.o						\
+OBJECTS = $(BOOTLOADER_PATH)/multiboot.o           	\
+	arch/x86-pc/input_output/screen/vga.o           \
+	arch/x86-all/mmu/gdt.o                          \
+	arch/x86-all/interrupts/idt.o                   \
+	arch/x86-all/interrupts/isr_stubs.o             \
+	arch/x86-all/interrupts/isr.o                   \
+	arch/x86-all/interrupts/pic.o                   \
+	arch/x86-all/interrupts/irq_stubs.o             \
+	arch/x86-all/interrupts/irq.o                   \
+	arch/x86-pc/timer/pit.o                         \
+	arch/x86-pc/input_output/keyboard/keyboard.o    \
+	arch/all/klibc.o                                \
+	memory_manager/physical_memory.o                \
+	arch/x86-all/mmu/paging.o                       \
+	memory_manager/virtual_memory.o                 \
+	arch/x86-all/process/cpu_context.o              \
+	arch/x86-all/process/cpu_context_switch.o       \
+	process/thread.o                                \
+	process/scheduler.o                             \
+	test_suite/initrd_test.o                        \
 	startup.o
 
 KERNEL			= $(BUILD_PATH)/roentgenium.elf
 MULTIBOOT_IMAGE	= $(BUILD_PATH)/roentgenium.iso
 
-all: kernel cdrom
+all: kernel initrd cdrom
 
 kernel: $(KERNEL)
 
 $(KERNEL): $(OBJECTS)
-	@if [ ! -d $(BUILD_PATH) ]; \
-	then 						\
-		mkdir $(BUILD_PATH); 	\
-	fi
+	@if [ ! -d $(BUILD_PATH) ];  \
+	then                         \
+		mkdir $(BUILD_PATH); \
+	fi                           
 	$(LD) $(LDFLAGS) -T ./linker.ld -o $@ $^
 
 %.o: %.c
@@ -56,8 +57,15 @@ cdrom:
 	genisoimage -R -b boot/grub/stage2_eltorito -no-emul-boot \
 	-boot-load-size 4 -boot-info-table -o $(MULTIBOOT_IMAGE) $(BOOTLOADER_PATH)/iso/
 
+initrd:
+	../tools/initrd_generate.py
+	mv initrd.img $(INITRD_PATH) 
+
 clean:
-	$(RM) $(BUILD_PATH)/*.iso
+	@if [ -d $(BUILD_PATH) ];    \
+	then                         \
+		rm -R $(BUILD_PATH); \
+	fi                        
 	$(RM) $(BOOTLOADER_PATH)/*.o
 	$(RM) $(BOOTLOADER_PATH)/iso/roentgenium.elf
 	$(RM) *.o
@@ -71,8 +79,5 @@ clean:
 	$(RM) arch/x86-all/process/*.o
 	$(RM) process/*.o
 	$(RM) test_suite/*.o
-	@if [ -d $(BUILD_PATH) ]; 		\
-	then 							\
-		rm -R $(BUILD_PATH); 		\
-		echo "rm -R $(BUILD_PATH)" ;\
-	fi
+	$(RM) file_systems/*.o
+	$(RM) $(INITRD_PATH)/initrd.img

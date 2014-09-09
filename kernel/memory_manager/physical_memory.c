@@ -51,21 +51,16 @@ static uint32_t g_physical_memory_used_pages;
 uint16_t physical_memory_setup(uint32_t ram_size, 
 		paddr_t *out_kernel_base, 
 		paddr_t *out_kernel_top,
-		uint32_t ramfs_start,
-		uint32_t ramfs_end)
+		uint32_t initrd_start,
+		uint32_t initrd_end)
 {
-
-	/** Physical pages descriptors array's address */
-
-	//uint32_t higher_end_address;
-	
-	// TODO higher_end_address = (ramfs_end < ((uint32_t)&__kernel_end)) ? ramfs_end : (uint32_t)&__kernel_end;
-
-	#define PAGE_DESCRIPTORS_ARRAY_ADDRESS PAGE_ALIGN_UPPER_ADDRESS((uint32_t)&__kernel_end)
-  
+	uint32_t higher_end_address;
+	uint32_t physical_page_address;
 	struct physical_page_descriptor *physical_page_descr;
 
-	uint32_t physical_page_address;          
+	/** Physical pages descriptors array's address */	
+	higher_end_address = (initrd_end > ((uint32_t)&__kernel_end)) ? initrd_end : (uint32_t)&__kernel_end;
+	#define PAGE_DESCRIPTORS_ARRAY_ADDRESS PAGE_ALIGN_UPPER_ADDRESS(higher_end_address)
 
 	/* Initialize used pages circular queue. */
 	TAILQ_INIT(&used_pages_head);    
@@ -102,11 +97,10 @@ uint16_t physical_memory_setup(uint32_t ram_size,
 
 	/* Setup the page descriptor arrray */
 	g_physical_page_descriptor_array
-			= (struct physical_page_descriptor*)
+			= (struct physical_page_descriptor *)
 			PAGE_DESCRIPTORS_ARRAY_ADDRESS;
 
-	enum { MARK_RESERVED, MARK_FREE, MARK_KERNEL, MARK_HARDWARE, 
-		MARK_RAMFS } action;
+	enum { MARK_RESERVED, MARK_FREE, MARK_KERNEL, MARK_HARDWARE } action;
 
 
 	/* Scan the list of physical pages */
@@ -155,14 +149,8 @@ uint16_t physical_memory_setup(uint32_t ram_size,
 		else if ((physical_page_address >= *out_kernel_base)
 			&& (physical_page_address < *out_kernel_top))
 		{
+			// Initrd is also in this range
 			action = MARK_KERNEL;
-
-			/* Used : RAMFS */
-			if ((physical_page_address >= ramfs_start)
-			&& (physical_page_address < ramfs_end))
-			{
-				action = MARK_RAMFS;
-			}
 		}
 
 		/* Free : first page of descr ... end of RAM */
@@ -174,7 +162,7 @@ uint16_t physical_memory_setup(uint32_t ram_size,
 		/* Actually does the insertion in the used/free page lists */
 		g_physical_memory_total_pages++;
 
-//printf("AKTION = %d\n", MARK_FREE);
+
 		switch (action)
 		{
 			case MARK_FREE://printf("Action = %d\n", action);
@@ -182,7 +170,6 @@ uint16_t physical_memory_setup(uint32_t ram_size,
 				TAILQ_INSERT_TAIL(&free_pages_head, physical_page_descr, next);
 				break;
 
-			case MARK_RAMFS:
 			case MARK_KERNEL:
 			case MARK_HARDWARE:
 				physical_page_descr->reference_counter = 1;

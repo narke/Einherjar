@@ -21,40 +21,38 @@
 #include <memory_manager/virtual_memory.h>
 #include <process/thread.h>
 #include <process/scheduler.h>
-#include <test_suite/threading_test.h>
-
+#include <test_suite/initrd_test.h>
 
 
 static void idle_thread()
 {
-	while (1)
-	{
-		asm("hlt\n");
-	}
+    while (1)
+    {
+        asm("hlt\n");
+    }
 }
 
 
 /**
  * The kernel entry point. All starts from here!
  */
-
 void roentgenium_main(uint32_t magic, uint32_t address)
 {
     uint16_t retval;
     multiboot_info_t *mbi;
     mbi = (multiboot_info_t *)address;
 
-	extern unsigned int x86_kernel_stack_bottom;
-	extern unsigned int x86_kernel_stack_size;
+    extern unsigned int x86_kernel_stack_bottom;
+    extern unsigned int x86_kernel_stack_size;
     
     // Memory manager variables
     paddr_t physical_addresses_bottom;
     paddr_t physical_addresses_top;
     uint32_t ram_size;
 
-    // RAMFS
-    uint32_t ramfs_start = 0;
-    uint32_t ramfs_end = 0;
+    // Initrd
+    uint32_t initrd_start = 0;
+    uint32_t initrd_end = 0;
 
     // VGA scren setup
     vga_clear();
@@ -66,8 +64,7 @@ void roentgenium_main(uint32_t magic, uint32_t address)
     // RAM size
     ram_size = (unsigned int)mbi->mem_upper;
 
-    printf("RAM is %dMB (upper mem = %x kB)\n",
-			(ram_size >> 10) + 1, ram_size);
+    printf("RAM is %dMB\n", (ram_size >> 10) + 1);
 
     // GDT
     x86_gdt_setup();
@@ -100,17 +97,16 @@ void roentgenium_main(uint32_t magic, uint32_t address)
     // Keyboard interrupt
     x86_irq_set_routine(IRQ_KEYBOARD, keyboard_interrupt_handler);
 
-    printf("Modules: %d \n", mbi->mods_count);
-
-    ramfs_start = *((uint32_t*)mbi->mods_addr);
-    ramfs_end = *(uint32_t*)(mbi->mods_addr + 4);
+	// Initrd: Initial Ram Disk
+	initrd_start = *((uint32_t *)mbi->mods_addr);
+	initrd_end   = *(uint32_t *)(mbi->mods_addr + 4);
 
     // Memory management: Physical memory management
     retval = physical_memory_setup((mbi->mem_upper<<10) + (1<<20),
 			&physical_addresses_bottom,
 			&physical_addresses_top,
-			ramfs_start,
-			ramfs_end);
+			initrd_start,
+			initrd_end);
 
     assert(retval == KERNEL_OK);
 
@@ -131,23 +127,24 @@ void roentgenium_main(uint32_t magic, uint32_t address)
 
     printf(" | Virtual memory\n");
 
-	// Kernel threads
-	retval = threading_setup(x86_kernel_stack_bottom,
+    // Kernel threads
+    retval = threading_setup(x86_kernel_stack_bottom,
 			x86_kernel_stack_bottom	+ x86_kernel_stack_size);
 
-	assert(retval == KERNEL_OK);
+    assert(retval == KERNEL_OK);
 
-	printf("Kernel threads\n");
+    printf("Kernel threads\n");
 
-	// Scheduler
-	scheduler_setup();
+    // Scheduler
+    scheduler_setup();
 
-	// Declare the idle thread
-	assert(thread_create("idle", idle_thread, NULL) != NULL);
+    // Declare the idle thread
+    assert(thread_create("idle", idle_thread, NULL) != NULL);
 
     // Enable interrupts
-    __asm__ __volatile__ ("sti");
+    asm volatile("sti");
 
-	printf("\nTesting threads:\n");
-	test_kernel_threads();
+	printf("Initrd\n");
+
+	initrd_test(initrd_start, initrd_end);
 }

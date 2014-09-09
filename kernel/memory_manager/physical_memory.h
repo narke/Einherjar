@@ -65,9 +65,9 @@
  *
  * @param kernel_core_top Kernel's top address for identity mapping
  *
- * @param ramfs_start Starting address of RAMFS
+ * @param initrd_start Starting address of RAMFS
  *
- * @param ramfs_end End address of RAMFS
+ * @param initrd_end End address of RAMFS
  * 
  * TODO: 
  * kernel_core_base -> kernel_identity_mapping_bottom
@@ -76,8 +76,8 @@
 uint16_t physical_memory_setup(uint32_t ram_size,
 		/* out */paddr_t *kernel_core_base,
 		/* out */paddr_t *kernel_core_top,
-		uint32_t ramfs_start,
-		uint32_t ramfs_end);
+		uint32_t initrd_start,
+		uint32_t initrd_end);
 
 /**
  * Get a free page.

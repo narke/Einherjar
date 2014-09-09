@@ -50,14 +50,8 @@ void printf(const char *format, ...);
  */
 void *memset(void *dst, sint32_t c, uint32_t length);
 
-/**
- * Copy memory area
- *
- * @param dst Memory destination zone
- * @param src Memory source
- * @param n Number of bytes to copy
- */
-void *memcpy(void *dst, const void *src, size_t n);
+/* String copy */
+char *strzcpy(register char *dst, register const char *src, register int len);
 
 /**
  * Allocate memory
@@ -66,9 +60,6 @@ void *memcpy(void *dst, const void *src, size_t n);
  * @return The address of the allocated memory region
  */
 void *malloc(size_t size);
-
-/* String copy */
-char *strzcpy(register char *dst, register const char *src, register int len);
 
 /**
  * Deallocate memory
