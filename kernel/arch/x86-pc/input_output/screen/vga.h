@@ -88,11 +88,6 @@ void vga_set_position(uint8_t x, uint8_t y);
  */
 void vga_set_attributes(uint8_t attributes);
 
-/** Displays a formatted string 
- * 
- * @param str String to display
- */							
-void vga_display_string(const char* str);
 
 /** Displays a character 
  *

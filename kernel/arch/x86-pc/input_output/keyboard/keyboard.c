@@ -116,6 +116,7 @@ uchar_t keymap[] = {
 void keyboard_interrupt_handler(int number) 
 {
 	uchar_t i;
+	static int ctrl = 0;
 
 	do 
 	{
@@ -127,6 +128,35 @@ void keyboard_interrupt_handler(int number)
 
 	if ( i < 0x80 )
 	{
-		vga_display_character(keymap[i*4]);
+		switch(i)
+		{
+			case 0x1C: // CTRL enable
+				ctrl = 1;
+				break;
+			default:
+				if (ctrl == 1)
+				{
+					switch(keymap[i*4])
+					{
+						case 'r':
+							vga_set_attributes(FG_RED | BG_BLACK);
+							break;
+						case 'y':
+							vga_set_attributes(FG_YELLOW | BG_BLACK);
+							break;
+						case 'g':
+							vga_set_attributes(FG_GREEN | BG_BLACK);
+							break;
+						default:
+							;
+					}
+				}
+				else
+				{
+					// Avoid displaying the character pressed along CTRL 
+					vga_display_character(keymap[i*4]);
+				}
+				ctrl = 0;
+		}
 	}
 }

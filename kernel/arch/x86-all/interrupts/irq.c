@@ -28,7 +28,7 @@ uint16_t x86_irq_set_routine(uint32_t irq_level, x86_irq_handler_t routine)
 	uint16_t ret;
 	uint32_t flags;
   
-	if ((irq_level < 0) || (irq_level >= X86_IRQ_NUM))
+	if (irq_level >= X86_IRQ_NUM)
 		return -KERNEL_INVALID_VALUE;
   
 	X86_IRQs_DISABLE(flags);
@@ -71,7 +71,7 @@ uint16_t x86_irq_set_routine(uint32_t irq_level, x86_irq_handler_t routine)
 
 x86_irq_handler_t irq_get_routine(uint32_t irq_level)
 {
-	if ((irq_level < 0) || (irq_level >= X86_IRQ_NUM))
+	if (irq_level >= X86_IRQ_NUM)
 		return NULL;
 	
 	/* Expected to be atomic */

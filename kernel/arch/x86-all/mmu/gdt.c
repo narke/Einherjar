@@ -118,30 +118,4 @@ void x86_gdt_setup(void)
 }
 
 
-void x86_gdt_kernel_tss_setup(vaddr_t tss_virtual_address)
-{
-	uint16_t tss_segement_selector;
 
-	/* Initialize the GDT corresponding to the kernel TSS */
-	gdt[KERNEL_TSS_SEGMENT] = (struct x86_gdt_entry) 
-	{
-		.segment_limit_15_0		= 0x67, /* See Intel x86 vol 3 section 6.2.2 */
-		.base_paged_address_15_0	= (tss_virtual_address) & 0xffff,
-		.base_paged_address_23_16	= (tss_virtual_address >> 16) & 0xff,
-		.segment_type			= 0x9,  /* See Intel x86 vol 3 figure 6-3 */
-		.descriptor_type		= 0,    /* (idem) */
-		.descriptor_privilege_level	= 3,    /* Allowed for CPL3 tasks */
-		.segment_present		= 1,
-		.segment_limit_19_16		= 0,    /* Size of a TSS is < 2^16 ! */
-		.available			= 0,    /* Unused */
-		.zero				= 0,
-		.operand_size			= 0,    /* See Intel x86 vol 3 figure 6-3 */
-		.granularity			= 1,    /* limit is in Bytes */
-		.base_paged_address_31_24	= (tss_virtual_address >> 24) & 0xff
-	};
-
-	/* Load the TSS register into the processor */
-	tss_segement_selector = X86_BUILD_SEGMENT_REGISTER_VALUE(DPL0, KERNEL_TSS_SEGMENT);
-	
-	asm ("ltr %0" : :"r"(tss_segement_selector));
-}

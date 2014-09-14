@@ -48,10 +48,10 @@ uint16_t x86_idt_set_handler(uint32_t index,
 {
 	struct x86_idt_entry *idt_entry;
 
-	if ((index < 0) || (index >= INTERRUPTIONS_MAX_LIMIT))
+	if (index >= INTERRUPTIONS_MAX_LIMIT)
 		return -KERNEL_INVALID_VALUE;
 	
-	if ((lowest_priviledge < 0) || (lowest_priviledge > 3))
+	if (lowest_priviledge > 3)
 		return -KERNEL_INVALID_VALUE;
   
 	idt_entry = global_idt + index;

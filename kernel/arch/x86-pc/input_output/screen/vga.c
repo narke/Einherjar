@@ -10,12 +10,17 @@
 #include <arch/x86-pc/input_output/keyboard/keyboard.h>
 
 
-/** Position X on the screen */
-uint8_t g_position_x;
-/** Position Y on the screen */
-uint8_t g_position_y; 
-/** Represents a foreground/background color set */
-uint8_t g_attributes; 
+struct vga_symbol
+{
+	/** Position X on the screen */
+	uint8_t position_x;
+	/** Position Y on the screen */
+	uint8_t position_y; 
+	/** Represents a foreground/background color set */
+	uint8_t attributes;
+};
+
+struct vga_symbol symbol;
 
 
 void vga_clear(void)
@@ -31,8 +36,8 @@ void vga_clear(void)
 	}
 	
 	/* Move the cursor back to the starting point */
-	g_position_x = 0;
-	g_position_y = 0;
+	symbol.position_x = 0;
+	symbol.position_y = 0;
 }
 
 
@@ -53,29 +58,20 @@ void vga_scroll_up(uint8_t nb_lines)
 			*video = 0;
 	}
 	
-	g_position_y = g_position_y - nb_lines;
+	symbol.position_y -= nb_lines;
 }
 
 
 void vga_set_position(uint8_t x, uint8_t y)
 {
-	g_position_x = x;
-	g_position_y = y;
+	symbol.position_x = x;
+	symbol.position_y = y;
 }
 
 
 void vga_set_attributes(uint8_t attributes)
 {
-	g_attributes = attributes;
-}
-
-
-void vga_display_string(const char* str)
-{
-	while(*str != 0)
-	{		
-		vga_display_character(*str++);
-	}
+	symbol.attributes = attributes;
 }
 
 
@@ -86,42 +82,50 @@ void vga_display_character(uchar_t character)
 	switch(character)
 	{
 		case KBD_CR_NL: /* Carriage return or new line */
-			g_position_x = 0;
-			g_position_y++;
+			symbol.position_x = 0;
+			symbol.position_y++;
 			
-			if ( g_position_y > 24 )
-				vga_scroll_up(g_position_y-24);
+			if (symbol.position_y > 24)
+				vga_scroll_up(symbol.position_y-24);
 			
 			break;
 			
 		case KBD_BACKSPACE:
-			if ( g_position_x > 0 )
-				g_position_x--;
+			if (symbol.position_x > 0)
+			{
+				symbol.position_x--;
+				video = (uchar_t *)(SCREEN_START + 2 * symbol.position_x 
+						+ COLUMNS * 2 * symbol.position_y);
+				*video = ' ';
+				*(video+1) = symbol.attributes;
+			}
 			
 			break;
 			
 		case KBD_TABULATION:
-			if ( g_position_x + 4 > COLUMNS )
+			if (symbol.position_x + 4 > COLUMNS)
 				; /* What to do? */
 			else
-				g_position_x = g_position_x + 4;
+				symbol.position_x += 4;
 			
 			break;
 			
 		default: /* Other characters */
-			video = (uchar_t*)(SCREEN_START + 2 * g_position_x + COLUMNS * 2 * g_position_y);
+			video = (uchar_t*)(SCREEN_START + 2 * symbol.position_x + 
+					COLUMNS * 2 * symbol.position_y);
 			*video = character;
-			*(video+1) = g_attributes;
+			*(video+1) = symbol.attributes;
 
-			g_position_x++;
+			symbol.position_x++;
 		
-			if( g_position_x > 79 )
+			if (symbol.position_x > 79)
 			{
-				g_position_x = 0;
-				g_position_y++;
+				symbol.position_x = 0;
+				symbol.position_y++;
 			}
 			
-			if( g_position_y > 24 )
-				vga_scroll_up(g_position_y-24);			
+			if (symbol.position_y > 24)
+				vga_scroll_up(symbol.position_y-24);			
 	}
 }
+
