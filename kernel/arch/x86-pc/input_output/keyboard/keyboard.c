@@ -139,13 +139,22 @@ void keyboard_interrupt_handler(int number)
 					switch(keymap[i*4])
 					{
 						case 'r':
-							vga_set_attributes(FG_RED | BG_BLACK);
+							vga_set_attributes(FG_RED     | BG_BLACK);
 							break;
 						case 'y':
-							vga_set_attributes(FG_YELLOW | BG_BLACK);
+							vga_set_attributes(FG_YELLOW  | BG_BLACK);
 							break;
 						case 'g':
-							vga_set_attributes(FG_GREEN | BG_BLACK);
+							vga_set_attributes(FG_GREEN   | BG_BLACK);
+							break;
+						case 'c':
+							vga_set_attributes(FG_CYAN    | BG_BLACK);
+							break;
+						case 'p':
+							vga_set_attributes(FG_MAGENTA | BG_BLACK);
+							break;
+						case 'o':
+							vga_set_attributes(FG_WHITE   | BG_BLACK);
 							break;
 						default:
 							;
