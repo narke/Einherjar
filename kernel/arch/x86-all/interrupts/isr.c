@@ -51,44 +51,38 @@ extern void isr31();
 
 void x86_isr_setup(void)
 {
-    x86_idt_set_handler(0,  (uint32_t)isr0,  RING0);
-    x86_idt_set_handler(1,  (uint32_t)isr1,  RING0);
-    x86_idt_set_handler(2,  (uint32_t)isr2,  RING0);
-    x86_idt_set_handler(3,  (uint32_t)isr3,  RING0);
-    x86_idt_set_handler(4,  (uint32_t)isr4,  RING0);
-    x86_idt_set_handler(5,  (uint32_t)isr5,  RING0);
-    x86_idt_set_handler(6,  (uint32_t)isr6,  RING0);
-    x86_idt_set_handler(7,  (uint32_t)isr7,  RING0);
-
-
-    x86_idt_set_handler(8,  (uint32_t)isr8,  RING0);
-    x86_idt_set_handler(9,  (uint32_t)isr9,  RING0);
-    x86_idt_set_handler(10, (uint32_t)isr10, RING0);
-    x86_idt_set_handler(11, (uint32_t)isr11, RING0);
-    x86_idt_set_handler(12, (uint32_t)isr12, RING0);
-    x86_idt_set_handler(13, (uint32_t)isr13, RING0);
-    x86_idt_set_handler(14, (uint32_t)isr14, RING0);
-    x86_idt_set_handler(15, (uint32_t)isr15, RING0);
-
-
-    x86_idt_set_handler(16, (uint32_t)isr16, RING0);
-    x86_idt_set_handler(17, (uint32_t)isr17, RING0);
-    x86_idt_set_handler(18, (uint32_t)isr18, RING0);
-    x86_idt_set_handler(19, (uint32_t)isr19, RING0);
-    x86_idt_set_handler(20, (uint32_t)isr20, RING0);
-    x86_idt_set_handler(21, (uint32_t)isr21, RING0);
-    x86_idt_set_handler(22, (uint32_t)isr22, RING0);
-    x86_idt_set_handler(23, (uint32_t)isr23, RING0);
-
-
-    x86_idt_set_handler(24, (uint32_t)isr24, RING0);
-    x86_idt_set_handler(25, (uint32_t)isr25, RING0);
-    x86_idt_set_handler(26, (uint32_t)isr26, RING0);
-    x86_idt_set_handler(27, (uint32_t)isr27, RING0);
-    x86_idt_set_handler(28, (uint32_t)isr28, RING0);
-    x86_idt_set_handler(29, (uint32_t)isr29, RING0);
-    x86_idt_set_handler(30, (uint32_t)isr30, RING0);
-    x86_idt_set_handler(31, (uint32_t)isr31, RING0);
+    x86_idt_set_handler(0,  (uint32_t)isr0);
+    x86_idt_set_handler(1,  (uint32_t)isr1);
+    x86_idt_set_handler(2,  (uint32_t)isr2);
+    x86_idt_set_handler(3,  (uint32_t)isr3);
+    x86_idt_set_handler(4,  (uint32_t)isr4);
+    x86_idt_set_handler(5,  (uint32_t)isr5);
+    x86_idt_set_handler(6,  (uint32_t)isr6);
+    x86_idt_set_handler(7,  (uint32_t)isr7);
+    x86_idt_set_handler(8,  (uint32_t)isr8);
+    x86_idt_set_handler(9,  (uint32_t)isr9);
+    x86_idt_set_handler(10, (uint32_t)isr10);
+    x86_idt_set_handler(11, (uint32_t)isr11);
+    x86_idt_set_handler(12, (uint32_t)isr12);
+    x86_idt_set_handler(13, (uint32_t)isr13);
+    x86_idt_set_handler(14, (uint32_t)isr14);
+    x86_idt_set_handler(15, (uint32_t)isr15);
+    x86_idt_set_handler(16, (uint32_t)isr16);
+    x86_idt_set_handler(17, (uint32_t)isr17);
+    x86_idt_set_handler(18, (uint32_t)isr18);
+    x86_idt_set_handler(19, (uint32_t)isr19);
+    x86_idt_set_handler(20, (uint32_t)isr20);
+    x86_idt_set_handler(21, (uint32_t)isr21);
+    x86_idt_set_handler(22, (uint32_t)isr22);
+    x86_idt_set_handler(23, (uint32_t)isr23);
+    x86_idt_set_handler(24, (uint32_t)isr24);
+    x86_idt_set_handler(25, (uint32_t)isr25);
+    x86_idt_set_handler(26, (uint32_t)isr26);
+    x86_idt_set_handler(27, (uint32_t)isr27);
+    x86_idt_set_handler(28, (uint32_t)isr28);
+    x86_idt_set_handler(29, (uint32_t)isr29);
+    x86_idt_set_handler(30, (uint32_t)isr30);
+    x86_idt_set_handler(31, (uint32_t)isr31);
 }
 
 

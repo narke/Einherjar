@@ -31,7 +31,7 @@ void x86_idt_setup(void)
 		idt_entry->storage_segment	= 0;
 		
 		/* This IDT entry is disabled by default */
-		x86_idt_set_handler(i, (uint32_t)NULL, 0);
+		x86_idt_set_handler(i, (uint32_t)NULL);
 	}	
 	
 
@@ -43,17 +43,13 @@ void x86_idt_setup(void)
 
 
 uint16_t x86_idt_set_handler(uint32_t index,
-			      uint32_t handler_address,
-			      uint32_t lowest_priviledge)
+			      uint32_t handler_address)
 {
 	struct x86_idt_entry *idt_entry;
 
 	if (index >= INTERRUPTIONS_MAX_LIMIT)
 		return -KERNEL_INVALID_VALUE;
 	
-	if (lowest_priviledge > 3)
-		return -KERNEL_INVALID_VALUE;
-  
 	idt_entry = global_idt + index;
   
 	if (handler_address != (uint32_t)NULL)
@@ -61,7 +57,7 @@ uint16_t x86_idt_set_handler(uint32_t index,
 		/* Enabling IDT entry*/
 		idt_entry->offset_low  = handler_address & 0xffff;
 		idt_entry->offset_high = (handler_address >> 16) & 0xffff;
-		idt_entry->descriptor_privilidge_level	= lowest_priviledge;
+		idt_entry->descriptor_privilidge_level	= 0;
 		idt_entry->present     = 1;	/* Yes, there is a handler */
 	}
 	else

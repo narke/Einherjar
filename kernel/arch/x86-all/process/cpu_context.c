@@ -85,13 +85,13 @@ void cpu_kstate_init(struct cpu_state **ctxt,
 
 	/* Setup the segment registers */
 	kctxt->regs.cs =
-		X86_BUILD_SEGMENT_REGISTER_VALUE(0, KERNEL_CODE_SEGMENT); /* Code */
+		X86_BUILD_SEGMENT_REGISTER_VALUE(KERNEL_CODE_SEGMENT); /* Code */
 	kctxt->regs.ds =
-		X86_BUILD_SEGMENT_REGISTER_VALUE(0, KERNEL_DATA_SEGMENT); /* Data */
+		X86_BUILD_SEGMENT_REGISTER_VALUE(KERNEL_DATA_SEGMENT); /* Data */
 	kctxt->regs.es =
-		X86_BUILD_SEGMENT_REGISTER_VALUE(0, KERNEL_DATA_SEGMENT); /* Data */
+		X86_BUILD_SEGMENT_REGISTER_VALUE(KERNEL_DATA_SEGMENT); /* Data */
 	kctxt->regs.ss =
-		X86_BUILD_SEGMENT_REGISTER_VALUE(0, KERNEL_DATA_SEGMENT); /* Stack */
+		X86_BUILD_SEGMENT_REGISTER_VALUE(KERNEL_DATA_SEGMENT); /* Stack */
 
 	/* fs and gs unused for the moment. */
 			         

@@ -43,8 +43,7 @@ uint16_t x86_irq_set_routine(uint32_t irq_level, x86_irq_handler_t routine)
 	if (routine != NULL)
     {
 		ret = x86_idt_set_handler(X86_IRQ_BASE + irq_level,
-				(uint32_t) x86_irq_wrapper_array[irq_level],
-				0 /* CPL0 routine */);
+				(uint32_t) x86_irq_wrapper_array[irq_level]);
 		
 		/* A problem occured */
 		if (ret != KERNEL_OK)
@@ -53,8 +52,7 @@ uint16_t x86_irq_set_routine(uint32_t irq_level, x86_irq_handler_t routine)
 	else /* Disable this idt entry */
     {
 		ret = x86_idt_set_handler(X86_IRQ_BASE + irq_level,
-				(uint32_t)NULL /* Disable IDTE */,
-				0  /* Don't care */);
+				(uint32_t)NULL /* Disable IDTE */);
     }
 
 	/* Update the PIC only if an IRQ handler has been set */

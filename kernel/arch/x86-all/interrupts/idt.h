@@ -73,11 +73,9 @@ void x86_idt_setup(void);
  * Set an interrupt handler with a callback
  * @param index 		Index in IDT
  * @param handler_address	The callback which will be called
- * @param lowest_priviledge	The range value must be 0..3
  * @return KERNEL_OK on success or KERNEL_INVALID_VALUE on failure
  * */
 uint16_t x86_idt_set_handler(uint32_t index,
-			      uint32_t handler_address,
-			      uint32_t lowest_priviledge);
+			      uint32_t handler_address);
 
 #endif // _IDT_H_
