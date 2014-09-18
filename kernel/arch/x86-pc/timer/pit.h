@@ -14,7 +14,7 @@
  * Programmable Interrupt Timer
  */
 
-#include <arch/all/types.h>
+#include <lib/types.h>
 
 /** 
  * Changes timer interrupt frequency from the default one (18.222 Hz)

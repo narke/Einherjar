@@ -7,10 +7,10 @@
  */
 
 
-#include <arch/all/status.h>
-#include <arch/x86-all/io_ports.h>
-#include <arch/x86-all/interrupts/irq.h>
-#include <process/scheduler.h>
+#include <lib/status.h>
+#include <arch/x86/io-ports.h>
+#include <arch/x86/interrupts/irq.h>
+#include <threading/scheduler.h>
 
 #include "pit.h"
 

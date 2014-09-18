@@ -7,26 +7,26 @@ BOOTLOADER_PATH = arch/x86-pc/bootstrap
 BUILD_PATH      = ../build
 INITRD_PATH     = arch/x86-pc/bootstrap/iso
 
-OBJECTS = $(BOOTLOADER_PATH)/multiboot.o           	\
-	arch/x86-pc/input_output/screen/vga.o           \
-	arch/x86-all/mmu/gdt.o                          \
-	arch/x86-all/interrupts/idt.o                   \
-	arch/x86-all/interrupts/isr_stubs.o             \
-	arch/x86-all/interrupts/isr.o                   \
-	arch/x86-all/interrupts/pic.o                   \
-	arch/x86-all/interrupts/irq_stubs.o             \
-	arch/x86-all/interrupts/irq.o                   \
-	arch/x86-pc/timer/pit.o                         \
-	arch/x86-pc/input_output/keyboard/keyboard.o    \
-	arch/all/klibc.o                                \
-	memory_manager/physical_memory.o                \
-	arch/x86-all/mmu/paging.o                       \
-	memory_manager/virtual_memory.o                 \
-	arch/x86-all/process/cpu_context.o              \
-	arch/x86-all/process/cpu_context_switch.o       \
-	process/thread.o                                \
-	process/scheduler.o                             \
-	test_suite/initrd_test.o                        \
+OBJECTS = $(BOOTLOADER_PATH)/multiboot.o    \
+	arch/x86-pc/io/vga.o                    \
+	arch/x86/mmu/gdt.o                      \
+	arch/x86/interrupts/idt.o               \
+	arch/x86/interrupts/isr-stubs.o         \
+	arch/x86/interrupts/isr.o               \
+	arch/x86/interrupts/pic.o               \
+	arch/x86/interrupts/irq-stubs.o         \
+	arch/x86/interrupts/irq.o               \
+	arch/x86-pc/timer/pit.o                 \
+	arch/x86-pc/io/keyboard.o               \
+	lib/libc.o                              \
+	memory/physical-memory.o                \
+	arch/x86/mmu/paging.o                   \
+	memory/virtual-memory.o                 \
+	arch/x86/threading/cpu-context.o        \
+	arch/x86/threading/cpu-context-switch.o \
+	threading/thread.o                      \
+	threading/scheduler.o                   \
+	test-suite/initrd-test.o                \
 	startup.o
 
 KERNEL			= $(BUILD_PATH)/roentgenium.elf
@@ -69,15 +69,13 @@ clean:
 	$(RM) $(BOOTLOADER_PATH)/*.o
 	$(RM) $(BOOTLOADER_PATH)/iso/roentgenium.elf
 	$(RM) *.o
-	$(RM) arch/x86-pc/input_output/screen/*.o
+	$(RM) arch/x86-pc/io/*.o
 	$(RM) arch/x86-all/mmu/*.o
 	$(RM) arch/x86-all/interrupts/*.o
 	$(RM) arch/x86-pc/timer/*.o
-	$(RM) arch/x86-pc/input_output/keyboard/*.o
-	$(RM) arch/all/*.o
-	$(RM) memory_manager/*.o
-	$(RM) arch/x86-all/process/*.o
-	$(RM) process/*.o
-	$(RM) test_suite/*.o
-	$(RM) file_systems/*.o
+	$(RM) lib/*.o
+	$(RM) memory/*.o
+	$(RM) arch/x86-all/threading/*.o
+	$(RM) threading/*.o
+	$(RM) test-suite/*.o
 	$(RM) $(INITRD_PATH)/initrd.img

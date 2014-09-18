@@ -6,22 +6,22 @@
  * Roentgenium's kernel's main file
  */
 
-#include <arch/all/status.h>
-#include <arch/x86-pc/input_output/screen/vga.h>
-#include <arch/x86-all/mmu/gdt.h>
-#include <arch/x86-all/interrupts/idt.h>
-#include <arch/x86-all/interrupts/isr.h>
-#include <arch/x86-all/interrupts/irq.h>
+#include <lib/status.h>
+#include <arch/x86-pc/io/vga.h>
+#include <arch/x86/mmu/gdt.h>
+#include <arch/x86/interrupts/idt.h>
+#include <arch/x86/interrupts/isr.h>
+#include <arch/x86/interrupts/irq.h>
 #include <arch/x86-pc/timer/pit.h>
-#include <arch/x86-pc/input_output/keyboard/keyboard.h>
-#include <arch/all/klibc.h>
+#include <arch/x86-pc/io/keyboard.h>
+#include <lib/libc.h>
 #include <arch/x86-pc/bootstrap/multiboot.h>
-#include <memory_manager/physical_memory.h>
-#include <arch/x86-all/mmu/paging.h>
-#include <memory_manager/virtual_memory.h>
-#include <process/thread.h>
-#include <process/scheduler.h>
-#include <test_suite/initrd_test.h>
+#include <memory/physical-memory.h>
+#include <arch/x86/mmu/paging.h>
+#include <memory/virtual-memory.h>
+#include <threading/thread.h>
+#include <threading/scheduler.h>
+#include <test-suite/initrd-test.h>
 
 
 static void idle_thread()
