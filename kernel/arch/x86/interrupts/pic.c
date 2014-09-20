@@ -1,4 +1,4 @@
-#include <arch/x86-all/io-ports.h>
+#include <arch/x86/io-ports.h>
 #include <lib/status.h>
 
 #include "pic.h"

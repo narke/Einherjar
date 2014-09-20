@@ -1,5 +1,5 @@
 #include <lib/libc.h>
-#include <arch/x86-all/mmu/segment.h>
+#include <arch/x86/mmu/segment.h>
 
 #include "cpu-context.h"
 

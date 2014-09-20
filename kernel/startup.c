@@ -144,7 +144,7 @@ void roentgenium_main(uint32_t magic, uint32_t address)
     // Enable interrupts
     asm volatile("sti");
 
-	printf("Initrd\n");
+    printf("Initrd\n");
 
-	initrd_test(initrd_start, initrd_end);
+    initrd_test(initrd_start, initrd_end);
 }

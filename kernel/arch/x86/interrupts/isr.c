@@ -6,8 +6,8 @@
  * Exceptions handling
  */
 
-#include <arch/x86-all/interrupts/idt.h>
-#include <arch/x86-all/mmu/segment.h>
+#include <arch/x86/interrupts/idt.h>
+#include <arch/x86/mmu/segment.h>
 #include <lib/types.h>
 #include <lib/libc.h>
 

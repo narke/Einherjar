@@ -1,3 +1,9 @@
+# Set this to see commands being run
+VERBOSE = off
+COLOR   = on
+
+include messages.make
+
 CC      = gcc
 PWD    := $(shell pwd)
 CFLAGS  = -Wall -m32 -Wa,--32 -nostdlib -nostdinc -ffreestanding -I$(PWD)
@@ -44,24 +50,30 @@ $(KERNEL): $(OBJECTS)
 	$(LD) $(LDFLAGS) -T ./linker.ld -o $@ $^
 
 %.o: %.c
+	$(compiling) '$< > $@'
 	$(CC) -c $< -o $@ $(CFLAGS)
 
 %.o: %.S
+	$(assembling) '$< > $@'
 	$(CC) -I$(PWD) -c $< $(CFLAGS) -o $@
 
 %.o: %.asm
+	$(assembling) '$< > $@'
 	nasm -f elf $<
 
-cdrom: 
+cdrom:
+	$(generating) '$@'
 	mv $(KERNEL) $(BOOTLOADER_PATH)/iso/
 	genisoimage -R -b boot/grub/stage2_eltorito -no-emul-boot \
 	-boot-load-size 4 -boot-info-table -o $(MULTIBOOT_IMAGE) $(BOOTLOADER_PATH)/iso/
 
 initrd:
+	$(generating) '$@'
 	../tools/initrd_generate.py
 	mv initrd.img $(INITRD_PATH) 
 
 clean:
+	$(cleaning)
 	@if [ -d $(BUILD_PATH) ];    \
 	then                         \
 		rm -R $(BUILD_PATH); \
@@ -70,12 +82,12 @@ clean:
 	$(RM) $(BOOTLOADER_PATH)/iso/roentgenium.elf
 	$(RM) *.o
 	$(RM) arch/x86-pc/io/*.o
-	$(RM) arch/x86-all/mmu/*.o
-	$(RM) arch/x86-all/interrupts/*.o
+	$(RM) arch/x86/mmu/*.o
+	$(RM) arch/x86/interrupts/*.o
 	$(RM) arch/x86-pc/timer/*.o
 	$(RM) lib/*.o
 	$(RM) memory/*.o
-	$(RM) arch/x86-all/threading/*.o
+	$(RM) arch/x86/threading/*.o
 	$(RM) threading/*.o
 	$(RM) test-suite/*.o
 	$(RM) $(INITRD_PATH)/initrd.img
