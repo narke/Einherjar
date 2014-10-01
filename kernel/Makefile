@@ -35,7 +35,7 @@ OBJECTS = $(BOOTLOADER_PATH)/multiboot.o    \
 	test-suite/initrd-test.o                \
 	startup.o
 
-KERNEL			= $(BUILD_PATH)/roentgenium.elf
+KERNEL          = $(BUILD_PATH)/roentgenium.elf
 MULTIBOOT_IMAGE	= $(BUILD_PATH)/roentgenium.iso
 
 all: kernel initrd cdrom
@@ -78,16 +78,6 @@ clean:
 	then                         \
 		rm -R $(BUILD_PATH); \
 	fi                        
-	$(RM) $(BOOTLOADER_PATH)/*.o
+	$(RM) $(OBJECTS)
 	$(RM) $(BOOTLOADER_PATH)/iso/roentgenium.elf
-	$(RM) *.o
-	$(RM) arch/x86-pc/io/*.o
-	$(RM) arch/x86/mmu/*.o
-	$(RM) arch/x86/interrupts/*.o
-	$(RM) arch/x86-pc/timer/*.o
-	$(RM) lib/*.o
-	$(RM) memory/*.o
-	$(RM) arch/x86/threading/*.o
-	$(RM) threading/*.o
-	$(RM) test-suite/*.o
 	$(RM) $(INITRD_PATH)/initrd.img
