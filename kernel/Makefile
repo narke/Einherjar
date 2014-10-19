@@ -32,6 +32,8 @@ OBJECTS = $(BOOTLOADER_PATH)/multiboot.o    \
 	arch/x86/threading/cpu-context-switch.o \
 	threading/thread.o                      \
 	threading/scheduler.o                   \
+	io/console.o                            \
+	colorforth/editor.o                     \
 	test-suite/initrd-test.o                \
 	startup.o
 

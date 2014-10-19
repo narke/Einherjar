@@ -1,15 +1,6 @@
-/**
- * @file keyboard.c
- * @author Konstantin Tcholokachvili
- * @date 2007, 2013
- * @license MIT License
- *
- * Keyboard handling
- */
-
-#include <lib/types.h>
 #include <arch/x86/io-ports.h>
 #include <arch/x86-pc/io/vga.h>
+#include <arch/x86/interrupts/irq.h>
 
 #include "keyboard.h"
 
@@ -113,10 +104,11 @@ uchar_t keymap[] = {
 0xFF,	0xFF,	0xFF,	0xFF	/*	(0x61)	*/	
 };
 
+static struct console *terminal;
+
 void keyboard_interrupt_handler(int number) 
 {
 	uchar_t i;
-	static int ctrl = 0;
 
 	do 
 	{
@@ -128,44 +120,18 @@ void keyboard_interrupt_handler(int number)
 
 	if ( i < 0x80 )
 	{
-		switch(i)
-		{
-			case 0x1C: // CTRL enable
-				ctrl = 1;
-				break;
-			default:
-				if (ctrl == 1)
-				{
-					switch(keymap[i*4])
-					{
-						case 'r':
-							vga_set_attributes(FG_RED     | BG_BLACK);
-							break;
-						case 'y':
-							vga_set_attributes(FG_YELLOW  | BG_BLACK);
-							break;
-						case 'g':
-							vga_set_attributes(FG_GREEN   | BG_BLACK);
-							break;
-						case 'c':
-							vga_set_attributes(FG_CYAN    | BG_BLACK);
-							break;
-						case 'p':
-							vga_set_attributes(FG_MAGENTA | BG_BLACK);
-							break;
-						case 'o':
-							vga_set_attributes(FG_WHITE   | BG_BLACK);
-							break;
-						default:
-							;
-					}
-				}
-				else
-				{
-					// Avoid displaying the character pressed along CTRL 
-					vga_display_character(keymap[i*4]);
-				}
-				ctrl = 0;
-		}
+		console_add_character(terminal, i);
 	}
+}
+
+uchar_t keyboard_get_keymap(uchar_t i)
+{
+	return keymap[i*4];
+}
+
+void keyboard_setup(struct console *term)
+{
+	terminal = term;
+
+	x86_irq_set_routine(IRQ_KEYBOARD, keyboard_interrupt_handler);
 }

@@ -21,6 +21,8 @@
 #include <memory/virtual-memory.h>
 #include <threading/thread.h>
 #include <threading/scheduler.h>
+#include <io/console.h>
+#include <colorforth/editor.h>
 #include <test-suite/initrd-test.h>
 
 
@@ -53,6 +55,9 @@ void roentgenium_main(uint32_t magic, uint32_t address)
     // Initrd
     uint32_t initrd_start = 0;
     uint32_t initrd_end = 0;
+
+	// Console
+	struct console *cons = NULL;
 
     // VGA scren setup
     vga_clear();
@@ -93,9 +98,6 @@ void roentgenium_main(uint32_t magic, uint32_t address)
 
     // Timer interrupt, momentarily disabled
     x86_irq_set_routine(IRQ_TIMER, timer_interrupt_handler);
-
-    // Keyboard interrupt
-    x86_irq_set_routine(IRQ_KEYBOARD, keyboard_interrupt_handler);
 
 	// Initrd: Initial Ram Disk
 	initrd_start = *((uint32_t *)mbi->mods_addr);
@@ -147,4 +149,8 @@ void roentgenium_main(uint32_t magic, uint32_t address)
     printf("Initrd\n");
 
     initrd_test(initrd_start, initrd_end);
+	
+    console_setup(&cons, vga_display_character);
+	
+    editor(cons);
 }

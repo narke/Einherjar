@@ -130,13 +130,23 @@ void *memset(void *dst, sint32_t c, uint32_t length)
 	char *p;
 
 	for (p = (char *)dst; length > 0; p++, length--)
-	{
 		*p = (char)c;
-	}
 	
 	return p;
 }
 
+void *memcpy(void *dst, const void *src, register unsigned int size)
+{
+	char *_dst;
+	const char *_src;
+	
+	for (_dst = (char*)dst, _src = (const char*)src;
+			size > 0 ;
+			_dst++, _src++, size--)
+		*_dst = *_src;
+	
+	return dst;
+}
 
 char *strzcpy(register char *dst, register const char *src, register int len)
 {

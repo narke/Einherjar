@@ -53,8 +53,6 @@ struct thread
 
 	struct cpu_state *cpu_state;
 
-	//TAILQ_HEAD(, waitqueue_entry) kwaitq_list;
-
 	TAILQ_ENTRY(thread) next;
 }__attribute__ ((packed, aligned (8)));
 
@@ -65,7 +63,7 @@ struct thread
  * Initialize the primary kernel thread so that it can be handled
  * the same way as an ordinary thread created by thread_create().
  */
-uint32_t threading_setup(uint32_t init_thread_stack_base_address,
+ret_t threading_setup(uint32_t init_thread_stack_base_address,
 		uint32_t init_thread_stack_size);
 
 struct thread *thread_create(const char *name,

@@ -50,6 +50,9 @@ void printf(const char *format, ...);
  */
 void *memset(void *dst, sint32_t c, uint32_t length);
 
+/** Copy memory area */
+void *memcpy(void *dst, const void *src, register unsigned int size );
+
 /* String copy */
 char *strzcpy(register char *dst, register const char *src, register int len);
 

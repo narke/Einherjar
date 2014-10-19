@@ -15,8 +15,8 @@ inline void thread_set_current(struct thread *current_thread)
 {
 	assert(current_thread->state == THREAD_READY);
 	
-	g_current_thread		= current_thread;
-	g_current_thread->state	= THREAD_RUNNING;
+	g_current_thread        = current_thread;
+	g_current_thread->state = THREAD_RUNNING;
 }
 
 struct thread *thread_get_current()
@@ -25,7 +25,7 @@ struct thread *thread_get_current()
 	return (struct thread *)g_current_thread;
 }
 
-uint32_t threading_setup(uint32_t init_thread_stack_base_address,
+ret_t threading_setup(uint32_t init_thread_stack_base_address,
 		uint32_t init_thread_stack_size)
 {
 	struct thread *myself;
@@ -40,9 +40,9 @@ uint32_t threading_setup(uint32_t init_thread_stack_base_address,
 
 	/* Initialize the thread attributes */
 	strzcpy(myself->name, "[kinit]", THREAD_MAX_NAMELEN);
-	myself->state						= THREAD_CREATED;
-	myself->kernel_stack_base_address	= init_thread_stack_base_address;
-	myself->kernel_stack_size			= init_thread_stack_size;
+	myself->state                     = THREAD_CREATED;
+	myself->kernel_stack_base_address = init_thread_stack_base_address;
+	myself->kernel_stack_size         = init_thread_stack_size;
 	
 	/* Add the thread in the global list */        
 	TAILQ_INSERT_TAIL(&kernel_threads, myself, next);
@@ -78,12 +78,12 @@ struct thread *thread_create(const char *name,
 	new_thread->state = THREAD_CREATED;
 																				          
 	/* Allocate the stack for the new thread */
-	new_thread->kernel_stack_base_address	= (uint32_t)malloc(THREAD_KERNEL_STACK_SIZE);
-	new_thread->kernel_stack_size			= THREAD_KERNEL_STACK_SIZE;
+	new_thread->kernel_stack_base_address = (uint32_t)malloc(THREAD_KERNEL_STACK_SIZE);
+	new_thread->kernel_stack_size         = THREAD_KERNEL_STACK_SIZE;
 																									          
 	if (!new_thread->kernel_stack_base_address)
 		goto undo_creation;
-	
+
 	/* Initialize the CPU context of the new thread */
 	cpu_kstate_init(&new_thread->cpu_state,
 			(cpu_kstate_function_arg1_t *)start_func,
@@ -93,9 +93,7 @@ struct thread *thread_create(const char *name,
 
 	/* Add the thread in the global list */
 	X86_IRQs_DISABLE(flags);
-			          
 	TAILQ_INSERT_TAIL(&kernel_threads, new_thread, next);
-								          
 	X86_IRQs_ENABLE(flags);
 
 
