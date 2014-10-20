@@ -48,7 +48,7 @@ void printf(const char *format, ...);
  * @param c Specific value which will written to the memory zone
  * @param length the size of the memory zone
  */
-void *memset(void *dst, int32_t c, uint32_t length);
+void *memset(void *dst, sint32_t c, uint32_t length);
 
 /** Copy memory area */
 void *memcpy(void *dst, const void *src, register unsigned int size );

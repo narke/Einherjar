@@ -75,7 +75,7 @@ void x86_idt_setup(void);
  * @param handler_address	The callback which will be called
  * @return KERNEL_OK on success or KERNEL_INVALID_VALUE on failure
  * */
-ret_t x86_idt_set_handler(uint32_t index,
+uint16_t x86_idt_set_handler(uint32_t index,
 			      uint32_t handler_address);
 
 #endif // _IDT_H_

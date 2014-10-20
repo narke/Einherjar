@@ -43,7 +43,7 @@ void x86_irq_setup(void);
 
 /* The routine is set by IDT and called on interruptions.
  * If the routine is NULL then it's disabled. */
-ret_t x86_irq_set_routine(uint32_t irq_level, x86_irq_handler_t routine);
+uint16_t x86_irq_set_routine(uint32_t irq_level, x86_irq_handler_t routine);
 
 x86_irq_handler_t x86_irq_get_routine(uint32_t irq_level);
 

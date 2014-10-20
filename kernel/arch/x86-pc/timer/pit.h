@@ -22,7 +22,7 @@
  * @param frequency Frequency at which interrupts whill be raised
  * @return status Status indicating the success of operation
  */
-ret_t x86_pit_set_frequency(uint32_t frequency);
+uint16_t x86_pit_set_frequency(uint32_t frequency);
 
 /**
 * Timer's interrupt handler called periodically

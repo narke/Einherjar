@@ -125,7 +125,7 @@ void printf(const char *format, ...)
 }
 
 
-void *memset(void *dst, int32_t c, uint32_t length)
+void *memset(void *dst, sint32_t c, uint32_t length)
 {
 	char *p;
 

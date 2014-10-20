@@ -33,7 +33,7 @@
  *
  * IRQ0 will be raised periodically.
  */
-ret_t x86_pit_set_frequency(uint32_t frequency)
+uint16_t x86_pit_set_frequency(uint32_t frequency)
 {
 	uint32_t divisor;
 	
@@ -46,7 +46,7 @@ ret_t x86_pit_set_frequency(uint32_t frequency)
 	divisor = MAX_FREQUENCY / frequency;
 
 	/* The divisor must be between 1 and 65536 (16 bits value) */
-	if (divisor <= 0 || divisor > 65536)
+	if ( divisor <= 0 || divisor > 65536 )
 		return -KERNEL_INVALID_VALUE;
 
 	/* Prevent the divisor value to overflow, because it is coded
@@ -72,7 +72,7 @@ void timer_interrupt_handler(int number)
 {
     static int ticks = 0;
     static int seconds = 0;
-    uint32_t flags;
+	uint32_t flags;
 
     ticks++;
 
@@ -82,9 +82,9 @@ void timer_interrupt_handler(int number)
         ticks = 0;
     }
 
-    X86_IRQs_DISABLE(flags);
-    schedule();
-    X86_IRQs_ENABLE(flags);
+	X86_IRQs_DISABLE(flags);
+	schedule();
+	X86_IRQs_ENABLE(flags);
 }
 
 
