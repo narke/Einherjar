@@ -58,7 +58,7 @@ struct x86_page_table
 
 
 
-static uint32_t identity_mapping(struct x86_page_directory *page_directory,
+static ret_t identity_mapping(struct x86_page_directory *page_directory,
 				 paddr_t physical_address,
 				 vaddr_t virtual_address)
 {
@@ -69,50 +69,50 @@ static uint32_t identity_mapping(struct x86_page_directory *page_directory,
 	struct x86_page_table *page_table;
 
 	/* Is the page directory's enytry mapped? */
-	if ( page_directory[index_in_pd].present )
+	if (page_directory[index_in_pd].present)
 	{
-        	/* Yes */
-		page_table = (struct x86_page_table*)
+        /* Yes */
+        page_table = (struct x86_page_table*)
 			(page_directory[index_in_pd].page_table_base_address << 12);
 
-		/* Is a corresponding entry present in the pages table? */
-		if (!page_table[index_in_pt].present)
-		{
-			/* No, allocate it */
-			physical_memory_page_reference_at((uint32_t)page_table);
+        /* Is a corresponding entry present in the pages table? */
+        if (!page_table[index_in_pt].present)
+        {
+            /* No, allocate it */
+            physical_memory_page_reference_at((uint32_t)page_table);
         }
-		else
-		{
-			/* The previous test must be always true because 
-			 * the setup function scans pages in increasing order */
-			assert(FALSE);
-		}
-	}
-	else
-	{
-		/* No, allocate a new one */
-		page_table = (struct x86_page_table*)physical_memory_page_reference_new();
+        else
+        {
+            /* The previous test must be always true because 
+             * the setup function scans pages in increasing order */
+            assert(FALSE);
+        }
+    }
+    else
+    {
+        /* No, allocate a new one */
+        page_table = (struct x86_page_table*)physical_memory_page_reference_new();
 
-		if (!page_table)
-			return -KERNEL_NO_MEMORY;
+        if (!page_table)
+            return -KERNEL_NO_MEMORY;
 
-		memset((void*)page_table, 0x0, X86_PAGE_SIZE);
+        memset((void*)page_table, 0x0, X86_PAGE_SIZE);
 
-		page_directory[index_in_pd].present	= TRUE;
-		page_directory[index_in_pd].rw    	= 1;
-		page_directory[index_in_pd].page_table_base_address = ((uint32_t)page_table) >> 12;
-	}
+        page_directory[index_in_pd].present	= TRUE;
+        page_directory[index_in_pd].rw    	= 1;
+        page_directory[index_in_pd].page_table_base_address = ((uint32_t)page_table) >> 12;
+    }
 
-	/* Map the page in the page table */
-	page_table[index_in_pt].present	= 1;
-	page_table[index_in_pt].rw   	= 1;  
-	page_table[index_in_pt].mode    = 0;
-	page_table[index_in_pt].page_base_address   = physical_address >> 12;
+    /* Map the page in the page table */
+    page_table[index_in_pt].present	= 1;
+    page_table[index_in_pt].rw   	= 1;  
+    page_table[index_in_pt].mode    = 0;
+    page_table[index_in_pt].page_base_address   = physical_address >> 12;
 
-	return KERNEL_OK;	
+    return KERNEL_OK;	
 }
 
-uint16_t x86_paging_setup(paddr_t identity_mapping_base, paddr_t identity_mapping_top)
+ret_t x86_paging_setup(paddr_t identity_mapping_base, paddr_t identity_mapping_top)
 {
 	struct x86_page_directory *page_directory;
 	uint32_t cr0;
@@ -128,47 +128,46 @@ uint16_t x86_paging_setup(paddr_t identity_mapping_base, paddr_t identity_mappin
 	for (physical_address = identity_mapping_base;
 			physical_address < identity_mapping_top;
 			physical_address = physical_address + X86_PAGE_SIZE)
-	{
-		if (identity_mapping(page_directory,
+    {
+        if (identity_mapping(page_directory,
 					physical_address,
 					physical_address))
-		{
-			return -KERNEL_NO_MEMORY;
-		}
+        {
+            return -KERNEL_NO_MEMORY;
+        }
     }
 
-	/* Identity map the video area */
-	for (physical_address = BIOS_VIDEO_START;
+    /* Identity map the video area */
+    for (physical_address = BIOS_VIDEO_START;
 			physical_address < BIOS_VIDEO_END;
 			physical_address = physical_address + X86_PAGE_SIZE)
-	{
-		if (identity_mapping(page_directory,
+    {
+        if (identity_mapping(page_directory,
 					physical_address,
 					physical_address))
-		{
-			return -KERNEL_NO_MEMORY;
-		}
-	}
+        {
+            return -KERNEL_NO_MEMORY;
+        }
+    }
 
-	/* Setup the mirroring */
-	page_directory[VIRTUAL_ADDRESS_TO_PAGE_DIRECTORY_INDEX(PAGING_MIRROR_VIRTUAL_ADDRESS)].present = TRUE;
-	page_directory[VIRTUAL_ADDRESS_TO_PAGE_DIRECTORY_INDEX(PAGING_MIRROR_VIRTUAL_ADDRESS)].rw = 1;
-	page_directory[VIRTUAL_ADDRESS_TO_PAGE_DIRECTORY_INDEX(PAGING_MIRROR_VIRTUAL_ADDRESS)].mode  = 0;
-	page_directory[VIRTUAL_ADDRESS_TO_PAGE_DIRECTORY_INDEX(PAGING_MIRROR_VIRTUAL_ADDRESS)].page_table_base_address = ((uint32_t)page_directory)>>12;
+    /* Setup the mirroring */
+    page_directory[VIRTUAL_ADDRESS_TO_PAGE_DIRECTORY_INDEX(PAGING_MIRROR_VIRTUAL_ADDRESS)].present = TRUE;
+    page_directory[VIRTUAL_ADDRESS_TO_PAGE_DIRECTORY_INDEX(PAGING_MIRROR_VIRTUAL_ADDRESS)].rw = 1;
+    page_directory[VIRTUAL_ADDRESS_TO_PAGE_DIRECTORY_INDEX(PAGING_MIRROR_VIRTUAL_ADDRESS)].mode  = 0;
+    page_directory[VIRTUAL_ADDRESS_TO_PAGE_DIRECTORY_INDEX(PAGING_MIRROR_VIRTUAL_ADDRESS)].page_table_base_address = ((uint32_t)page_directory)>>12;
 
-	// Enable paging
-	// The CR3 register must point to the page directory
-	asm volatile("mov %0, %%cr3":: "b"(page_directory));
-	// A bit must be "swithed on" in the register cr0 to enable paging
-	asm volatile("mov %%cr0, %0": "=b"(cr0));	// read cr0
-	cr0 |= PAGING_FLAG;							// switching paging bit on
-	asm volatile("mov %0, %%cr0":: "b"(cr0));	// write back	
+    /* Enable paging, the CR3 register must point to the page directory */
+    asm volatile("mov %0, %%cr3":: "b"(page_directory));
+    /* A bit must be "swithed on" in the register cr0 to enable paging */
+    asm volatile("mov %%cr0, %0": "=b"(cr0));	// read cr0
+    cr0 |= PAGING_FLAG;							// switching paging bit on
+    asm volatile("mov %0, %%cr0":: "b"(cr0));	// write back	
 
-	return KERNEL_OK;
+    return KERNEL_OK;
 }
 
 
-uint16_t x86_paging_map(paddr_t page_physical_address,
+ret_t x86_paging_map(paddr_t page_physical_address,
 			vaddr_t page_virtual_address,
 			bool_t is_user_page,
 			uint32_t flags)
@@ -219,10 +218,10 @@ uint16_t x86_paging_map(paddr_t page_physical_address,
 		   and increase its reference count */
 		physical_memory_page_reference_at(pd[index_in_pd].page_table_base_address << 12);
 	}
-	else
-	{
-		/* Yes, unmap it */
-		physical_memory_page_unreference(pt[index_in_pt].page_base_address << 12);
+    else
+    {
+        /* Yes, unmap it */
+        physical_memory_page_unreference(pt[index_in_pt].page_base_address << 12);
     }
     
 	/* Map the page in the page table */
@@ -241,7 +240,7 @@ uint16_t x86_paging_map(paddr_t page_physical_address,
 }
 
 
-uint16_t x86_paging_unmap(vaddr_t page_virtual_address)
+ret_t x86_paging_unmap(vaddr_t page_virtual_address)
 {
 	uint32_t pt_unref_retval;
 
@@ -299,7 +298,7 @@ uint16_t x86_paging_unmap(vaddr_t page_virtual_address)
       
 		/* Update the TLB */
 		invlpg(pt);
-    }
-
-    return KERNEL_OK;  
+	}
+	
+	return KERNEL_OK;  
 }

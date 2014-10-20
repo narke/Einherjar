@@ -27,17 +27,17 @@
 #define PAGING_MIRROR_SIZE (1 << 22)	// 1 PD = 1024 Page Tables = 4MB
 
 /** Setting up paging */
-uint16_t x86_paging_setup(paddr_t identity_mapping_base,
+ret_t x86_paging_setup(paddr_t identity_mapping_base,
 		  paddr_t identity_mapping_top);
 
 /** Map a virtual address to a physical address */
-uint16_t x86_paging_map(paddr_t page_physical_address, 
+ret_t x86_paging_map(paddr_t page_physical_address, 
 		    vaddr_t page_virtual_address,
 		    bool_t is_user_page,
 		    uint32_t flags);
 
 /** Unmap a virtual address */	
-uint16_t x86_paging_unmap(vaddr_t virtual_address); 
+ret_t x86_paging_unmap(vaddr_t virtual_address); 
 
 
 #endif // _PAGING_H_

@@ -42,7 +42,7 @@ void x86_idt_setup(void)
 } 
 
 
-uint16_t x86_idt_set_handler(uint32_t index,
+ret_t x86_idt_set_handler(uint32_t index,
 			      uint32_t handler_address)
 {
 	struct x86_idt_entry *idt_entry;

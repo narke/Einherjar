@@ -9,8 +9,7 @@
 
 void x86_pic_setup(void)
 {
-	/* Send ICW1: 8086 mode + NOT Single ctrl + call address
-     interval=8 */
+	/* Send ICW1: 8086 mode + NOT Single ctrl + call address interval=8 */
 	outb(PIC_MASTER_COMMAND, 0x11);
 	outb(PIC_SLAVE_COMMAND, 0x11);
 	
@@ -38,7 +37,7 @@ void x86_pic_setup(void)
 void x86_pic_enable_irq_line(uint32_t param_irq_number)
 {
 	if( param_irq_number < 8 ) /*  IRQ on master PIC */
-		outb(PIC_MASTER_COMMAND+1,
+		outb(PIC_MASTER_COMMAND+1, 
 				(inb(PIC_MASTER_COMMAND+1) & ~(1 << param_irq_number)));
 	else /*  IRQ on slave PIC */
 		outb(PIC_SLAVE_COMMAND+1,
