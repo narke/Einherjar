@@ -20,25 +20,25 @@ typedef unsigned short int      uint16_t; 	/**< 16 bits unsigned */
 typedef unsigned char           uint8_t;  	/**< 8  bits unsigned */
 typedef unsigned char           uchar_t;  	/**< 8  bits unsigned */
 
-typedef signed long long int    sint64_t;	/**< 64 bits signed */
-typedef signed long int         sint32_t; 	/**< 32 bits signed */
-typedef signed short int        sint16_t; 	/**< 16 bits signed */
-typedef signed char             sint8_t;	/**< 8  bits signed */
+typedef signed long long int    int64_t;	/**< 64 bits signed */
+typedef signed long int         int32_t; 	/**< 32 bits signed */
+typedef signed short int        int16_t; 	/**< 16 bits signed */
+typedef signed char             int8_t;		/**< 8  bits signed */
 
 /** Physical address */
-typedef unsigned int			paddr_t;
+typedef unsigned int            paddr_t;
 
 /** Virtual address */
-typedef unsigned int			vaddr_t;
+typedef unsigned int            vaddr_t;
 
 /** Memory size of an object */
-typedef unsigned int			size_t;
+typedef unsigned int            size_t;
 
 /** Return status **/
-typedef int						ret_t;
+typedef int                     ret_t;
 
 /** Offset type */
-typedef signed int				off_t;
+typedef signed int              off_t;
 
 #endif // _TYPES_H_
 

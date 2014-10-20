@@ -48,7 +48,7 @@ static uint32_t g_physical_memory_used_pages;
 
 
 
-uint16_t physical_memory_setup(uint32_t ram_size, 
+ret_t physical_memory_setup(uint32_t ram_size, 
 		paddr_t *out_kernel_base, 
 		paddr_t *out_kernel_top,
 		uint32_t initrd_start,
@@ -236,7 +236,7 @@ physical_memory_get_page_descriptor_at_address(uint32_t page_physical_address)
 }
 
 
-uint32_t physical_memory_page_reference_at(uint32_t page_physical_address)
+ret_t physical_memory_page_reference_at(uint32_t page_physical_address)
 {
 	struct physical_page_descriptor *physical_page_descr
 		= physical_memory_get_page_descriptor_at_address(page_physical_address);
@@ -266,7 +266,7 @@ uint32_t physical_memory_page_reference_at(uint32_t page_physical_address)
 }
 
 
-uint16_t physical_memory_page_unreference(uint32_t page_physical_address)
+ret_t physical_memory_page_unreference(uint32_t page_physical_address)
 {
 	/* By default we assume that the page is still used */
 	uint32_t retval = FALSE;
