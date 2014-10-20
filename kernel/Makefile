@@ -67,7 +67,8 @@ cdrom:
 	$(generating) '$@'
 	mv $(KERNEL) $(BOOTLOADER_PATH)/iso/
 	genisoimage -R -b boot/grub/stage2_eltorito -no-emul-boot \
-	-boot-load-size 4 -boot-info-table -o $(MULTIBOOT_IMAGE) $(BOOTLOADER_PATH)/iso/
+	-boot-load-size 4 -boot-info-table -input-charset utf8 
+	-o $(MULTIBOOT_IMAGE) $(BOOTLOADER_PATH)/iso/
 
 initrd:
 	$(generating) '$@'
