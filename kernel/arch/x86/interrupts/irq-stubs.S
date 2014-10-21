@@ -9,9 +9,6 @@
 // The address of the table of wrappers (defined below, and shared with irq.c 
 .globl x86_irq_wrapper_array
 
-/** The variable holding the nested level of the IRQ handlers */
-.extern irq_nested_level_counter
-
 // These pre-handlers are for IRQ (Master PIC)
 .irp id, 0,1,2,3,4,5,6,7
 
@@ -44,11 +41,6 @@
 		pushw fs
 		pushw gs
 
-.att_syntax prefix
-		//  Increment IRQ nested level
-		incl irq_nested_level_counter
-.intel_syntax noprefix
-		
 		// Send EOI to PIC. See Intel 8259 datasheet
 		mov al, 0x20
 		outb 0x20, al
@@ -61,27 +53,10 @@
 		call [edi+4*\id]
 		add  esp, 4
 
-		/*
-		 * Decrement IRQ nested level
-		 */
-		cli  // Just in case we messed up everything in the handler
-.att_syntax prefix
-		subl $1, irq_nested_level_counter
-.intel_syntax noprefix
-		// irq_nested_level_counter went below 0?
-		jnc 2f
-	
-	1:  // Yes:	Print fatal error message
-		push msg_nested_level_overflow
-		call display_fatal_error
-		add  esp, 4 ; jmp 1b
-		// Never returns
-
-	2:	// No: Restore the context
 		popw  gs
 		popw  fs
 		popw  es
-	    popw  ds
+		popw  ds
 		popw  ss
 		add esp, 2
 		pop eax
@@ -118,6 +93,7 @@
 		push ebp
 		mov  ebp, esp
 
+		// Restore the context
 		push edi
 		push esi
 		push edx
@@ -131,12 +107,6 @@
 		pushw fs
 		pushw gs
 
-		/*
-		 * Increment IRQ nested level
-		 */
-.att_syntax prefix
-		incl irq_nested_level_counter
-.intel_syntax noprefix
 		// Send EOI to PIC. See Intel 8259 datasheet	
 		movb  al, 0x20
 		outb  0xa0, al
@@ -150,27 +120,11 @@
 		call [edi+4*\id]
 		add  esp, 4
 
-		/*
-		 * Decrement IRQ nested level
-		 */
-		cli  // Just in case we messed up everything in the handler
-.att_syntax prefix
-		subl $1, irq_nested_level_counter
-.intel_syntax noprefix
-		// irq_nested_level_counter went below 0?
-		jnc 2f
-		
-	1:  // Yes:	Print fatal error message
-		push msg_nested_level_overflow
-		call display_fatal_error
-		add  esp, 4 ; jmp 1b
-		// Never returns
-
-	2:	// No: Restore the context
+		// Restore the context
 		popw gs
 		popw fs
 		popw es
-	    popw ds
+		popw ds
 		popw ss
 		add  esp, 2
 		pop  eax

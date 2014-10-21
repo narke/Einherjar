@@ -13,12 +13,8 @@ extern uint32_t x86_irq_wrapper_array[X86_IRQ_NUM];
 /* arrays of IRQ handlers, shared with irq_wrappers.S */
 x86_irq_handler_t x86_irq_handler_array[X86_IRQ_NUM] = { NULL, };
 
-/** Number of interrupt handlers that are currently executing */
-uint32_t irq_nested_level_counter;
-
 void x86_irq_setup(void)
 {
-	irq_nested_level_counter = 0;
 	x86_pic_setup();
 }
 
