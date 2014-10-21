@@ -10,6 +10,6 @@
  * Pysical pages testing
  */
 
-void test_physical_memory();
+void test_physical_memory(void);
 
 #endif // _PHYSICAL_MEMORY_TEST_H_

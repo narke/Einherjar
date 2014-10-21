@@ -71,6 +71,6 @@ void *malloc(size_t size);
  */
 void free(void *ptr);
 
-void display_fatal_error();
+void display_fatal_error(void);
 
 #endif // _LIBC_H_

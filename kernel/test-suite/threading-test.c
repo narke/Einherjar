@@ -14,7 +14,7 @@ void print_world(void *a)
 	printf("world!\n");
 }
 
-void test_kernel_threads()
+void test_kernel_threads(void)
 {
 	uint32_t flags;
 

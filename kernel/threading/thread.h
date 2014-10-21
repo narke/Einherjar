@@ -72,7 +72,7 @@ struct thread *thread_create(const char *name,
 
 inline void thread_set_current(struct thread *current_thread);
 
-struct thread *thread_get_current();
+struct thread *thread_get_current(void);
 
 #endif // _THREAD_H_
 

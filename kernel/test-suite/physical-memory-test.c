@@ -16,7 +16,7 @@ struct phys_page
 };
 
 
-void test_physical_memory()
+void test_physical_memory(void)
 {
         TAILQ_HEAD(, phys_page) phys_pages_head;
 

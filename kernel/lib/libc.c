@@ -180,7 +180,7 @@ void free(void *ptr)
 }
 
 
-void display_fatal_error()
+void display_fatal_error(void)
 {
   asm("cli\n"); /* disable interrupts -- x86 only */ \
 

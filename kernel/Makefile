@@ -12,6 +12,7 @@ LDFLAGS = --warn-common -melf_i386 --strip-all
 BOOTLOADER_PATH = arch/x86-pc/bootstrap
 BUILD_PATH      = ../build
 INITRD_PATH     = arch/x86-pc/bootstrap/iso
+TOOLS_PATH      = ../tools
 
 OBJECTS = $(BOOTLOADER_PATH)/multiboot.o    \
 	arch/x86-pc/io/vga.o                    \
@@ -35,7 +36,7 @@ OBJECTS = $(BOOTLOADER_PATH)/multiboot.o    \
 	io/console.o                            \
 	colorforth/editor.o                     \
 	test-suite/initrd-test.o                \
-	startup.o
+	arch/x86-pc/startup.o
 
 KERNEL          = $(BUILD_PATH)/roentgenium.elf
 MULTIBOOT_IMAGE	= $(BUILD_PATH)/roentgenium.iso
@@ -48,8 +49,9 @@ $(KERNEL): $(OBJECTS)
 	@if [ ! -d $(BUILD_PATH) ];  \
 	then                         \
 		mkdir $(BUILD_PATH); \
-	fi                           
-	$(LD) $(LDFLAGS) -T ./linker.ld -o $@ $^
+	fi
+	$(linking) '$< > $@'
+	$(LD) $(LDFLAGS) -T arch/x86-pc/linker.ld -o $@ $^
 
 %.o: %.c
 	$(compiling) '$< > $@'
@@ -72,7 +74,7 @@ cdrom:
 
 initrd:
 	$(generating) '$@'
-	../tools/initrd_generate.py
+	$(TOOLS_PATH)/initrd_generate.py
 	mv initrd.img $(INITRD_PATH) 
 
 clean:

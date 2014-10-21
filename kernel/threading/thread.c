@@ -19,7 +19,7 @@ inline void thread_set_current(struct thread *current_thread)
 	g_current_thread->state = THREAD_RUNNING;
 }
 
-struct thread *thread_get_current()
+struct thread *thread_get_current(void)
 {
 	assert(g_current_thread->state == THREAD_RUNNING);
 	return (struct thread *)g_current_thread;

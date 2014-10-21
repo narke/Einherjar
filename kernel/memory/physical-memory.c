@@ -187,7 +187,7 @@ ret_t physical_memory_setup(uint32_t ram_size,
 }
 
 
-uint32_t physical_memory_page_reference_new()
+uint32_t physical_memory_page_reference_new(void)
 {
 	struct physical_page_descriptor *physical_page_descr;
 	
