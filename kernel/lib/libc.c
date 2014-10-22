@@ -179,18 +179,3 @@ void free(void *ptr)
 	heap_free(ptr);
 }
 
-
-void display_fatal_error(void)
-{
-  asm("cli\n"); /* disable interrupts -- x86 only */ \
-
-  vga_set_position(0, 23);
-  vga_set_attributes(BG_BLACK | FG_RED);
-
-  printf("Fatal error!\n");
-
-  /* Infinite loop: processor halted */
-  for ( ; ; )
-    asm("hlt\n");
-}
-
