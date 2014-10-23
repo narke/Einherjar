@@ -48,13 +48,13 @@ void printf(const char *format, ...);
  * @param c Specific value which will written to the memory zone
  * @param length the size of the memory zone
  */
-void *memset(void *dst, int32_t c, uint32_t length);
+void *memset(void *dst, int c, size_t length);
 
 /** Copy memory area */
-void *memcpy(void *dst, const void *src, register unsigned int size );
+void *memcpy(void *dst, const void *src, register size_t size);
 
 /* String copy */
-char *strzcpy(register char *dst, register const char *src, register int len);
+char *strzcpy(register char *dst, register const char *src, register size_t len);
 
 /**
  * Allocate memory

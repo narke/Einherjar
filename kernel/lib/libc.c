@@ -12,57 +12,49 @@
 #include "libc.h"
 
 
-static void itoa(unsigned int value, char *str, int base)
+static void itoa(int value, char *str, uint8_t base)
 {
-	uint8_t i = 0;
-	uint8_t j = 0;
-	uint8_t divisor;
+	uint8_t i           = 0;
+	uint8_t j           = 0;
+	uint8_t divisor     = 10;
+	uint8_t is_negative = 0;
 	uint8_t remainder;
+	
 	char tmp;
 	
+	// Convert 0
 	if (value == 0)
-	{
 		str[i++] = '0';
-	}
-		
-	switch (base)
-	{
-		case 'd':
-			divisor = 10;
-			
-			if (value < 0)
-			{
-				str[i++] = '-';
-				value = -value;
-			}
-			break;
-		
 	
-		case 'x':
-			divisor = 16;
-			break;
-			
-		default:
-			divisor = 10;
-	}	
-
+	// Handle negative decimal values
+	if (base == 'd' && value < 0)
+	{
+		is_negative = 1;
+		value       = -value;
+	}
+	
+	// Convert the value into the corresponding base
 	while (value > 0)
 	{
 		remainder = value % divisor;
-		str[i++] = (remainder < 10) ? remainder + '0' : remainder + 'a' - 10;
-		value = value / divisor;
+		str[i++]  = (remainder < 10) ? remainder + '0' : remainder + 'a' - 10;
+		value     = value / divisor;
 	}
 	
+	// Add '-' to negative numbers now, to reverse that later
+	if (base == 'd' && is_negative)
+		str[i++] = '-';
+	
+	// Handle hex values
 	if (base == 'x')
 	{
-		// Display 0xN
 		str[i++] = 'x';
-		str[i++] = '0'; 
+		str[i++] = '0';
 	}
-
+	
+	// Finalizing by ending the string and reversing it
 	str[i] = '\0';
 	
-	// reversing the array to get the numbers in order
 	for (i = i - 1, j = 0; j < i; i--, j++)
 	{
 		tmp = str[j];
@@ -125,7 +117,7 @@ void printf(const char *format, ...)
 }
 
 
-void *memset(void *dst, int32_t c, uint32_t length)
+void *memset(void *dst, int c, size_t length)
 {
 	char *p;
 
@@ -135,7 +127,7 @@ void *memset(void *dst, int32_t c, uint32_t length)
 	return p;
 }
 
-void *memcpy(void *dst, const void *src, register unsigned int size)
+void *memcpy(void *dst, const void *src, register size_t size)
 {
 	char *_dst;
 	const char *_src;
@@ -148,7 +140,7 @@ void *memcpy(void *dst, const void *src, register unsigned int size)
 	return dst;
 }
 
-char *strzcpy(register char *dst, register const char *src, register int len)
+char *strzcpy(register char *dst, register const char *src, register size_t len)
 {
 	int i;
 	
