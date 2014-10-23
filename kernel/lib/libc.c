@@ -32,6 +32,8 @@ static void itoa(int value, char *str, uint8_t base)
 		is_negative = 1;
 		value       = -value;
 	}
+	else if (base == 'x') // Handle hex values
+		divisor = 16;
 	
 	// Convert the value into the corresponding base
 	while (value > 0)
