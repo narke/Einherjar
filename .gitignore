@@ -15,3 +15,8 @@
 *.exe
 *.out
 *.app
+
+# Generated files
+*.iso
+*.elf
+*.img
