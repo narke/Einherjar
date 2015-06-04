@@ -51,7 +51,6 @@ static uint32_t g_physical_memory_used_pages;
 ret_t physical_memory_setup(uint32_t ram_size, 
 		paddr_t *out_kernel_base, 
 		paddr_t *out_kernel_top,
-		uint32_t initrd_start,
 		uint32_t initrd_end)
 {
 	uint32_t higher_end_address;

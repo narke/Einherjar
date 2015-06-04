@@ -288,8 +288,6 @@ ret_t x86_paging_unmap(vaddr_t page_virtual_address)
 	/* Free this page table's entry, it may free the page table */
 	pt_unref_retval = physical_memory_page_unreference(pd[index_in_pd].page_table_base_address << 12);
   
-	assert(pt_unref_retval >= 0);
-
 	/* Is the page table completely unused? */
 	if (pt_unref_retval > 0)
 	{

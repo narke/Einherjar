@@ -13,9 +13,7 @@
 #include <lib/types.h>
 
 /** Setup virtual memory, free and use address ranges */
-void virtual_memory_setup(uint32_t kernel_base,
-		uint32_t kernel_top, 
-		uint32_t ram_size);
+void virtual_memory_setup(uint32_t kernel_top, uint32_t ram_size);
 
 /** Allocate memory on the heap */
 void *heap_alloc(size_t size);

@@ -107,7 +107,6 @@ void roentgenium_main(uint32_t magic, uint32_t address)
     retval = physical_memory_setup((mbi->mem_upper<<10) + (1<<20),
 			&physical_addresses_bottom,
 			&physical_addresses_top,
-			initrd_start,
 			initrd_end);
 
     assert(retval == KERNEL_OK);
@@ -123,9 +122,7 @@ void roentgenium_main(uint32_t magic, uint32_t address)
     printf(" | Paging");
 
     // Memory Management: Virtual memory
-    virtual_memory_setup(physical_addresses_bottom,
-			physical_addresses_top,
-			ram_size);
+    virtual_memory_setup(physical_addresses_top, ram_size);
 
     printf(" | Virtual memory\n");
 
@@ -148,7 +145,7 @@ void roentgenium_main(uint32_t magic, uint32_t address)
 
     printf("Initrd\n");
 
-    initrd_test(initrd_start, initrd_end);
+    initrd_test(initrd_start);
 	
     console_setup(&cons, vga_display_character);
 	

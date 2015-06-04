@@ -76,7 +76,6 @@
 ret_t physical_memory_setup(uint32_t ram_size,
 		/* out */paddr_t *kernel_core_base,
 		/* out */paddr_t *kernel_core_top,
-		uint32_t initrd_start,
 		uint32_t initrd_end);
 
 /**

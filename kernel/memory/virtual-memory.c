@@ -176,10 +176,10 @@ static void heap_setup(uint32_t kernel_top_address)
 }
 
 
-void virtual_memory_setup(uint32_t kernel_base,
-		uint32_t kernel_top,
-		uint32_t ram_size)
+void virtual_memory_setup(uint32_t kernel_top, uint32_t ram_size)
 {
+	/* TODO: Use kernel base address for ranges, later */
+
 	TAILQ_INIT(&free_memory_ranges);
 	TAILQ_INIT(&used_memory_ranges);
 

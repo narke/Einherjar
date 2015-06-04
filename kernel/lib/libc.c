@@ -144,7 +144,7 @@ void *memcpy(void *dst, const void *src, register size_t size)
 
 char *strzcpy(register char *dst, register const char *src, register size_t len)
 {
-	int i;
+	size_t i;
 	
 	if (len <= 0)
 		return dst;
