@@ -4,6 +4,25 @@
 
 #include "editor.h"
 
+#define HIGHBIT 0x80000000L
+#define MASK    0xffffffffL
+
+#define STACK_SIZE 8
+
+cell_t *blocks;
+
+/*
+ * Stack macros
+ */
+#define stack_push(x) *(++tos) = x
+#define stack_pop()   *(tos--)
+#define nos           tos[-1]	// Next On Stack
+#define start_of(x)   (&x[0])
+
+/* Data stack */
+cell_t stack[STACK_SIZE];
+cell_t *tos = start_of(stack);	// Top Of Stack
+
 static void handle_input(uchar_t c)
 {
 	static bool_t ctrl = FALSE;
@@ -56,10 +75,141 @@ static void handle_input(uchar_t c)
 	}
 }
 
-void editor(struct console *cons)
+
+/*
+ * Packing and unpacking words
+ */
+char *code = " rtoeanismcylgfwdvpbhxuq0123456789j-k.z/;:!+@*,?";
+
+char *
+unpack(cell_t word)
+{
+	unsigned char nybble;
+	static char text[16];
+	unsigned int coded, bits, i;
+
+	coded  = word;
+	i      = 0;
+	bits   = 32 - 4;
+	coded &= ~0xf;
+
+	memset(text, 0, 16);
+
+	while (coded)
+	{
+		nybble = coded >> 28;
+		coded  = (coded << 4) & MASK;
+		bits  -= 4;
+
+		if (nybble < 0x8)
+		{
+			text[i] += code[nybble];
+		}
+		else if (nybble < 0xc)
+		{
+			text[i] += code[(((nybble ^ 0xc) << 1) | ((coded & HIGHBIT) > 0))];
+			coded    = (coded << 1) & MASK;
+			bits    -= 1;
+		}
+		else
+		{
+			text[i] += code[(coded >> 29) + (8 * (nybble - 10))];
+			coded    = (coded << 3) & MASK;
+			bits    -= 3;
+		}
+
+		i++;
+	}
+
+	return text;
+}
+
+static void do_word(cell_t word)
+{
+	uint8_t color;
+
+	color = (int)word & 0x0000000f;
+
+	switch (color)
+	{
+		case 0:
+			break;
+		case 1:
+		case 2:
+		case 8:
+			vga_set_attributes(FG_YELLOW | BG_BLACK);
+			break;
+		case 3:
+			vga_set_attributes(FG_RED | BG_BLACK);
+			break;
+		case 4:
+		case 5:
+		case 6:
+			vga_set_attributes(FG_GREEN | BG_BLACK);
+			break;
+		case 7:
+			vga_set_attributes(FG_CYAN | BG_BLACK);
+			break;
+		case 9:
+		case 10:
+		case 11:
+		case 15:
+			vga_set_attributes(FG_WHITE | BG_BLACK);
+			break;
+		case 12:
+			vga_set_attributes(FG_MAGENTA | BG_BLACK);
+			break;
+		default:
+			;
+	}
+
+	if (color == 2 || color == 5 || color == 6 || color == 8 || color == 15)
+	{
+		printf("%d ", word >> 5);
+	}
+	else
+	{
+		printf("%s ", unpack(word));
+	}
+}
+
+void run_block(cell_t n)
+{
+	unsigned long start, limit, i;
+
+	start = n * 256;     // Start executing block from here...
+	limit = (n+1) * 256; // to this point.
+
+	for (i = start; i < limit; i++)
+	{
+		// Is the end of block reached? If so return.
+		if (blocks[i] == 0)
+			return;
+
+		do_word(blocks[i]);
+	}
+}
+
+void load(void)
+{
+	cell_t n;
+
+	n = stack_pop();
+	run_block(n);
+}
+
+void editor(struct console *cons, uint32_t initrd_start)
 {
 	char buffer[256];
 	uchar_t c;
+
+	vga_clear();
+
+	blocks = (cell_t *)initrd_start;
+
+	// Load block 0
+	stack_push(0);
+	load();
 
 	while (1)
 	{

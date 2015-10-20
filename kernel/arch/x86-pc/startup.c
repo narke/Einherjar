@@ -145,9 +145,7 @@ void roentgenium_main(uint32_t magic, uint32_t address)
 
     printf("Initrd\n");
 
-    initrd_test(initrd_start);
-	
     console_setup(&cons, vga_display_character);
 	
-    editor(cons);
+    editor(cons, initrd_start);
 }

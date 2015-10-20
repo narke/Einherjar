@@ -3,6 +3,8 @@
 
 #include <io/console.h>
 
-void editor(struct console *cons);
+typedef int32_t cell_t;
+
+void editor(struct console *cons, uint32_t initrd_start);
 
 #endif // _EDITOR_H_
