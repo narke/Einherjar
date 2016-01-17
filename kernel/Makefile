@@ -1,5 +1,4 @@
-# Set this to see commands being run
-VERBOSE = off
+VERBOSE = off # Set this to see commands being run
 COLOR   = on
 
 include messages.make
@@ -67,10 +66,8 @@ $(KERNEL): $(OBJECTS)
 
 cdrom:
 	$(generating) '$@'
-	mv $(KERNEL) $(BOOTLOADER_PATH)/iso/
-	genisoimage -R -b boot/grub/stage2_eltorito -no-emul-boot \
-	-boot-load-size 4 -boot-info-table -input-charset utf8    \
-	-o $(MULTIBOOT_IMAGE) $(BOOTLOADER_PATH)/iso/
+	mv $(KERNEL) $(BOOTLOADER_PATH)/iso/boot/
+	grub-mkrescue -o $(MULTIBOOT_IMAGE) $(BOOTLOADER_PATH)/iso/ 
 
 initrd:
 	$(generating) '$@'
@@ -84,5 +81,5 @@ clean:
 		rm -R $(BUILD_PATH); \
 	fi                        
 	$(RM) $(OBJECTS)
-	$(RM) $(BOOTLOADER_PATH)/iso/roentgenium.elf
+	$(RM) $(BOOTLOADER_PATH)/iso/boot/roentgenium.elf
 	$(RM) $(INITRD_PATH)/initrd.img
