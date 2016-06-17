@@ -32,7 +32,7 @@ static void handle_input(uchar_t c)
 		case KEY_CTRL:
 			ctrl = TRUE;
 			break;
-					
+
 		default:
 			if (ctrl == TRUE)
 			{
@@ -41,27 +41,27 @@ static void handle_input(uchar_t c)
 					case 'r':
 						vga_set_attributes(FG_RED | BG_BLACK);
 						break;
-					
+
 					case 'y':
 						vga_set_attributes(FG_YELLOW | BG_BLACK);
 						break;
-					
+
 					case 'g':
 						vga_set_attributes(FG_GREEN | BG_BLACK);
 						break;
-					
+
 					case 'c':
 						vga_set_attributes(FG_CYAN | BG_BLACK);
 						break;
-					
+
 					case 'p':
 						vga_set_attributes(FG_MAGENTA | BG_BLACK);
 						break;
-					
+
 					case 'o':
 						vga_set_attributes(FG_WHITE | BG_BLACK);
 						break;
-					
+
 					default:
 						;
 				}
@@ -80,6 +80,35 @@ static void handle_input(uchar_t c)
  * Packing and unpacking words
  */
 char *code = " rtoeanismcylgfwdvpbhxuq0123456789j-k.z/;:!+@*,?";
+
+int
+get_code_index(const char letter)
+{
+	// Get the index of a character in the 'code' sequence.
+	return strchr(code, letter) - code;
+}
+
+cell_t
+pack(const char *word_name)
+{
+	int word_length, i, bits, length, letter_code, packed;
+
+	word_length = strlen(word_name);
+	packed      = 0;
+	bits        = 28;
+
+	for (i = 0; i < word_length; i++)
+	{
+		letter_code = get_code_index(word_name[i]);
+		length      = 4 + (letter_code > 7) + (2 * (letter_code > 15));
+		letter_code += (8 * (length == 5)) + ((96 - 16) * (length == 7));
+		packed      = (packed << length) + letter_code;
+		bits        -= length;
+	}
+
+	packed <<= bits + 4;
+	return packed;
+}
 
 char *
 unpack(cell_t word)

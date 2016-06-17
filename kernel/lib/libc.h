@@ -6,8 +6,8 @@
  * @author Konstantin Tcholokachvili
  * @date 2013
  * @license MIT License
- * 
- * Tiny C library for the kernel land 
+ *
+ * Tiny C library for the kernel land
  */
 
 #include "types.h"
@@ -15,7 +15,7 @@
 /**
  * Assert an expression
  *
- * @param expression The expression to evaluate 
+ * @param expression The expression to evaluate
  */
 #define assert(expression)												\
 	({																	\
@@ -30,12 +30,12 @@
 			while (1) asm("hlt");										\
 		}																\
 	})
-	
- 
+
+
 
 /**
  * Formatted display of numbers and strings
- * 
+ *
  * @format Describes the format: %d,%x or %s
  * @... Variable number of variables ;-)
  */
@@ -53,12 +53,18 @@ void *memset(void *dst, int c, size_t length);
 /** Copy memory area */
 void *memcpy(void *dst, const void *src, register size_t size);
 
-/* String copy */
+/** String copy */
 char *strzcpy(register char *dst, register const char *src, register size_t len);
+
+/** Find the first occurence of a character */
+char *strchr(const char *s, int c);
+
+/** Calculate the length of a string */
+size_t strlen(const char *s);
 
 /**
  * Allocate memory
- * 
+ *
  * @param size Number of bytes to allocate
  * @return The address of the allocated memory region
  */

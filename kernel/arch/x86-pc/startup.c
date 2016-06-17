@@ -2,7 +2,7 @@
  * @author Konstantin Tcholokachvili
  * @date 2013, 2014
  * @license MIT License
- * 
+ *
  * Roentgenium's kernel's main file
  */
 
@@ -46,7 +46,7 @@ void roentgenium_main(uint32_t magic, uint32_t address)
 
     extern unsigned int x86_kernel_stack_bottom;
     extern unsigned int x86_kernel_stack_size;
-    
+
     // Memory manager variables
     paddr_t physical_addresses_bottom;
     paddr_t physical_addresses_top;
@@ -63,7 +63,7 @@ void roentgenium_main(uint32_t magic, uint32_t address)
     vga_clear();
     vga_set_attributes(FG_BRIGHT_BLUE | BG_BLACK );
     vga_set_position(34, 0);
-	
+
     printf("Roentgenium\n");
 
     // RAM size
@@ -73,12 +73,12 @@ void roentgenium_main(uint32_t magic, uint32_t address)
 
     // GDT
     x86_gdt_setup();
-	
+
     printf("CPU: GDT");
-	
+
     // IDT
     x86_idt_setup();
-	
+
     printf(" | IDT");
 
     // ISRs: Exceptions
@@ -146,6 +146,6 @@ void roentgenium_main(uint32_t magic, uint32_t address)
     printf("Initrd\n");
 
     console_setup(&cons, vga_display_character);
-	
+
     editor(cons, initrd_start);
 }
