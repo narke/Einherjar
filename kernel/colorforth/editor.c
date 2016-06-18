@@ -10,6 +10,7 @@
 #define STACK_SIZE 8
 
 cell_t *blocks;
+uint8_t nb_red_words;
 
 /*
  * Stack macros
@@ -170,6 +171,10 @@ static void do_word(cell_t word)
 			break;
 		case 3:
 			vga_set_attributes(FG_RED | BG_BLACK);
+            // Display each newly defined word on a new line
+            if (nb_red_words > 0)
+                printf("\n");
+            nb_red_words++;
 			break;
 		case 4:
 		case 5:
@@ -205,6 +210,8 @@ static void do_word(cell_t word)
 void run_block(cell_t n)
 {
 	unsigned long start, limit, i;
+
+    nb_red_words = 0;
 
 	start = n * 256;     // Start executing block from here...
 	limit = (n+1) * 256; // to this point.
