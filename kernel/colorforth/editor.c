@@ -26,13 +26,20 @@ cell_t *tos = start_of(stack);	// Top Of Stack
 
 static void handle_input(uchar_t c)
 {
-	static bool_t ctrl = FALSE;
+    static bool_t ctrl = FALSE;
+    static char word[32];
+    static uint8_t i = 0;
 
-	switch(c)
-	{
-		case KEY_CTRL:
+    switch(c)
+    {
+        case KEY_CTRL:
 			ctrl = TRUE;
 			break;
+
+        case KEY_SPACE:
+            word[i] = '\0';
+            i = 0;
+            break;
 
 		default:
 			if (ctrl == TRUE)
@@ -71,6 +78,9 @@ static void handle_input(uchar_t c)
 			{
 				// Avoid displaying character pressed along CTRL
 				vga_display_character(keyboard_get_keymap(c));
+
+                // Make a word from characters (it won't be patented ;-)
+                word[i++] = keyboard_get_keymap(c);
 			}
 			ctrl = FALSE;
 	}
@@ -82,15 +92,13 @@ static void handle_input(uchar_t c)
  */
 char *code = " rtoeanismcylgfwdvpbhxuq0123456789j-k.z/;:!+@*,?";
 
-int
-get_code_index(const char letter)
+int get_code_index(const char letter)
 {
 	// Get the index of a character in the 'code' sequence.
 	return strchr(code, letter) - code;
 }
 
-cell_t
-pack(const char *word_name)
+cell_t pack(const char *word_name)
 {
 	int word_length, i, bits, length, letter_code, packed;
 
@@ -111,8 +119,7 @@ pack(const char *word_name)
 	return packed;
 }
 
-char *
-unpack(cell_t word)
+char *unpack(cell_t word)
 {
 	unsigned char nybble;
 	static char text[16];
@@ -247,10 +254,10 @@ void editor(struct console *cons, uint32_t initrd_start)
 	stack_push(0);
 	load();
 
+	memset(buffer, 0, sizeof(buffer));
+
 	while (1)
 	{
-		memset(buffer, 0, sizeof(buffer));
-
 		console_read(cons, &c, 1);
 		handle_input(c);
 	}
