@@ -23,6 +23,10 @@
 
 #define KEY_CTRL    0x1C
 #define KEY_SPACE   0x38
+#define KEY_UP      0x47
+#define KEY_DOWN    0x4f
+#define KEY_LEFT    0x4a
+#define KEY_RIGHT   0x4c
 
 /** Handles keyboard
  *

@@ -1,7 +1,7 @@
 #ifndef _VGA_H_
 #define _VGA_H_
 
-/** 
+/**
  * @file vga.h
  * @author Konstantin Tcholokachvili
  * @date 2007, 2013
@@ -14,12 +14,12 @@
  * VGA-capable screen constants and functions
  */
 
-/** Video RAM starting adress */ 
+/** Video RAM starting adress */
 #define SCREEN_START 		0xB8000
 /** Video screen page size: 4000 bytes or 4 Ko */
-#define SCREEN_PAGE_SIZE	0xFA0 	
+#define SCREEN_PAGE_SIZE	0xFA0
 /** Video screen page maximal offset = SCREEN_START + SCREEN_PAGE_SIZE = 0xB8000 + 0xFA0 = 0xB8FA0 */
-#define SCREEN_PAGE_LIMIT (SCREEN_START + SCREEN_PAGE_SIZE) 
+#define SCREEN_PAGE_LIMIT (SCREEN_START + SCREEN_PAGE_SIZE)
 
 /** Number of maximal lines on a VGA screen */
 #define LINES 	25
@@ -27,9 +27,9 @@
 #define COLUMNS 80
 
 /** VGA control register */
-#define VGA_CONTROL_REGISTER 	0x3D4
+#define VGA_CONTROL_REGISTER    0x3D4
 /** VGA data register */
-#define VGA_DATA_REGISTER 	0x3D5
+#define VGA_DATA_REGISTER       0x3D5
 
 /* Normal and Dark/Light foreground colors */
 #define FG_BLACK           0
@@ -63,19 +63,22 @@
 #define FG_BLINKING  (1 << 7)
 
 #include <lib/types.h>
- 
+
 /** VGA-capable screen driver */
-	
+
 /** Clear the screen (by setting it to black) */
 void vga_clear(void);
 
-/** Scroll up the screen by a given number of lines 
+/** Update the cursor position */
+void vga_update_cursor(uint16_t x, uint16_t y);
+
+/** Scroll up the screen by a given number of lines
  *
  * @param nb_lines Number of lines to scroll up
  */
 void vga_scroll_up(uint8_t nb_lines);
 
-/** Set the X and Y position where the next string would be displayed 
+/** Set the X and Y position where the next string would be displayed
  *
  * @param x X position
  * @param y Y position
@@ -89,7 +92,7 @@ void vga_set_position(uint8_t x, uint8_t y);
 void vga_set_attributes(uint8_t attributes);
 
 
-/** Displays a character 
+/** Displays a character
  *
  * @param character Character to display or a special character to handle
  */
