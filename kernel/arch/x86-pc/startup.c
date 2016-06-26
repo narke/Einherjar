@@ -47,6 +47,8 @@ void roentgenium_main(uint32_t magic, uint32_t address)
     extern unsigned int x86_kernel_stack_bottom;
     extern unsigned int x86_kernel_stack_size;
 
+    (void)magic; // Avoid a useless warning ;-)
+
     // Memory manager variables
     paddr_t physical_addresses_bottom;
     paddr_t physical_addresses_top;

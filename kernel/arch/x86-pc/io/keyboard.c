@@ -111,6 +111,8 @@ void keyboard_interrupt_handler(int number)
 {
 	uchar_t status, scancode;
 
+       (void)number; // Avoid a useless warning ;-)
+
 	do
 	{
 		status = inb(KEYBOARD_COMMAND_PORT);

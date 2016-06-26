@@ -74,6 +74,8 @@ void timer_interrupt_handler(int number)
     static int seconds = 0;
     uint32_t flags;
 
+    (void)number; // Avoid a useless warning ;-)
+
     ticks++;
 
     if (ticks % 100 == 0)
