@@ -5,6 +5,7 @@
 #include "keyboard.h"
 
 char keymap[] = {
+0x0,    0x0,    0x0,    0x0,
 0x1B,	0x1B,	0x1B,	0x1B,	/*	esc	(0x01)	*/
 '1',	'!',	'1',	'1',
 '2',	'@',	'2',	'2',
@@ -108,19 +109,19 @@ static struct console *terminal;
 
 void keyboard_interrupt_handler(int number)
 {
-	uchar_t i;
+	uchar_t status, scancode;
 
 	do
 	{
-		i = inb(KEYBOARD_COMMAND_PORT);
-	} while((i & 0x01) == 0);
+		status = inb(KEYBOARD_COMMAND_PORT);
+	} while((status & 0x01) == 0);
 
-	i = inb(KEYBOARD_DATA_PORT);
-	i--;
+	scancode = inb(KEYBOARD_DATA_PORT);
+	//scancode--;
 
-	if ( i < 0x80 )
+	if (scancode < 0x80)
 	{
-		console_add_character(terminal, i);
+		console_add_character(terminal, scancode);
 	}
 }
 

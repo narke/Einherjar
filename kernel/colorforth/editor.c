@@ -24,15 +24,15 @@ uint8_t nb_red_words;
 cell_t stack[STACK_SIZE];
 cell_t *tos = start_of(stack);  // Top Of Stack
 
-static void handle_input(uchar_t c)
+static void handle_input(uchar_t scancode)
 {
     static bool_t ctrl = FALSE;
     static char word[32];
     static uint8_t i = 0;
 
-    switch(c)
+    switch(scancode)
     {
-        case KEY_CTRL:
+        case KEY_LEFT_CTRL:
             ctrl = TRUE;
             break;
 
@@ -60,7 +60,7 @@ static void handle_input(uchar_t c)
         default:
             if (ctrl == TRUE)
             {
-                switch(keyboard_get_keymap(c))
+                switch(keyboard_get_keymap(scancode))
                 {
                     case 'r':
                         vga_set_attributes(FG_RED | BG_BLACK);
@@ -93,10 +93,10 @@ static void handle_input(uchar_t c)
             else
             {
                 // Avoid displaying character pressed along CTRL
-                vga_display_character(keyboard_get_keymap(c));
+                vga_display_character(keyboard_get_keymap(scancode));
 
                 // Make a word from characters (it won't be patented ;-)
-                word[i++] = keyboard_get_keymap(c);
+                word[i++] = keyboard_get_keymap(scancode);
             }
             ctrl = FALSE;
     }
