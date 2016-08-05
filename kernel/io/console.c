@@ -50,11 +50,11 @@ ret_t console_setup(struct console **terminal_out,
 
 
 ret_t console_read(struct console *t,
-		uchar_t *dest_buffer,
+		uchar_t *dst_buffer,
 		size_t len)
 {
 	size_t count = 0;
-	
+
 	if (len == 0)
 		return KERNEL_OK;
 
@@ -69,33 +69,33 @@ ret_t console_read(struct console *t,
 			/* Loop, maybe the semaphore was stolen by someone else */
 			continue;
 		}
-		
+
 		c = t->buffer[t->buffer_read];
 
 		/* Copy the received character from the ring buffer to the
 		 * destination buffer */
-		 memcpy((void *)dest_buffer, 
-				 (void *)&t->buffer[t->buffer_read],
-				 sizeof(char));
+		memcpy((void *)dst_buffer,
+				(void *)&t->buffer[t->buffer_read],
+				sizeof(char));
 
-		dest_buffer++;
-		
+		dst_buffer++;
+
 		/* Update the ring buffer read pointer */
 		t->buffer_read++;
-		
+
 		if (t->buffer_read == CONSOLE_BUFFER_LENGTH)
 			t->buffer_read = 0;
-		
+
 		count++;
-		
+
 		if (t->mode & CONSOLE_MODE_ECHO)
 			t->write(c);
-		
+
 		/* Did we read enough bytes ? */
 		if (count == len || (c == '\n' && t->mode & CONSOLE_MODE_CANON))
 			break;
 	}
-	
+
 	len = count;
 	return KERNEL_OK;
 }
@@ -105,7 +105,7 @@ void console_write(struct console *t, void *src_buffer, uint16_t len)
 {
 	int i;
 	char c;
-	
+
 	for (i = 0; i < len; i++)
 	{
 		memcpy((void *)&c, (void *)src_buffer, sizeof(char));
@@ -127,7 +127,7 @@ void console_add_character(struct console *cons, char c)
 {
 	cons->buffer[cons->buffer_write] = c;
 	cons->buffer_write++;
-	
+
 	if (cons->buffer_write == CONSOLE_BUFFER_LENGTH)
 		cons->buffer_write = 0;
 

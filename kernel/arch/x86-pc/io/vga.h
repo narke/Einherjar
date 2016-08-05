@@ -1,10 +1,9 @@
-#ifndef _VGA_H_
-#define _VGA_H_
+#pragma once
 
 /**
  * @file vga.h
  * @author Konstantin Tcholokachvili
- * @date 2007, 2013
+ * @date 2007, 2013, 2016
  * @license MIT License
  *
  * @see http://sos.enix.org [FR]
@@ -13,23 +12,6 @@
  *
  * VGA-capable screen constants and functions
  */
-
-/** Video RAM starting adress */
-#define SCREEN_START 		0xB8000
-/** Video screen page size: 4000 bytes or 4 Ko */
-#define SCREEN_PAGE_SIZE	0xFA0
-/** Video screen page maximal offset = SCREEN_START + SCREEN_PAGE_SIZE = 0xB8000 + 0xFA0 = 0xB8FA0 */
-#define SCREEN_PAGE_LIMIT (SCREEN_START + SCREEN_PAGE_SIZE)
-
-/** Number of maximal lines on a VGA screen */
-#define LINES 	25
-/** Number of maximal columns on a VGA screen */
-#define COLUMNS 80
-
-/** VGA control register */
-#define VGA_CONTROL_REGISTER    0x3D4
-/** VGA data register */
-#define VGA_DATA_REGISTER       0x3D5
 
 /* Normal and Dark/Light foreground colors */
 #define FG_BLACK           0
@@ -70,7 +52,7 @@
 void vga_clear(void);
 
 /** Update the cursor position */
-void vga_update_cursor(uint16_t x, uint16_t y);
+void vga_update_cursor(void);
 
 /** Scroll up the screen by a given number of lines
  *
@@ -78,12 +60,19 @@ void vga_update_cursor(uint16_t x, uint16_t y);
  */
 void vga_scroll_up(uint8_t nb_lines);
 
-/** Set the X and Y position where the next string would be displayed
+/** Set X and Y positions where the next string would be displayed
  *
  * @param x X position
  * @param y Y position
  */
 void vga_set_position(uint8_t x, uint8_t y);
+
+/** Update X and Y positions where the next string would be displayed
+ *
+ * @param x X position
+ * @param y Y position
+ */
+void vga_update_position(int8_t x, int8_t y);
 
 /** Set attributes: foreground/background colors and blinking
  *
@@ -97,5 +86,3 @@ void vga_set_attributes(uint8_t attributes);
  * @param character Character to display or a special character to handle
  */
 void vga_display_character(uchar_t character);
-
-#endif // _VGA_H_
