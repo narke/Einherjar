@@ -11,7 +11,6 @@ LDFLAGS = --warn-common -melf_i386 --strip-all
 BOOTLOADER_PATH = arch/x86-pc/bootstrap
 BUILD_PATH      = ../build
 INITRD_PATH     = arch/x86-pc/bootstrap/iso
-TOOLS_PATH      = ../tools
 
 OBJECTS = $(BOOTLOADER_PATH)/multiboot.o    \
 	arch/x86-pc/io/vga.o                    \
@@ -34,6 +33,7 @@ OBJECTS = $(BOOTLOADER_PATH)/multiboot.o    \
 	threading/scheduler.o                   \
 	io/console.o                            \
 	colorforth/editor.o                     \
+	arch/x86/colorforth/compiler.o          \
 	test-suite/initrd-test.o                \
 	arch/x86-pc/startup.o
 
@@ -67,19 +67,18 @@ $(KERNEL): $(OBJECTS)
 cdrom:
 	$(generating) '$@'
 	mv $(KERNEL) $(BOOTLOADER_PATH)/iso/boot/
-	grub-mkrescue -o $(MULTIBOOT_IMAGE) $(BOOTLOADER_PATH)/iso/ 
+	grub-mkrescue -o $(MULTIBOOT_IMAGE) $(BOOTLOADER_PATH)/iso/
 
 initrd:
 	$(generating) '$@'
-	$(TOOLS_PATH)/initrd_generate.py
-	mv initrd.img $(INITRD_PATH) 
+	cp ../initrd/blocks.cf $(INITRD_PATH)/initrd.img
 
 clean:
 	$(cleaning)
 	@if [ -d $(BUILD_PATH) ];    \
 	then                         \
 		rm -R $(BUILD_PATH); \
-	fi                        
+	fi
 	$(RM) $(OBJECTS)
 	$(RM) $(BOOTLOADER_PATH)/iso/boot/roentgenium.elf
 	$(RM) $(INITRD_PATH)/initrd.img
