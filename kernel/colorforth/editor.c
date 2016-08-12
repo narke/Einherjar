@@ -1,3 +1,7 @@
+/*
+ * Credits: unpack(), print_hex() and print_dec() are courtesy of Andrei Dragomir.
+ */
+
 #include <lib/libc.h>
 #include <arch/x86-pc/io/keyboard.h>
 #include <arch/x86-pc/io/vga.h>
@@ -10,19 +14,14 @@
 #define STACK_SIZE 8
 
 cell_t *blocks;
-uint8_t nb_red_words;
+cell_t nb_block;
+unsigned int word_index;
 
-/*
- * Stack macros
- */
-#define stack_push(x)	*(++tos) = x
-#define stack_pop()	*(tos--)
-#define nos		tos[-1]   // Next On Stack
-#define start_of(x)	(&x[0])
+/* Prototype of a later implemented function */
+static void run_block(cell_t n);
 
-/* Data stack */
-cell_t stack[STACK_SIZE];
-cell_t *tos = start_of(stack);  // Top Of Stack
+char hex[] = {'0', '1', '2', '3', '4', '5', '6', '7',
+       '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
 static void handle_input(uchar_t scancode)
 {
@@ -64,6 +63,14 @@ static void handle_input(uchar_t scancode)
 			vga_update_cursor();
 			break;
 
+		case KEY_PAGE_UP:
+			run_block(--nb_block);
+			break;
+
+		case KEY_PAGE_DOWN:
+			run_block(++nb_block);
+			break;
+
 		default:
 			if (ctrl == TRUE)
 			{
@@ -90,7 +97,7 @@ static void handle_input(uchar_t scancode)
 						break;
 
 					case 'o':
-						vga_set_attributes(FG_WHITE | BG_BLACK);
+						vga_set_attributes(FG_BRIGHT_WHITE | BG_BLACK);
 						break;
 
 					default:
@@ -114,13 +121,13 @@ static void handle_input(uchar_t scancode)
  */
 char *code = " rtoeanismcylgfwdvpbhxuq0123456789j-k.z/;:!+@*,?";
 
-int get_code_index(const char letter)
+static int get_code_index(const char letter)
 {
 	// Get the index of a character in the 'code' sequence.
 	return strchr(code, letter) - code;
 }
 
-cell_t pack(const char *word_name)
+static cell_t pack(const char *word_name)
 {
 	int word_length, i, bits, length, letter_code, packed;
 
@@ -141,7 +148,7 @@ cell_t pack(const char *word_name)
 	return packed;
 }
 
-char *unpack(cell_t word)
+static char *unpack(cell_t word)
 {
 	unsigned char nibble;
 	static char text[16];
@@ -183,97 +190,228 @@ char *unpack(cell_t word)
 	return text;
 }
 
+static void print_hex(unsigned int i)
+{
+	int n = 8, f = 0;
+
+	if (i == 0)
+	{
+		vga_display_character('0'); return;
+	}
+
+	while (n--)
+	{
+		if (!(i & 0xf0000000))
+		{
+			if (f)
+				vga_display_character('0');
+		}
+		else
+		{
+			f = 1;
+			vga_display_character(hex [i >> 28]);
+		}
+		i <<= 4;
+	}
+}
+
+static void print_dec(int i)
+{
+	int j, k, f = 0;
+
+	if (i == 0)
+	{
+		vga_display_character('0'); return;
+	}
+
+	if (i < 0)
+	{
+		vga_display_character('-'); i = -i;
+	}
+
+	for (j = 1000000000; j != 0; j /= 10)
+	{
+		k = i / j;
+
+		if (k == 0)
+		{
+			if (f)
+				vga_display_character('0');
+		}
+		else
+		{
+			i -= j * k;
+			f = 1;
+			vga_display_character(hex[k]);
+		}
+	}
+}
+
+static void print_number(cell_t word, bool_t is_hex)
+{
+	if (is_hex)
+		print_hex(word >> 5);
+	else
+		print_dec(word >> 5);
+	vga_display_character(' ');
+}
+
 static void do_word(cell_t word)
 {
-	uint8_t color = (int)word & 0x0000000f;
+	uint8_t color = word & 0x0000000f;
+	bool_t is_hex = FALSE;
+	bool_t is_extension = FALSE;
 
 	switch (color)
 	{
 		case 0:
+			is_extension = TRUE;
+			printf("%s", unpack(word));
 			break;
+
 		case 1:
-		case 2:
-		case 8:
 			vga_set_attributes(FG_YELLOW | BG_BLACK);
+			printf("%s ", unpack(word));
 			break;
+
+		case 2:
+			vga_set_attributes(FG_BROWN | BG_BLACK);
+			if (word & 0x10)
+				print_hex(blocks[++word_index]);
+			else
+				print_dec(blocks[++word_index]);
+			vga_display_character(' ');
+			break;
+
 		case 3:
 			vga_set_attributes(FG_RED | BG_BLACK);
-			// Display each newly defined word on a new line
-			if (nb_red_words > 0)
-				printf("\n");
-			nb_red_words++;
+			printf("\n%s ", unpack(word));
 			break;
+
 		case 4:
+			vga_set_attributes(FG_BRIGHT_GREEN | BG_BLACK);
+			printf("%s ", unpack(word));
+			break;
+
 		case 5:
-		case 6:
 			vga_set_attributes(FG_GREEN | BG_BLACK);
+			if (word & 0x10)
+				print_hex(blocks[++word_index]);
+			else
+				print_dec(blocks[++word_index]);
+			vga_display_character(' ');
 			break;
+
+		case 6:
+			if (word & 0x10)
+			{
+				is_hex = TRUE;
+				vga_set_attributes(FG_GREEN | BG_BLACK);
+			}
+			else
+			{
+				is_hex = FALSE;
+				vga_set_attributes(FG_BRIGHT_GREEN | BG_BLACK);
+			}
+			print_number(word, is_hex);
+			break;
+
 		case 7:
-			vga_set_attributes(FG_CYAN | BG_BLACK);
+			vga_set_attributes(FG_BRIGHT_CYAN | BG_BLACK);
+			printf("%s ", unpack(word));
 			break;
+
+		case 8:
+			if (word & 0x10)
+			{
+				is_hex = TRUE;
+				vga_set_attributes(FG_BROWN | BG_BLACK);
+			}
+			else
+			{
+				is_hex = FALSE;
+				vga_set_attributes(FG_YELLOW | BG_BLACK);
+			}
+			print_number(word, is_hex);
+			break;
+
 		case 9:
-		case 10:
-		case 11:
-		case 15:
-			vga_set_attributes(FG_WHITE | BG_BLACK);
+			vga_set_attributes(FG_BRIGHT_WHITE | BG_BLACK);
+			printf("%s", unpack(word));
 			break;
+
+		case 10:
+			vga_set_attributes(FG_BRIGHT_WHITE | BG_BLACK);
+			if (!is_extension)
+				printf(" %s", unpack(word));
+			else
+				printf("%s", unpack(word));
+			break;
+
+		case 11:
+			vga_set_attributes(FG_BRIGHT_WHITE | BG_BLACK);
+			printf("%s", unpack(word));
+			break;
+
 		case 12:
 			vga_set_attributes(FG_MAGENTA | BG_BLACK);
+			printf("%s ", unpack(word));
+
+			vga_set_attributes(FG_BRIGHT_GREEN | BG_BLACK);
+			if (word & 0x10)
+				print_hex(blocks[++word_index]);
+			else
+				print_dec(blocks[++word_index]);
+			vga_display_character(' ');
 			break;
+
+		case 15:
+			vga_set_attributes(FG_BRIGHT_WHITE | BG_BLACK);
+			print_number(word, is_hex);
+			break;
+
 		default:
 			;
 	}
-	if (color == 2 || color == 5 || color == 6 || color == 8 || color == 15)
-	{
-		printf("%d ", word >> 5);
-	}
-	else
-	{
-		printf("%s ", unpack(word));
-	}
 }
 
-void run_block(cell_t n)
+static void status_bar_update_block_number(cell_t n)
 {
-	unsigned long start, limit, i;
+	vga_set_position(65, 23);
+	vga_set_attributes(FG_BRIGHT_GREEN | BG_BLACK);
 
-	nb_red_words = 0;
+	printf("Block: %d\n", n);
+
+	vga_set_position(0, 0);
+	vga_update_cursor();
+}
+
+static void run_block(cell_t n)
+{
+	unsigned long start, limit;
 
 	start = n * 256;     // Start executing block from here...
 	limit = (n+1) * 256; // to this point.
 
-	for (i = start; i < limit; i++)
+	vga_clear();
+
+	for (word_index = start; word_index < limit; word_index++)
 	{
-		// Is the end of block reached? If so return.
-		if (blocks[i] == 0)
-			return;
-
-		do_word(blocks[i]);
+		do_word(blocks[word_index]);
 	}
-}
 
-void load(void)
-{
-	cell_t n;
-
-	n = stack_pop();
-	run_block(n);
+	status_bar_update_block_number(n);
 }
 
 void editor(struct console *cons, uint32_t initrd_start)
 {
-	char buffer[256];
 	uchar_t c;
 
 	vga_clear();
 
 	blocks = (cell_t *)initrd_start;
 
-	// Load block 0
-	stack_push(0);
-	load();
-
-	memset(buffer, 0, sizeof(buffer));
+	run_block(0);
 
 	while (1)
 	{

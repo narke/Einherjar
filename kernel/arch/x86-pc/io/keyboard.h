@@ -50,6 +50,8 @@
 #define KEY_DOWN        0x50
 #define KEY_LEFT        0x4b
 #define KEY_RIGHT       0x4d
+#define KEY_PAGE_UP	0x49
+#define KEY_PAGE_DOWN	0x51
 
 /** Handles keyboard
  *

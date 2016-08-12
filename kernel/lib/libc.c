@@ -1,6 +1,6 @@
 /**
 * @author Konstantin Tcholokachvili
-* @date 2013
+* @date 2013, 2016
 * @license MIT License
 *
 * Tiny C library for the kernel land
@@ -11,53 +11,13 @@
 
 #include "libc.h"
 
-
-static void itoa(int value, char *str, uint8_t base)
+static void reverse(char str[], int length)
 {
-	uint8_t i           = 0;
-	uint8_t j           = 0;
-	uint8_t divisor     = 10;
-	uint8_t is_negative = 0;
-	uint8_t remainder;
-
 	char tmp;
+	int i = 0;
+	int j = 0;
 
-	// Convert 0
-	if (value == 0)
-		str[i++] = '0';
-
-	// Handle negative decimal values
-	if (base == 'd' && value < 0)
-	{
-		is_negative = 1;
-		value       = -value;
-	}
-	else if (base == 'x') // Handle hex values
-		divisor = 16;
-
-	// Convert the value into the corresponding base
-	while (value > 0)
-	{
-		remainder = value % divisor;
-		str[i++]  = (remainder < 10) ? remainder + '0' : remainder + 'a' - 10;
-		value     = value / divisor;
-	}
-
-	// Add '-' to negative numbers now, to reverse that later
-	if (base == 'd' && is_negative)
-		str[i++] = '-';
-
-	// Handle hex values
-	if (base == 'x')
-	{
-		str[i++] = 'x';
-		str[i++] = '0';
-	}
-
-	// Finalizing by ending the string and reversing it
-	str[i] = '\0';
-
-	for (i = i - 1, j = 0; j < i; i--, j++)
+	for (i = length - 1, j = 0; j < i; i--, j++)
 	{
 		tmp = str[j];
 		str[j] = str[i];
@@ -65,59 +25,103 @@ static void itoa(int value, char *str, uint8_t base)
 	}
 }
 
+static char *itoa(int value, char *str, int base)
+{
+	int remainder;
+	int i		= 0;
+	int is_negative = 0;
+
+	// Convert 0
+	if (value == 0)
+	{
+		str[i++] = '0';
+		str[i]   = '\0';
+		return str;
+	}
+
+	// Handle negative decimal values
+	if (value < 0 && base == 10)
+	{
+		is_negative = 1;
+		value       = -value;
+	}
+
+	// Convert the value into the corresponding base
+	while (value != 0)
+	{
+		remainder = value % base;
+		str[i++]  = (remainder > 9) ? (remainder-10) + 'a' : remainder + '0';
+		value     = value / base;
+	}
+
+	// Add '-' to negative numbers now, to reverse that later
+	if (is_negative)
+		str[i++] = '-';
+
+	// Finalizing by ending the string and reversing it
+	str[i] = '\0';
+
+	reverse(str, i);
+
+	return str;
+}
+
 
 void printf(const char *format, ...)
 {
 	uint8_t c;
+	int base;
 	char buffer[20];
+	char *ptr_str;
 
 	char **arg = (char **)&format;
 
 	arg++;
 
-	while ( (c = *format++) != '\0')
+	while ((c = *format++) != '\0')
 	{
 		if (c != '%')
 		{
 			vga_display_character(c);
+			continue;
 		}
-		else
+
+		c = *format++;
+
+		switch (c)
 		{
-			char *ptr_str;
+			case '%':
+				vga_display_character('%');
+				break;
 
-			c = *format++;
+			case 'i':
+			case 'd':
+			case 'x':
+				if (c == 'i' || c == 'd')
+					base = 10;
+				else
+					base = 16;
 
-			switch (c)
-			{
-				case '%':
-					vga_display_character('%');
-					break;
+				itoa(*((int *)arg++), buffer, base);
+				ptr_str = buffer;
+				goto string;
+				break;
 
-				case 'd':
-				case 'x':
-					itoa(*((int *)arg++), buffer, c);
-					ptr_str = buffer;
-					goto string;
-					break;
+			case 's':
+				ptr_str = *arg++;
+				if (!ptr_str)
+					ptr_str = "(null)";
 
-				case 's':
-					ptr_str = *arg++;
-					if (!ptr_str)
-						ptr_str = "(null)";
+				string:
+					while (*ptr_str)
+						vga_display_character(*ptr_str++);
+				break;
 
-					string:
-						while (*ptr_str)
-							vga_display_character(*ptr_str++);
-					break;
-
-				default:
-					vga_display_character(*((int *)arg++));
-			}
+			default:
+				vga_display_character(*((int *)arg++));
 		}
-
 	}
 }
-
 
 void *memset(void *dst, int c, size_t length)
 {
@@ -164,33 +168,32 @@ char *strzcpy(register char *dst, register const char *src, register size_t len)
 char *
 strchr(const char *s, int c)
 {
-    while (*s++)
-    {
-        if (*s == (char)c)
-            return (char *)s;
-    }
+	while (*s++)
+	{
+		if (*s == (char)c)
+			return (char *)s;
+	}
 
-    return NULL;
+	return NULL;
 }
 
 size_t
 strlen(const char *s)
 {
-    uint32_t length = 0;
+	uint32_t length = 0;
 
-    while (*s++)
-        length++;
+	while (*s++)
+		length++;
 
-    return length;
+	return length;
 }
 
 void *malloc(size_t size)
 {
-    return heap_alloc(size);
+	return heap_alloc(size);
 }
 
 void free(void *ptr)
 {
 	heap_free(ptr);
 }
-
