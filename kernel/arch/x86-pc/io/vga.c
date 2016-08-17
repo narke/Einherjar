@@ -13,7 +13,7 @@
 #define VGA_COLUMNS 80
 
 #define VGA_LINES_MAX_INDEX  24
-#define VGA_COLUMNS_MAX_INDEX 80
+#define VGA_COLUMNS_MAX_INDEX 79
 
 /** VGA control register */
 #define VGA_CONTROL_REGISTER    0x3D4

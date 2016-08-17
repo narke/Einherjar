@@ -196,7 +196,8 @@ static void print_hex(unsigned int i)
 
 	if (i == 0)
 	{
-		vga_display_character('0'); return;
+		vga_display_character('0');
+		return;
 	}
 
 	while (n--)
@@ -221,12 +222,14 @@ static void print_dec(int i)
 
 	if (i == 0)
 	{
-		vga_display_character('0'); return;
+		vga_display_character('0');
+		return;
 	}
 
 	if (i < 0)
 	{
-		vga_display_character('-'); i = -i;
+		vga_display_character('-');
+		i = -i;
 	}
 
 	for (j = 1000000000; j != 0; j /= 10)
@@ -337,7 +340,11 @@ static void do_word(cell_t word)
 
 		case 9:
 			vga_set_attributes(FG_BRIGHT_WHITE | BG_BLACK);
-			printf("%s", unpack(word));
+			if (!is_extension)
+				printf(" %s", unpack(word));
+			else
+				printf("%s", unpack(word));
+
 			break;
 
 		case 10:
@@ -350,7 +357,11 @@ static void do_word(cell_t word)
 
 		case 11:
 			vga_set_attributes(FG_BRIGHT_WHITE | BG_BLACK);
-			printf("%s", unpack(word));
+			if (!is_extension)
+				printf(" %s", unpack(word));
+			else
+				printf("%s", unpack(word));
+
 			break;
 
 		case 12:
@@ -367,6 +378,10 @@ static void do_word(cell_t word)
 
 		case 15:
 			vga_set_attributes(FG_BRIGHT_WHITE | BG_BLACK);
+			if (word & 0x10)
+				is_hex = TRUE;
+			else
+				is_hex = FALSE;
 			print_number(word, is_hex);
 			break;
 
