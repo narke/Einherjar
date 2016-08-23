@@ -12,13 +12,15 @@
 #define MASK    0xffffffffL
 
 #define STACK_SIZE 8
+#define BLOCK_SIZE 1024
 
 cell_t *blocks;
 cell_t nb_block;
 unsigned int word_index;
+uint32_t total_blocks;
 
 /* Prototype of a later implemented function */
-static void run_block(cell_t n);
+static void display_block(cell_t n);
 
 char hex[] = {'0', '1', '2', '3', '4', '5', '6', '7',
        '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
@@ -64,11 +66,17 @@ static void handle_input(uchar_t scancode)
 			break;
 
 		case KEY_PAGE_UP:
-			run_block(--nb_block);
+			if (nb_block-1 == -1)
+				break;
+
+			display_block(--nb_block);
 			break;
 
 		case KEY_PAGE_DOWN:
-			run_block(++nb_block);
+			if (nb_block+1 > (cell_t)total_blocks-1)
+				break;
+
+			display_block(++nb_block);
 			break;
 
 		default:
@@ -259,7 +267,7 @@ static void print_number(cell_t word, bool_t is_hex)
 	vga_display_character(' ');
 }
 
-static void do_word(cell_t word)
+static void display_word(cell_t word)
 {
 	uint8_t color = word & 0x0000000f;
 	bool_t is_hex = FALSE;
@@ -401,7 +409,7 @@ static void status_bar_update_block_number(cell_t n)
 	vga_update_cursor();
 }
 
-static void run_block(cell_t n)
+static void display_block(cell_t n)
 {
 	unsigned long start, limit;
 
@@ -412,21 +420,22 @@ static void run_block(cell_t n)
 
 	for (word_index = start; word_index < limit; word_index++)
 	{
-		do_word(blocks[word_index]);
+		display_word(blocks[word_index]);
 	}
 
 	status_bar_update_block_number(n);
 }
 
-void editor(struct console *cons, uint32_t initrd_start)
+void editor(struct console *cons, uint32_t initrd_start, uint32_t initrd_end)
 {
 	uchar_t c;
 
 	vga_clear();
 
 	blocks = (cell_t *)initrd_start;
+	total_blocks = (initrd_end - initrd_start) / BLOCK_SIZE;
 
-	run_block(0);
+	display_block(0);
 
 	while (1)
 	{
