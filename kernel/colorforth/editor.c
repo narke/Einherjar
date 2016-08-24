@@ -14,6 +14,8 @@
 #define STACK_SIZE 8
 #define BLOCK_SIZE 1024
 
+extern void run_block(cell_t nb_block);
+
 cell_t *blocks;
 cell_t nb_block;
 unsigned int word_index;
@@ -28,6 +30,7 @@ char hex[] = {'0', '1', '2', '3', '4', '5', '6', '7',
 static void handle_input(uchar_t scancode)
 {
 	static bool_t ctrl = FALSE;
+	static bool_t alt = FALSE;
 	static char word[32];
 	static uint8_t i = 0;
 
@@ -35,6 +38,10 @@ static void handle_input(uchar_t scancode)
 	{
 		case KEY_LEFT_CTRL:
 			ctrl = TRUE;
+			break;
+
+		case KEY_LEFT_ALT:
+			alt = TRUE;
 			break;
 
 		case KEY_SPACE:
@@ -80,7 +87,7 @@ static void handle_input(uchar_t scancode)
 			break;
 
 		default:
-			if (ctrl == TRUE)
+			if (alt)
 			{
 				switch(keyboard_get_keymap(scancode))
 				{
@@ -100,12 +107,26 @@ static void handle_input(uchar_t scancode)
 						vga_set_attributes(FG_CYAN | BG_BLACK);
 						break;
 
+					case 'm':
 					case 'p':
 						vga_set_attributes(FG_MAGENTA | BG_BLACK);
 						break;
 
+					case 'w':
 					case 'o':
 						vga_set_attributes(FG_BRIGHT_WHITE | BG_BLACK);
+						break;
+
+					default:
+						;
+				}
+			}
+			else if (ctrl)
+			{
+				switch(keyboard_get_keymap(scancode))
+				{
+					case 'r':
+						run_block(nb_block);
 						break;
 
 					default:
@@ -120,6 +141,7 @@ static void handle_input(uchar_t scancode)
 				word[i++] = keyboard_get_keymap(scancode);
 			}
 			ctrl = FALSE;
+			alt = FALSE;
 	}
 }
 

@@ -34,6 +34,7 @@
 	lodsd
 %endmacro
 
+global run_block
 
 section .text
 
