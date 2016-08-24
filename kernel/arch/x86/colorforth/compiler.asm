@@ -398,9 +398,11 @@ run_block:
 
 section .data
 
+extern initrd_start_address
+
 lit:	dd adup
 marker:	dd 0, 0, 0
-H	dd 0x1000000 ; TODO start of initrd
+H	dd initrd_start_address
 last	dd 0
 class	dd 0
 list:	dd 0, 0

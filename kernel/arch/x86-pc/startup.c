@@ -25,6 +25,8 @@
 #include <colorforth/editor.h>
 #include <test-suite/initrd-test.h>
 
+// Global variable to hold the start address of initrd for colorForth
+uint32_t initrd_start_address;
 
 static void idle_thread()
 {
@@ -55,11 +57,11 @@ void roentgenium_main(uint32_t magic, uint32_t address)
     uint32_t ram_size;
 
     // Initrd
-    uint32_t initrd_start = 0;
-    uint32_t initrd_end = 0;
+    uint32_t initrd_start;
+    uint32_t initrd_end;
 
-	// Console
-	struct console *cons = NULL;
+    // Console
+    struct console *cons = NULL;
 
     // VGA scren setup
     vga_clear();
@@ -101,9 +103,11 @@ void roentgenium_main(uint32_t magic, uint32_t address)
     // Timer interrupt, momentarily disabled
     x86_irq_set_routine(IRQ_TIMER, timer_interrupt_handler);
 
-	// Initrd: Initial Ram Disk
-	initrd_start = *((uint32_t *)mbi->mods_addr);
-	initrd_end   = *(uint32_t *)(mbi->mods_addr + 4);
+    // Initrd: Initial Ram Disk
+    initrd_start = *((uint32_t *)mbi->mods_addr);
+    initrd_end   = *(uint32_t *)(mbi->mods_addr + 4);
+
+    initrd_start_address = initrd_start;
 
     // Memory management: Physical memory management
     retval = physical_memory_setup((mbi->mem_upper<<10) + (1<<20),
