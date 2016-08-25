@@ -5,8 +5,8 @@ Roentgenium
 What is it?
 -----------
 
-A prototype of a real-time operating system. 
-This will be a <p style="color:red;">color</p><p style="color:green;">Forth</p> computing environment, without separating
+A prototype of a real-time operating system.  
+This will be a <font color=red>color</font><font color=green>Forth</font> computing environment, without separating
 the operating system from the programming language and applications.
 
 
