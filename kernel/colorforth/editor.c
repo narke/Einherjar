@@ -15,6 +15,7 @@
 #define BLOCK_SIZE 1024
 
 extern void run_block(cell_t nb_block);
+extern void colorforth_setup(uint32_t initrd_start);
 
 cell_t *blocks;
 cell_t nb_block;
@@ -30,19 +31,73 @@ char hex[] = {'0', '1', '2', '3', '4', '5', '6', '7',
 static void handle_input(uchar_t scancode)
 {
 	static bool_t ctrl = FALSE;
-	static bool_t alt = FALSE;
+	static bool_t alt  = FALSE;
+	static uint8_t i   = 0;
 	static char word[32];
-	static uint8_t i = 0;
+
+	if (scancode == KEY_LEFT_CTRL)
+	{
+		ctrl = TRUE;
+		return;
+	}
+	else if (scancode == KEY_LEFT_ALT)
+	{
+		alt = TRUE;
+		return;
+	}
+
+	if (alt)
+	{
+		switch(keyboard_get_keymap(scancode))
+		{
+			case 'r':
+				vga_set_attributes(FG_RED | BG_BLACK);
+				break;
+
+			case 'y':
+				vga_set_attributes(FG_YELLOW | BG_BLACK);
+				break;
+
+			case 'g':
+				vga_set_attributes(FG_GREEN | BG_BLACK);
+				break;
+
+			case 'c':
+				vga_set_attributes(FG_CYAN | BG_BLACK);
+				break;
+
+			case 'm':
+			case 'p':
+				vga_set_attributes(FG_MAGENTA | BG_BLACK);
+				break;
+
+			case 'w':
+			case 'o':
+				vga_set_attributes(FG_BRIGHT_WHITE | BG_BLACK);
+				break;
+
+			default:
+				;
+		}
+	}
+	else if (ctrl)
+	{
+		switch(keyboard_get_keymap(scancode))
+		{
+			case 'r':
+				run_block(nb_block);
+				break;
+
+			default:
+				;
+		}
+	}
+
+	ctrl = FALSE;
+	alt = FALSE;
 
 	switch(scancode)
 	{
-		case KEY_LEFT_CTRL:
-			ctrl = TRUE;
-			break;
-
-		case KEY_LEFT_ALT:
-			alt = TRUE;
-			break;
 
 		case KEY_SPACE:
 			word[i] = '\0';
@@ -87,61 +142,10 @@ static void handle_input(uchar_t scancode)
 			break;
 
 		default:
-			if (alt)
-			{
-				switch(keyboard_get_keymap(scancode))
-				{
-					case 'r':
-						vga_set_attributes(FG_RED | BG_BLACK);
-						break;
+			vga_display_character(keyboard_get_keymap(scancode));
 
-					case 'y':
-						vga_set_attributes(FG_YELLOW | BG_BLACK);
-						break;
-
-					case 'g':
-						vga_set_attributes(FG_GREEN | BG_BLACK);
-						break;
-
-					case 'c':
-						vga_set_attributes(FG_CYAN | BG_BLACK);
-						break;
-
-					case 'm':
-					case 'p':
-						vga_set_attributes(FG_MAGENTA | BG_BLACK);
-						break;
-
-					case 'w':
-					case 'o':
-						vga_set_attributes(FG_BRIGHT_WHITE | BG_BLACK);
-						break;
-
-					default:
-						;
-				}
-			}
-			else if (ctrl)
-			{
-				switch(keyboard_get_keymap(scancode))
-				{
-					case 'r':
-						run_block(nb_block);
-						break;
-
-					default:
-						;
-				}
-			}
-			else
-			{
-				// Avoid displaying character pressed along CTRL
-				vga_display_character(keyboard_get_keymap(scancode));
-				// Make a word from characters (it won't be patented ;-)
-				word[i++] = keyboard_get_keymap(scancode);
-			}
-			ctrl = FALSE;
-			alt = FALSE;
+			// Make a word from characters (it won't be patented ;-)
+			word[i++] = keyboard_get_keymap(scancode);
 	}
 }
 
@@ -452,11 +456,12 @@ void editor(struct console *cons, uint32_t initrd_start, uint32_t initrd_end)
 {
 	uchar_t c;
 
-	vga_clear();
-
 	blocks = (cell_t *)initrd_start;
 	total_blocks = (initrd_end - initrd_start) / BLOCK_SIZE;
 
+	vga_clear();
+
+	colorforth_setup(initrd_start);
 	display_block(0);
 
 	while (1)

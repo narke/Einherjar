@@ -35,6 +35,7 @@
 %endmacro
 
 global run_block
+global colorforth_setup
 
 section .text
 
@@ -392,18 +393,23 @@ compile_27bit_number:
 	sar eax, 5
 	ret
 
+; execute block's code
 run_block:
-	pop eax			; get the block number to load
+	mov eax, [esp+4]	; get the block number to load
 	call load		; load the block
+	ret
 
+; let H track colorForth code from its beginning
+colorforth_setup:
+	mov edx, [esp+4]
+	mov [H], edx
+	ret
 
 section .data
 
-extern initrd_start_address
-
 lit:	dd adup
 marker:	dd 0, 0, 0
-H	dd initrd_start_address
+H	dd 0
 last	dd 0
 class	dd 0
 list:	dd 0, 0
