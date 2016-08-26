@@ -9,7 +9,8 @@ A prototype of a real-time operating system.
 This will be a
 ```html
 	<font color=red>color</font><font color=green>Forth</font>
-``` computing environment, without separating
+```
+computing environment, without separating
 the operating system from the programming language and applications.
 
 
