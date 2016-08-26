@@ -6,8 +6,12 @@ What is it?
 -----------
 
 A prototype of a real-time operating system.  
-This will be a <font color=red>color</font><font color=green>Forth</font> computing environment, without separating
+This will be a
+```html
+	<font color=red>color</font><font color=green>Forth</font>
+``` computing environment, without separating
 the operating system from the programming language and applications.
+
 
 
 Screenshot
