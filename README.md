@@ -6,7 +6,7 @@ What is it?
 -----------
 
 A prototype of a real-time operating system.  
-This will be a ![colorForth](https://raw.githubusercontent.com/narke/Roentgenium/master/docs/colorforth.gif "colorForth")
+This will be a ![colorForth](https://raw.githubusercontent.com/narke/Roentgenium/master/docs/colorforth.png "colorForth")
 computing environment, without separating
 the operating system from the programming language and applications.
 
