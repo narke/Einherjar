@@ -6,10 +6,7 @@ What is it?
 -----------
 
 A prototype of a real-time operating system.  
-This will be a
-```html
-	<font color=red>color</font><font color=green>Forth</font>
-```
+This will be a ![colorForth](https://raw.githubusercontent.com/narke/Roentgenium/master/docs/colorforth.gif "colorForth")
 computing environment, without separating
 the operating system from the programming language and applications.
 
