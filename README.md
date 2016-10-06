@@ -1,6 +1,8 @@
 Roentgenium
 ===========
 
+[![Coverity Status](https://scan.coverity.com/projects/10390/badge.svg)](https://scan.coverity.com/projects/10390)
+
 
 What is it?
 -----------
