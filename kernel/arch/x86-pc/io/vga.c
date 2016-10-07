@@ -100,7 +100,9 @@ void vga_set_attributes(uint8_t attributes)
 
 void vga_display_character(uchar_t character)
 {
-	uint8_t* video;
+	uint8_t* video = (uchar_t*)(SCREEN_START + 2 * symbol.position_x
+			+ VGA_COLUMNS * 2 * symbol.position_y);
+
 
 	switch(character)
 	{
@@ -143,8 +145,6 @@ void vga_display_character(uchar_t character)
 			break;
 
 		default: /* Other characters */
-			video = (uchar_t*)(SCREEN_START + 2 * symbol.position_x
-					+ VGA_COLUMNS * 2 * symbol.position_y);
 			*video     = character;
 			*(video+1) = symbol.attributes;
 

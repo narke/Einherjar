@@ -96,7 +96,6 @@ ret_t console_read(struct console *t,
 			break;
 	}
 
-	len = count;
 	return KERNEL_OK;
 }
 
