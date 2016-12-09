@@ -22,7 +22,7 @@
 #include <threading/thread.h>
 #include <threading/scheduler.h>
 #include <io/console.h>
-#include <colorforth/editor.h>
+#include <colorforth/colorforth.h>
 #include <test-suite/initrd-test.h>
 
 static void idle_thread()
@@ -146,7 +146,10 @@ void roentgenium_main(uint32_t magic, uint32_t address)
 
     printf("Initrd\n");
 
+    // Console
     console_setup(&cons, vga_display_character);
 
+    // colorForth
+    colorforth_initialize();
     editor(cons, initrd_start, initrd_end);
 }

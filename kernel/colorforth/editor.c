@@ -1,21 +1,19 @@
 /*
- * Credits: unpack(), print_hex() and print_dec() are courtesy of Andrei Dragomir.
+ * Credits: unpack(), print_hex() and print_dec() are courtesy of
+ * Andrei Dragomir.
  */
 
 #include <lib/libc.h>
 #include <arch/x86-pc/io/keyboard.h>
 #include <arch/x86-pc/io/vga.h>
 
-#include "editor.h"
+#include "colorforth.h"
 
 #define HIGHBIT 0x80000000L
 #define MASK    0xffffffffL
 
 #define STACK_SIZE 8
 #define BLOCK_SIZE 1024
-
-extern void run_block(cell_t nb_block);
-extern void colorforth_setup(uint32_t initrd_start);
 
 cell_t *blocks;
 cell_t nb_block;
@@ -86,7 +84,8 @@ static void handle_input(uchar_t scancode)
 		{
 			case 'r':
 				run_block(nb_block);
-				break;
+				dot_s();
+				return; // Avoid displaying 'r'
 
 			default:
 				;
@@ -161,7 +160,7 @@ static int get_code_index(const char letter)
 	return strchr(code, letter) - code;
 }
 
-static cell_t pack(const char *word_name)
+cell_t pack(const char *word_name)
 {
 	int word_length, i, bits, length, letter_code, packed;
 
@@ -182,7 +181,7 @@ static cell_t pack(const char *word_name)
 	return packed;
 }
 
-static char *unpack(cell_t word)
+char *unpack(cell_t word)
 {
 	unsigned char nibble;
 	static char text[16];
@@ -461,7 +460,6 @@ void editor(struct console *cons, uint32_t initrd_start, uint32_t initrd_end)
 
 	vga_clear();
 
-	colorforth_setup(initrd_start);
 	display_block(0);
 
 	while (1)

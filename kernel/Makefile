@@ -12,7 +12,7 @@ BOOTLOADER_PATH = arch/x86-pc/bootstrap
 BUILD_PATH      = ../build
 INITRD_PATH     = arch/x86-pc/bootstrap/iso
 
-OBJECTS = $(BOOTLOADER_PATH)/multiboot.o    \
+OBJECTS = $(BOOTLOADER_PATH)/multiboot.o        \
 	arch/x86-pc/io/vga.o                    \
 	arch/x86/mmu/gdt.o                      \
 	arch/x86/interrupts/idt.o               \
@@ -33,7 +33,7 @@ OBJECTS = $(BOOTLOADER_PATH)/multiboot.o    \
 	threading/scheduler.o                   \
 	io/console.o                            \
 	colorforth/editor.o                     \
-	arch/x86/colorforth/compiler.o          \
+	colorforth/compiler.o                   \
 	test-suite/initrd-test.o                \
 	arch/x86-pc/startup.o
 
@@ -71,7 +71,7 @@ cdrom:
 
 initrd:
 	$(generating) '$@'
-	../tools/blocks_converter.py tocf ../initrd/blocks.cf $(INITRD_PATH)/initrd.img
+	../tools/blocks_converter.py tocf ../initrd/blocks.txt $(INITRD_PATH)/initrd.img
 
 clean:
 	$(cleaning)
