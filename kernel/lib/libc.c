@@ -7,7 +7,7 @@
 */
 
 #include <arch/x86-pc/io/vga.h>
-#include <memory/virtual-memory.h>
+#include <memory/physical-memory.h>
 
 #include "libc.h"
 

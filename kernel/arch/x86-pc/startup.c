@@ -17,8 +17,6 @@
 #include <lib/libc.h>
 #include <arch/x86-pc/bootstrap/multiboot.h>
 #include <memory/physical-memory.h>
-#include <arch/x86/mmu/paging.h>
-#include <memory/virtual-memory.h>
 #include <threading/thread.h>
 #include <threading/scheduler.h>
 #include <io/console.h>
@@ -114,18 +112,7 @@ void roentgenium_main(uint32_t magic, uint32_t address)
 
     printf("Memory Manager: Physical memory");
 
-    // Memory management: Paging
-    retval = x86_paging_setup(physical_addresses_bottom,
-			physical_addresses_top);
-
-    assert(retval == KERNEL_OK);
-
-    printf(" | Paging");
-
-    // Memory Management: Virtual memory
-    virtual_memory_setup(physical_addresses_top, ram_size);
-
-    printf(" | Virtual memory\n");
+    heap_setup(physical_addresses_top);
 
     // Kernel threads
     retval = threading_setup(x86_kernel_stack_bottom,

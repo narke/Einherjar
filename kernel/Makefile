@@ -25,8 +25,6 @@ OBJECTS = $(BOOTLOADER_PATH)/multiboot.o        \
 	arch/x86-pc/io/keyboard.o               \
 	lib/libc.o                              \
 	memory/physical-memory.o                \
-	arch/x86/mmu/paging.o                   \
-	memory/virtual-memory.o                 \
 	arch/x86/threading/cpu-context.o        \
 	arch/x86/threading/cpu-context-switch.o \
 	threading/thread.o                      \

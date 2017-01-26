@@ -11,6 +11,7 @@
 
 
 #include <lib/types.h>
+#include <lib/queue.h>
 
 
 /** Each page is 4kb */
@@ -114,6 +115,13 @@ ret_t physical_memory_page_reference_at(uint32_t page_physical_address);
  */
 ret_t physical_memory_page_unreference(uint32_t page_physical_address);
 
+void heap_setup(uint32_t kernel_top_address);
+
+/** Allocate memory on the heap */
+void *heap_alloc(size_t size);
+
+/** Free memory by releasing some heap */
+void heap_free(void *ptr);
 
 #endif // _PHYSICAL_MEMORY_H_
 

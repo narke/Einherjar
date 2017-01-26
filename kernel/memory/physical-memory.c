@@ -4,6 +4,31 @@
 
 #include "physical-memory.h"
 
+/** Virtual address where mirroring is taking place */
+#define PAGING_MIRROR_VIRTUAL_ADDRESS 0x3fc00000 // 1GB - 4MB
+
+/** The kernel's heap is between these two addresses */
+#define KERNEL_VMM_BASE 0x4000 /* 16kB */
+#define KERNEL_VMM_TOP  PAGING_MIRROR_VIRTUAL_ADDRESS /* 1GB - 4MB */
+
+TAILQ_HEAD(, memory_range) free_memory_ranges;
+TAILQ_HEAD(, memory_range) used_memory_ranges;
+
+struct memory_range
+{
+	uint32_t base_address;
+	uint32_t size;
+
+	TAILQ_ENTRY(memory_range) next;
+};
+
+
+uint32_t heap_start = 0x0;
+uint32_t heap_used  = 0x0;
+uint32_t heap_limit = 0x3fffff;
+
+
+
 struct physical_page_descriptor
 {
 	/** The physical address of the page */
@@ -24,15 +49,15 @@ TAILQ_HEAD(, physical_page_descriptor) free_pages_head;
 
 
 
-/** Kernel beginning marker 
+/** Kernel beginning marker
  * @see linker.ld */
 extern char __kernel_start;
 
-/** Kernel end marker 
+/** Kernel end marker
  * @see linker.ld */
 extern char __kernel_end;
 
-  
+
 static struct physical_page_descriptor *g_physical_page_descriptor_array;
 
 
@@ -48,8 +73,8 @@ static uint32_t g_physical_memory_used_pages;
 
 
 
-ret_t physical_memory_setup(uint32_t ram_size, 
-		paddr_t *out_kernel_base, 
+ret_t physical_memory_setup(uint32_t ram_size,
+		paddr_t *out_kernel_base,
 		paddr_t *out_kernel_top,
 		uint32_t initrd_end)
 {
@@ -57,15 +82,15 @@ ret_t physical_memory_setup(uint32_t ram_size,
 	uint32_t physical_page_address;
 	struct physical_page_descriptor *physical_page_descr;
 
-	/** Physical pages descriptors array's address */	
+	/** Physical pages descriptors array's address */
 	higher_end_address = (initrd_end > ((uint32_t)&__kernel_end)) ? initrd_end : (uint32_t)&__kernel_end;
 	#define PAGE_DESCRIPTORS_ARRAY_ADDRESS PAGE_ALIGN_UPPER_ADDRESS(higher_end_address)
 
 	/* Initialize used pages circular queue. */
-	TAILQ_INIT(&used_pages_head);    
+	TAILQ_INIT(&used_pages_head);
 
 	/* Initialize free pages circular queue. */
-	TAILQ_INIT(&free_pages_head);  
+	TAILQ_INIT(&free_pages_head);
 
 	/* Ensure that ram size is page aligned.
 	   We may lose at most a page.
@@ -89,7 +114,7 @@ ret_t physical_memory_setup(uint32_t ram_size,
 		return -KERNEL_NO_MEMORY;
 	}
 
-	/* The first page is not available in order to signal 
+	/* The first page is not available in order to signal
 	   that no page is available by returning address 0 */
 	g_physical_memory_bottom = X86_PAGE_SIZE;
 	g_physical_memory_top  = ram_size;
@@ -108,7 +133,7 @@ ret_t physical_memory_setup(uint32_t ram_size,
 
 		physical_page_address < g_physical_memory_top;
 
-		physical_page_address += X86_PAGE_SIZE, 
+		physical_page_address += X86_PAGE_SIZE,
 		physical_page_descr++)
 	{
 		memset(physical_page_descr, 0x0, sizeof(struct physical_page_descriptor));
@@ -126,7 +151,7 @@ ret_t physical_memory_setup(uint32_t ram_size,
 		/* Free : base ... BIOS */
 		else if ((physical_page_address >= g_physical_memory_bottom)
 			&& (physical_page_address < BIOS_N_VIDEO_START))
-		{	
+		{
 			action = MARK_FREE;
 		}
 
@@ -189,7 +214,7 @@ ret_t physical_memory_setup(uint32_t ram_size,
 uint32_t physical_memory_page_reference_new(void)
 {
 	struct physical_page_descriptor *physical_page_descr;
-	
+
 	if (TAILQ_EMPTY(&free_pages_head))
 		return (uint32_t)NULL;
 
@@ -224,13 +249,13 @@ physical_memory_get_page_descriptor_at_address(uint32_t page_physical_address)
 	/* Don't handle non-page-aligned addresses */
 	if (page_physical_address & X86_PAGE_MASK)
 		return NULL;
-  
+
 	/* Check the requested memory address range's validity */
-	if ((page_physical_address < g_physical_memory_bottom) 
+	if ((page_physical_address < g_physical_memory_bottom)
 		|| (page_physical_address >= g_physical_memory_top))
 		return NULL;
 
-	return g_physical_page_descriptor_array 
+	return g_physical_page_descriptor_array
 			+ (page_physical_address >> X86_PAGE_SHIFT);
 }
 
@@ -300,6 +325,109 @@ ret_t physical_memory_page_unreference(uint32_t page_physical_address)
 
 	/* The page was already referenced by someone */
 	return retval;
+}
+
+void *heap_alloc(size_t size)
+{
+	struct memory_range *mem_range;
+	struct memory_range *place;
+	uint32_t address;
+
+	if (size <= 0 || TAILQ_EMPTY(&free_memory_ranges))
+		return NULL;
+
+	// First round: matching for the exact space
+	TAILQ_FOREACH(mem_range, &free_memory_ranges, next)
+	{
+		if (mem_range->size == size)
+		{
+			TAILQ_REMOVE(&free_memory_ranges, mem_range, next);
+			TAILQ_INSERT_TAIL(&used_memory_ranges, mem_range, next);
+
+			return (void *)mem_range->base_address;
+		}
+
+	}
+
+	// Second round: First-fit method
+	/*TAILQ_FOREACH(mem_range, &free_memory_ranges, next)
+	{
+		if (mem_range->size >= size)
+		{
+			// Resize the current memory range
+			mem_range->size = mem_range->size - size;
+
+			// Allocate a new chunk
+			place = (struct memory_range *)heap_start + heap_used;
+			heap_used += sizeof(struct memory_range);
+
+			place->base_address = mem_range->base_address + mem_range->size;
+			place->size			= size;
+
+			// Update the list
+			TAILQ_INSERT_TAIL(&used_memory_ranges, place, next);
+
+			return (void *)place->base_address;
+		}
+	}*/
+
+	// At the end of the used memory
+	if ((heap_used + size) < heap_limit)
+	{
+		place = (struct memory_range *)heap_start + heap_used;
+		heap_used += sizeof(struct memory_range);
+
+		address = heap_start + heap_used;
+		heap_used += size;
+
+		place->base_address = address;
+		place->size = size;
+
+		TAILQ_INSERT_TAIL(&used_memory_ranges, place, next);
+
+		return (void *)place->base_address;
+	}
+
+	return NULL;
+}
+
+
+void heap_free(void *address)
+{
+	struct memory_range *mem_range;
+
+	if (address == NULL)
+		return;
+
+	TAILQ_FOREACH(mem_range, &used_memory_ranges, next)
+	{
+		if (mem_range->base_address == (uint32_t)address)
+		{
+			TAILQ_REMOVE(&used_memory_ranges, mem_range, next);
+			TAILQ_INSERT_TAIL(&free_memory_ranges, mem_range, next);
+		}
+	}
+}
+
+
+void heap_setup(uint32_t kernel_top_address)
+{
+	struct memory_range *free_range;
+
+	TAILQ_INIT(&free_memory_ranges);
+	TAILQ_INIT(&used_memory_ranges);
+
+	heap_start = PAGE_ALIGN_UPPER_ADDRESS(kernel_top_address);
+
+	free_range = (struct memory_range *)heap_start;
+	heap_start += sizeof(struct memory_range);
+
+	free_range->base_address = heap_start;
+	free_range->size		 = KERNEL_VMM_TOP - heap_start;
+
+	TAILQ_INSERT_TAIL(&free_memory_ranges, free_range, next);
+
+	heap_used = heap_used + sizeof(struct memory_range);
 }
 
 
