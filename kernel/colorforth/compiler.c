@@ -451,15 +451,6 @@ insert_builtins_into_forth_dictionary(void)
 	_here		= malloc(sizeof(struct word_entry));
 	_i		= malloc(sizeof(struct word_entry));
 
-	if (!_comma || !_load || !_loads || !_forth || !_macro || !_exit_word
-		|| !_store || !_fetch || !_add || !_not || !_mult || !_div
-		|| !_ne || !_dup || !_dot || !_here || !_i)
-	{
-		printf("Error: Not enough memory!\n");
-		free(code_here);
-		// FIXME exit();
-	}
-
 	_comma->name		= pack(",");
 	_comma->code_address	= comma;
 	_comma->codeword	= &(_comma->code_address);
@@ -551,28 +542,13 @@ insert_builtins_into_macro_dictionary(void)
 {
 	struct word_entry *_rdrop, *_ne, *_swap, *_if, *_then, *_for, *_next;
 
-	_rdrop       = malloc(sizeof(struct word_entry));
-	_ne          = malloc(sizeof(struct word_entry));
-	_swap        = malloc(sizeof(struct word_entry));
-	_if          = malloc(sizeof(struct word_entry));
-	_then        = malloc(sizeof(struct word_entry));
-	_for         = malloc(sizeof(struct word_entry));
-	_next        = malloc(sizeof(struct word_entry));
-
-	if (!_rdrop || !_ne || !_swap || !_if || !_then || !_for || !_next)
-	{
-		printf("Error: Not enough memory!\n");
-		free(code_here);
-		// FIXME exit();
-	}
-
-	memset(_rdrop, 0, sizeof(struct word_entry));
-	memset(_ne, 0, sizeof(struct word_entry));
-	memset(_swap, 0, sizeof(struct word_entry));
-	memset(_if, 0, sizeof(struct word_entry));
-	memset(_then, 0, sizeof(struct word_entry));
-	memset(_for, 0, sizeof(struct word_entry));
-	memset(_next, 0, sizeof(struct word_entry));
+	_rdrop = malloc(sizeof(struct word_entry));
+	_ne = malloc(sizeof(struct word_entry));
+	_swap = malloc(sizeof(struct word_entry));
+	_if = malloc(sizeof(struct word_entry));
+	_then = malloc(sizeof(struct word_entry));
+	_for = malloc(sizeof(struct word_entry));
+	_next = malloc(sizeof(struct word_entry));
 
 	_rdrop->name               = pack("rdrop");
 	_rdrop->code_address       = rdrop;
@@ -602,13 +578,13 @@ insert_builtins_into_macro_dictionary(void)
 	_next->code_address        = next_;
 	_next->codeword            = &(_next->code_address);
 
-	LIST_INSERT_HEAD(&macro_dictionary, _rdrop,       next);
-	LIST_INSERT_HEAD(&macro_dictionary, _ne,          next);
-	LIST_INSERT_HEAD(&macro_dictionary, _swap,        next);
-	LIST_INSERT_HEAD(&macro_dictionary, _if,          next);
-	LIST_INSERT_HEAD(&macro_dictionary, _then,        next);
-	LIST_INSERT_HEAD(&macro_dictionary, _for,         next);
-	LIST_INSERT_HEAD(&macro_dictionary, _next,        next);
+	LIST_INSERT_HEAD(&macro_dictionary, _rdrop,	next);
+	LIST_INSERT_HEAD(&macro_dictionary, _ne,	next);
+	LIST_INSERT_HEAD(&macro_dictionary, _swap,	next);
+	LIST_INSERT_HEAD(&macro_dictionary, _if,	next);
+	LIST_INSERT_HEAD(&macro_dictionary, _then,	next);
+	LIST_INSERT_HEAD(&macro_dictionary, _for,	next);
+	LIST_INSERT_HEAD(&macro_dictionary, _next,	next);
 }
 
 void
@@ -743,7 +719,7 @@ create_word(cell_t word)
 	{
 		printf("Error: Not enough memory!\n");
 		colorforth_finalize();
-		// FIXME exit();
+		return;
 	}
 
 	word &= 0xfffffff0;
