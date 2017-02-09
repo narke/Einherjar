@@ -84,7 +84,7 @@ ret_t physical_memory_setup(uint32_t ram_size,
 
 	/** Physical pages descriptors array's address */
 	higher_end_address = (initrd_end > ((uint32_t)&__kernel_end)) ? initrd_end : (uint32_t)&__kernel_end;
-	#define PAGE_DESCRIPTORS_ARRAY_ADDRESS PAGE_ALIGN_UPPER_ADDRESS(higher_end_address)
+	#define PAGE_DESCRIPTORS_ARRAY_ADDRESS PAGE_ALIGN_UP(higher_end_address)
 
 	/* Initialize used pages circular queue. */
 	TAILQ_INIT(&used_pages_head);
@@ -95,16 +95,16 @@ ret_t physical_memory_setup(uint32_t ram_size,
 	/* Ensure that ram size is page aligned.
 	   We may lose at most a page.
 	 */
-	ram_size = PAGE_ALIGN_LOWER_ADDRESS(ram_size);
+	ram_size = PAGE_ALIGN_DOWN(ram_size);
 
 	/* In the beginning no pages are used */
 	g_physical_memory_total_pages = 0;
 	g_physical_memory_used_pages = 0;
 
 	/* Update the addresses managed by the physical memory allocator */
-	*out_kernel_base = PAGE_ALIGN_LOWER_ADDRESS((uint32_t)(& __kernel_start));
+	*out_kernel_base = PAGE_ALIGN_DOWN((uint32_t)(& __kernel_start));
 	*out_kernel_top = PAGE_DESCRIPTORS_ARRAY_ADDRESS
-			+ PAGE_ALIGN_UPPER_ADDRESS((ram_size >> X86_PAGE_SHIFT)
+			+ PAGE_ALIGN_UP((ram_size >> X86_PAGE_SHIFT)
 			* sizeof(struct physical_page_descriptor));
 
 	/* Is there enough memory to fit the kenel? */
@@ -136,7 +136,7 @@ ret_t physical_memory_setup(uint32_t ram_size,
 		physical_page_address += X86_PAGE_SIZE,
 		physical_page_descr++)
 	{
-		memset(physical_page_descr, 0x0, sizeof(struct physical_page_descriptor));
+		memset(physical_page_descr, 0xf, sizeof(struct physical_page_descriptor));
 
 		/* Init the page descriptor for this page */
 		physical_page_descr->physical_address = physical_page_address;
@@ -329,11 +329,10 @@ ret_t physical_memory_page_unreference(uint32_t page_physical_address)
 
 void *heap_alloc(size_t size)
 {
-	struct memory_range *mem_range;
-	struct memory_range *place;
+	struct memory_range *mem_range, *place;
 	uint32_t address;
 
-	if (size <= 0 || TAILQ_EMPTY(&free_memory_ranges))
+	if (size == 0 || TAILQ_EMPTY(&free_memory_ranges))
 		return NULL;
 
 	// First round: matching for the exact space
@@ -346,7 +345,6 @@ void *heap_alloc(size_t size)
 
 			return (void *)mem_range->base_address;
 		}
-
 	}
 
 	// Second round: First-fit method
@@ -417,13 +415,13 @@ void heap_setup(uint32_t kernel_top_address)
 	TAILQ_INIT(&free_memory_ranges);
 	TAILQ_INIT(&used_memory_ranges);
 
-	heap_start = PAGE_ALIGN_UPPER_ADDRESS(kernel_top_address);
+	heap_start = PAGE_ALIGN_UP(kernel_top_address);
 
 	free_range = (struct memory_range *)heap_start;
 	heap_start += sizeof(struct memory_range);
 
 	free_range->base_address = heap_start;
-	free_range->size		 = KERNEL_VMM_TOP - heap_start;
+	free_range->size         = KERNEL_VMM_TOP - heap_start;
 
 	TAILQ_INSERT_TAIL(&free_memory_ranges, free_range, next);
 
