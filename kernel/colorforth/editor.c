@@ -162,9 +162,11 @@ static int get_code_index(const char letter)
 
 cell_t pack(const char *word_name)
 {
-	int word_length, i, bits, length, letter_code, packed;
+	unsigned int word_length, i, bits, length, letter_code, packed;
 
 	word_length = strlen(word_name);
+	assert(word_length != 0);
+
 	packed      = 0;
 	bits        = 28;
 
@@ -296,13 +298,13 @@ static void display_word(cell_t word)
 {
 	uint8_t color = word & 0x0000000f;
 	bool_t is_hex = FALSE;
-	bool_t is_extension = FALSE;
 
 	switch (color)
 	{
 		case 0:
-			is_extension = TRUE;
-			printf("%s", unpack(word));
+			vga_update_position(-1, 0); // Go one character left to replace the blank space
+			vga_update_cursor();
+			printf("%s ", unpack(word));
 			break;
 
 		case 1:
@@ -372,29 +374,10 @@ static void display_word(cell_t word)
 			break;
 
 		case 9:
-			vga_set_attributes(FG_BRIGHT_WHITE | BG_BLACK);
-			if (!is_extension)
-				printf(" %s", unpack(word));
-			else
-				printf("%s", unpack(word));
-
-			break;
-
 		case 10:
-			vga_set_attributes(FG_BRIGHT_WHITE | BG_BLACK);
-			if (!is_extension)
-				printf(" %s", unpack(word));
-			else
-				printf("%s", unpack(word));
-			break;
-
 		case 11:
 			vga_set_attributes(FG_BRIGHT_WHITE | BG_BLACK);
-			if (!is_extension)
-				printf(" %s", unpack(word));
-			else
-				printf("%s", unpack(word));
-
+			printf("%s ", unpack(word));
 			break;
 
 		case 12:
