@@ -32,6 +32,22 @@
 	})
 
 
+/**
+ * Determines if a string can be converted to a number
+ *
+ * @param ptr String representing a number
+ * @return TRUE or FALSE
+ */
+bool_t is_number(char *ptr);
+
+/**
+ * Converts a string to an integer
+ *
+ * @param ptr String representing a number
+ * @return Converted string
+ */
+int atoi(const char *ptr);
+
 
 /**
  * Formatted display of numbers and strings

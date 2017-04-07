@@ -1,13 +1,11 @@
 #include <arch/x86-pc/io/vga.h>
 #include <lib/libc.h>
 #include <lib/queue.h>
+
 #include "colorforth.h"
 
 #define CODE_HEAP_SIZE (1024 * 100)	// 100 Kb
 #define STACK_SIZE     42
-
-#define FORTH_DICTIONARY TRUE
-#define MACRO_DICTIONARY FALSE
 
 #define FORTH_TRUE -1      // In Forth world -1 means true
 #define FORTH_FALSE 0
@@ -45,8 +43,8 @@ unsigned long *rtos = start_of(rstack);
  */
 unsigned long *code_here;
 unsigned long *h;			// Code is inserted here
-bool_t          selected_dictionary;
-cell_t        *blocks;			// Manage looping over the code contained in blocks
+bool_t         selected_dictionary;
+extern cell_t *blocks;			// Manage looping over the code contained in blocks
 unsigned long *IP;			// Instruction Pointer
 
 LIST_HEAD(, word_entry) forth_dictionary;
@@ -259,6 +257,7 @@ void dot_s(void)
 	nb_items = tos - start_of(stack);
 
 	vga_set_position(0, 22);
+	vga_set_attributes(FG_YELLOW | BG_BLACK);
 	printf("\nStack: ");
 
 	for (i = 1; i < nb_items + 1; i++)
@@ -377,7 +376,7 @@ void i_word(void)
 /*
  * Helper functions
  */
-static void
+void
 do_word(const cell_t word)
 {
 	uint8_t color = (int)word & 0x0000000f;
@@ -796,3 +795,4 @@ colorforth_finalize(void)
 
 	free(code_here);
 }
+

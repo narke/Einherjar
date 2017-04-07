@@ -15,16 +15,52 @@
 #define STACK_SIZE 8
 #define BLOCK_SIZE 1024
 
+
 cell_t *blocks;
 cell_t nb_block;
 unsigned int word_index;
 uint32_t total_blocks;
+
+static void command_prompt(void);
+static void command_prompt_erase(void);
+bool_t is_command = FALSE;
 
 /* Prototype of a later implemented function */
 static void display_block(cell_t n);
 
 char hex[] = {'0', '1', '2', '3', '4', '5', '6', '7',
        '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+
+static void
+do_cmd(char *word)
+{
+	cell_t packed;
+
+	command_prompt_erase();
+
+	if (is_number(word))
+	{
+		packed = ((atoi(word) << 5) & MASK) + 8; // 8 is number's tag
+	}
+	else
+	{
+		vga_set_position(0, 18);
+		packed = pack(word);
+
+		if (!lookup_word(packed, FORTH_DICTIONARY))
+		{
+			// Not found!
+			vga_set_position(0, 22);
+			printf("Error: Word not found!");
+			command_prompt();
+			return;
+		}
+	}
+
+	do_word(packed);
+	dot_s();
+	command_prompt();
+}
 
 static void handle_input(uchar_t scancode)
 {
@@ -83,9 +119,17 @@ static void handle_input(uchar_t scancode)
 		switch(keyboard_get_keymap(scancode))
 		{
 			case 'r':
+				is_command = TRUE;
 				run_block(nb_block);
 				dot_s();
+				command_prompt();
 				return; // Avoid displaying 'r'
+
+			case 'e':
+				is_command = FALSE;
+				vga_set_position(0, 0);
+				vga_update_cursor();
+				return;
 
 			default:
 				;
@@ -104,6 +148,9 @@ static void handle_input(uchar_t scancode)
 
 			vga_update_position(1, 0);
 			vga_display_character(' ');
+
+			if (is_command)
+				do_cmd(word);
 			break;
 
 		case KEY_UP:
@@ -417,6 +464,41 @@ static void status_bar_update_block_number(cell_t n)
 	vga_update_cursor();
 }
 
+static void display_command_prompt(void)
+{
+	vga_set_position(0, 21);
+	vga_set_attributes(FG_BRIGHT_GREEN | BG_BLACK);
+	printf("> ");
+	dot_s();
+}
+
+static void command_prompt(void)
+{
+	vga_set_position(2, 21);
+	vga_set_attributes(FG_YELLOW | BG_BLACK);
+	vga_update_cursor();
+}
+
+static void command_prompt_erase(void)
+{
+#define VGA_SCREEN 0xB8000
+#define VGA_NB_COLUMNS 80
+	uint8_t *video;
+
+	// Go to the prompt line (21) and erase the it along ther error
+	// reporting area (22). Don't erase the prompt (hence 2).
+
+	for (video = (uint8_t *)VGA_SCREEN + 21 * VGA_NB_COLUMNS * 2 + 2;
+		video <= (uint8_t *)VGA_SCREEN + 22 * VGA_NB_COLUMNS * 2 + VGA_NB_COLUMNS * 2 - 2;
+		video = video + 2)
+	{
+		*video = 0;
+	}
+
+	vga_set_position(2, 21);
+	vga_update_cursor();
+}
+
 static void display_block(cell_t n)
 {
 	unsigned long start, limit;
@@ -431,6 +513,7 @@ static void display_block(cell_t n)
 		display_word(blocks[word_index]);
 	}
 
+	display_command_prompt();
 	status_bar_update_block_number(n);
 }
 
@@ -451,3 +534,4 @@ void editor(struct console *cons, uint32_t initrd_start, uint32_t initrd_end)
 		handle_input(c);
 	}
 }
+

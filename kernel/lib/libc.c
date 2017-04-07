@@ -11,6 +11,47 @@
 
 #include "libc.h"
 
+bool_t is_number(char *ptr)
+{
+
+	while (*ptr++)
+	{
+		switch(*ptr)
+		{
+			case '0':
+			case '1':
+			case '2':
+			case '3':
+			case '4':
+			case '5':
+			case '6':
+			case '7':
+			case '8':
+			case '9':
+			case '\0':
+				break;
+			default:
+				return FALSE;
+		}
+	}
+
+	return TRUE;
+}
+
+int atoi(const char *ptr)
+{
+	int k = 0;
+	while (*ptr)
+	{
+		k = k * 10 + (*ptr) - '0';
+		ptr++;
+	}
+
+	return k;
+}
+
+
+
 static void reverse(char str[], int length)
 {
 	char tmp;
