@@ -25,6 +25,8 @@ static void command_prompt(void);
 static void command_prompt_erase(void);
 bool_t is_command = FALSE;
 
+bool_t is_first_definition;
+
 /* Prototype of a later implemented function */
 static void display_block(cell_t n);
 
@@ -369,8 +371,13 @@ static void display_word(cell_t word)
 			break;
 
 		case 3:
+			if (is_first_definition)
+				is_first_definition = FALSE;
+			else
+				printf("\n");
+
 			vga_set_attributes(FG_RED | BG_BLACK);
-			printf("\n%s ", unpack(word));
+			printf("%s ", unpack(word));
 			break;
 
 		case 4:
@@ -507,6 +514,8 @@ static void display_block(cell_t n)
 	limit = (n+1) * 256; // to this point.
 
 	vga_clear();
+
+	is_first_definition = TRUE;
 
 	for (word_index = start; word_index < limit; word_index++)
 	{
