@@ -15,6 +15,8 @@
 #define STACK_SIZE 8
 #define BLOCK_SIZE 1024
 
+#define INTERPRET_NUMBER_TAG 8
+#define INTERPRET_WORD_TAG   1
 
 cell_t *blocks;
 cell_t nb_block;
@@ -42,12 +44,12 @@ do_cmd(char *word)
 
 	if (is_number(word))
 	{
-		packed = ((atoi(word) << 5) & MASK) + 8; // 8 is number's tag
+		packed = ((atoi(word) << 5) & MASK) + INTERPRET_NUMBER_TAG;
 	}
 	else
 	{
 		vga_set_position(0, 18);
-		packed = pack(word) + 1; // 1 is to be interpreted word's tag
+		packed = pack(word) + INTERPRET_WORD_TAG;
 
 		if (!lookup_word(packed, FORTH_DICTIONARY))
 		{
