@@ -47,7 +47,7 @@ do_cmd(char *word)
 	else
 	{
 		vga_set_position(0, 18);
-		packed = pack(word);
+		packed = pack(word) + 1; // 1 is to be interpreted word's tag
 
 		if (!lookup_word(packed, FORTH_DICTIONARY))
 		{
