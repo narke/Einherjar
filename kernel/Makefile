@@ -69,7 +69,7 @@ cdrom:
 
 initrd:
 	$(generating) '$@'
-	../tools/blocks_converter.py tocf ../initrd/blocks.txt $(INITRD_PATH)/initrd.img
+	../tools/blocks_converter.py tocf ../initrd/blocks.cfs $(INITRD_PATH)/initrd.img
 
 clean:
 	$(cleaning)
