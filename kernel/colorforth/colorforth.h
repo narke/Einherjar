@@ -13,8 +13,14 @@
 #define MACRO_DICTIONARY FALSE
 
 typedef int32_t cell_t;
+struct editor_args
+{
+	struct console *cons;
+	uint32_t initrd_start;
+	uint32_t initrd_end;
+};
 
-void editor(struct console *cons, uint32_t initrd_start, uint32_t initrd_end);
+void editor(void *args);
 cell_t pack(const char *word_name);
 char *unpack(cell_t word);
 void run_block(const cell_t nb_block);

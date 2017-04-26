@@ -528,12 +528,15 @@ static void display_block(cell_t n)
 	status_bar_update_block_number(n);
 }
 
-void editor(struct console *cons, uint32_t initrd_start, uint32_t initrd_end)
+void editor(void *args)
 {
 	uchar_t c;
+	struct editor_args *params;
 
-	blocks = (cell_t *)initrd_start;
-	total_blocks = (initrd_end - initrd_start) / BLOCK_SIZE;
+	params = (struct editor_args *)args;
+
+	blocks = (cell_t *)params->initrd_start;
+	total_blocks = (params->initrd_end - params->initrd_start) / BLOCK_SIZE;
 
 	vga_clear();
 
@@ -541,7 +544,7 @@ void editor(struct console *cons, uint32_t initrd_start, uint32_t initrd_end)
 
 	while (1)
 	{
-		console_read(cons, &c, 1);
+		console_read(params->cons, &c, 1);
 		handle_input(c);
 	}
 }

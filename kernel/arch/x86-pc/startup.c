@@ -138,5 +138,12 @@ void roentgenium_main(uint32_t magic, uint32_t address)
 
     // colorForth
     colorforth_initialize();
-    editor(cons, initrd_start, initrd_end);
+
+    struct editor_args *args = malloc(sizeof(struct editor_args));
+
+    args->cons = cons;
+    args->initrd_start = initrd_start;
+    args->initrd_end = initrd_end;
+
+    thread_create("editor", editor, args);
 }
