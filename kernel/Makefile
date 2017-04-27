@@ -54,10 +54,6 @@ $(KERNEL): $(OBJECTS)
 	$(compiling) '$< > $@'
 	$(CC) -c $< -o $@ $(CFLAGS)
 
-%.o: %.S
-	$(assembling) '$< > $@'
-	$(CC) -I$(PWD) -c $< $(CFLAGS) -o $@
-
 %.o: %.asm
 	$(assembling) '$< > $@'
 	nasm -f elf $<
