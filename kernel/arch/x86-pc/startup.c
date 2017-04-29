@@ -23,13 +23,6 @@
 #include <colorforth/colorforth.h>
 #include <test-suite/initrd-test.h>
 
-static void idle_thread()
-{
-    while (1)
-    {
-        asm("hlt\n");
-    }
-}
 
 
 /**
@@ -40,9 +33,6 @@ void roentgenium_main(uint32_t magic, uint32_t address)
     uint16_t retval;
     multiboot_info_t *mbi;
     mbi = (multiboot_info_t *)address;
-
-    extern unsigned int x86_kernel_stack_bottom;
-    extern unsigned int x86_kernel_stack_size;
 
     (void)magic; // Avoid a useless warning ;-)
 
@@ -115,19 +105,14 @@ void roentgenium_main(uint32_t magic, uint32_t address)
     heap_setup(physical_addresses_top);
 
     // Kernel threads
-    retval = threading_setup(x86_kernel_stack_bottom,
-			x86_kernel_stack_bottom	+ x86_kernel_stack_size);
-
-    assert(retval == KERNEL_OK);
+    threading_setup();
 
     printf("Kernel threads\n");
 
     // Scheduler
     scheduler_setup();
 
-    // Declare the idle thread
-    assert(thread_create("idle", idle_thread, NULL) != NULL);
-
+    
     // Enable interrupts
     asm volatile("sti");
 

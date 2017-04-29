@@ -7,14 +7,20 @@
 
 TAILQ_HEAD(, thread) kernel_threads;
 
-
 static volatile struct thread *g_current_thread = NULL;
 
+static void idle_thread()
+{
+    while (1)
+    {
+        asm("hlt\n");
+    }
+}
 
 inline void thread_set_current(struct thread *current_thread)
 {
 	assert(current_thread->state == THREAD_READY);
-	
+
 	g_current_thread        = current_thread;
 	g_current_thread->state = THREAD_RUNNING;
 }
@@ -25,45 +31,27 @@ struct thread *thread_get_current(void)
 	return (struct thread *)g_current_thread;
 }
 
-ret_t threading_setup(uint32_t init_thread_stack_base_address,
-		uint32_t init_thread_stack_size)
+ret_t threading_setup(void)
 {
-	struct thread *myself;
-			          
 	TAILQ_INIT(&kernel_threads);
 
-	/* Allocate a new thread structure for the current running thread */
-	myself = (struct thread *)malloc(sizeof(struct thread));
+	// Declare the idle thread
+	struct thread *idle = thread_create("idle", idle_thread, NULL);
+	assert(idle != NULL);
 
-	if (!myself)
-		return -KERNEL_NO_MEMORY;
+	idle->state = THREAD_READY;
+	thread_set_current(idle);
 
-	/* Initialize the thread attributes */
-	strzcpy(myself->name, "[kinit]", THREAD_MAX_NAMELEN);
-	myself->state                     = THREAD_CREATED;
-	myself->kernel_stack_base_address = init_thread_stack_base_address;
-	myself->kernel_stack_size         = init_thread_stack_size;
-	
-	/* Add the thread in the global list */        
-	TAILQ_INSERT_TAIL(&kernel_threads, myself, next);
-																						        
-	/* Ok, now pretend that the running thread is ourselves */
-	myself->state = THREAD_READY;
-	thread_set_current(myself);
-																										        
 	return KERNEL_OK;
 }
-
-
 
 struct thread *thread_create(const char *name,
 		kernel_thread_start_routine_t start_func,
 		void *start_arg)
 {
-	__label__ undo_creation;
 	uint32_t flags;
 	struct thread *new_thread;
-								        
+
 	if (!start_func)
 		return NULL;
 
@@ -72,24 +60,24 @@ struct thread *thread_create(const char *name,
 
 	if (!new_thread)
 		return NULL;
-	
+
 	/* Initialize the thread attributes */
 	strzcpy(new_thread->name, ((name)?name:"[NONAME]"), THREAD_MAX_NAMELEN);
 	new_thread->state = THREAD_CREATED;
-																				          
+
 	/* Allocate the stack for the new thread */
-	new_thread->kernel_stack_base_address = (uint32_t)malloc(THREAD_KERNEL_STACK_SIZE);
-	new_thread->kernel_stack_size         = THREAD_KERNEL_STACK_SIZE;
-																									          
-	if (!new_thread->kernel_stack_base_address)
+	new_thread->stack_base_address	= (uint32_t)malloc(THREAD_KERNEL_STACK_SIZE);
+	new_thread->stack_size		= THREAD_KERNEL_STACK_SIZE;
+
+	if (!new_thread->stack_base_address)
 		goto undo_creation;
 
 	/* Initialize the CPU context of the new thread */
 	cpu_kstate_init(&new_thread->cpu_state,
 			(cpu_kstate_function_arg1_t *)start_func,
 			(uint32_t)start_arg,
-			new_thread->kernel_stack_base_address,
-			new_thread->kernel_stack_size);
+			new_thread->stack_base_address,
+			new_thread->stack_size);
 
 	/* Add the thread in the global list */
 	X86_IRQs_DISABLE(flags);
@@ -100,13 +88,13 @@ struct thread *thread_create(const char *name,
 	/* Mark the thread as ready */
 	if (scheduler_set_ready(new_thread) != KERNEL_OK)
 		goto undo_creation;
-	
+
 	return new_thread;
 
 
 undo_creation:
-	if (new_thread->kernel_stack_base_address)
-		free((uint32_t *)new_thread->kernel_stack_base_address);
+	if (new_thread->stack_base_address)
+		free((uint32_t *)new_thread->stack_base_address);
 
 	free(new_thread);
 	return NULL;
