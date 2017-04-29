@@ -74,5 +74,4 @@ void schedule(void)
 		assert(current_thread == thread_get_current());
 		assert(current_thread->state == THREAD_RUNNING);
 	}
-	printf("T: %s\n", current_thread->name);
 }

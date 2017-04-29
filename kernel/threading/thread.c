@@ -31,7 +31,7 @@ struct thread *thread_get_current(void)
 	return (struct thread *)g_current_thread;
 }
 
-ret_t threading_setup(void)
+void threading_setup(void)
 {
 	TAILQ_INIT(&kernel_threads);
 
@@ -41,8 +41,6 @@ ret_t threading_setup(void)
 
 	idle->state = THREAD_READY;
 	thread_set_current(idle);
-
-	return KERNEL_OK;
 }
 
 struct thread *thread_create(const char *name,

@@ -60,7 +60,7 @@ struct thread
  * Initialize the primary kernel thread so that it can be handled
  * the same way as an ordinary thread created by thread_create().
  */
-ret_t threading_setup(void);
+void threading_setup(void);
 
 struct thread *thread_create(const char *name,
 		kernel_thread_start_routine_t start_func,
