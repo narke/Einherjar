@@ -51,7 +51,7 @@ struct thread
 	struct cpu_state *cpu_state;
 
 	TAILQ_ENTRY(thread) next;
-}__attribute__ ((packed, aligned (8)));
+};
 
 
 /*

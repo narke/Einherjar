@@ -112,7 +112,6 @@ void roentgenium_main(uint32_t magic, uint32_t address)
     // Scheduler
     scheduler_setup();
 
-    
     // Enable interrupts
     asm volatile("sti");
 

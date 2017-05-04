@@ -28,7 +28,7 @@ struct vga_symbol
 	uint8_t position_y;
 	/** Represents a foreground/background color set */
 	uint8_t attributes;
-};
+}__attribute__((packed, aligned(4)));
 
 struct vga_symbol symbol;
 
