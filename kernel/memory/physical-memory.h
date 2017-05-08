@@ -47,8 +47,6 @@
 #define IS_PAGE_ALIGNED(value) \
   __IS_ALIGNED((value), X86_PAGE_SIZE)
 
-#define BIOS_N_VIDEO_START 0xa0000
-#define BIOS_N_VIDEO_END   0x100000
 
 /**
  * Setup the management of physical pages.
@@ -58,58 +56,17 @@
  *
  * @param ram_size Amount of the RAM
  *
- * @param kernel_core_base Kernel's lowest address for identity mapping
- *
  * @param kernel_core_top Kernel's top address for identity mapping
+ *
+ * @param initrd_start Start address of RAMFS
  *
  * @param initrd_end End address of RAMFS
  *
- * TODO:
- * kernel_core_base -> kernel_identity_mapping_bottom
- * kernel_core_top -> kernel_identity_mapping_top
  */
-ret_t physical_memory_setup(uint32_t ram_size,
-		/* out */paddr_t *kernel_core_base,
-		/* out */paddr_t *kernel_core_top,
-		uint32_t initrd_end);
-
-/**
- * Get a free page.
- *
- * @return The physical address of the allocated physical page,
- * or NULL if no one page is available
- *
- * @note The allocated page's reference count equals to 1.
- */
-uint32_t physical_memory_page_reference_new(void);
-
-
-/**
- * Increment the reference counter of the physical page
- * located at the specified address.
- *
- * @param page_physical_address address of a physical page
- *
- * @return TRUE = the page was in use
- *         FALSE = the page was free
- *         <0 = the page address is invalid.
- */
-ret_t physical_memory_page_reference_at(uint32_t page_physical_address);
-
-
-/**
- * Decrement the reference counter of the physical page.
- * The page is freed when the reference count reaches 0.
- *
- * @param page_physical_address address of a physical page
- *
- * @return TRUE = the page was freed
- * 		   FALSE = the page is still in use
- * 	 	   <0 = the page address is invalid
- */
-ret_t physical_memory_page_unreference(uint32_t page_physical_address);
-
-void heap_setup(uint32_t kernel_top_address);
+void physical_memory_setup(uint32_t ram_size,
+	paddr_t *kernel_top_address,
+	uint32_t initrd_start,
+	uint32_t initrd_end);
 
 /** Allocate memory on the heap */
 void *heap_alloc(size_t size);
@@ -118,4 +75,3 @@ void *heap_alloc(size_t size);
 void heap_free(void *ptr);
 
 #endif // _PHYSICAL_MEMORY_H_
-

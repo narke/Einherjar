@@ -24,7 +24,6 @@
 #include <test-suite/initrd-test.h>
 
 
-
 /**
  * The kernel entry point. All starts from here!
  */
@@ -36,8 +35,7 @@ void roentgenium_main(uint32_t magic, uint32_t address)
 
     (void)magic; // Avoid a useless warning ;-)
 
-    // Memory manager variables
-    paddr_t physical_addresses_bottom;
+    // For the memory manager
     paddr_t physical_addresses_top;
     uint32_t ram_size;
 
@@ -93,16 +91,12 @@ void roentgenium_main(uint32_t magic, uint32_t address)
     initrd_end   = *(uint32_t *)(mbi->mods_addr + 4);
 
     // Memory management: Physical memory management
-    retval = physical_memory_setup((mbi->mem_upper<<10) + (1<<20),
-			&physical_addresses_bottom,
-			&physical_addresses_top,
-			initrd_end);
-
-    assert(retval == KERNEL_OK);
+    physical_memory_setup((mbi->mem_upper<<10) + (1<<20),
+		    &physical_addresses_top,
+		    initrd_start,
+		    initrd_end);
 
     printf("Memory Manager: Physical memory");
-
-    heap_setup(physical_addresses_top);
 
     // Kernel threads
     threading_setup();
