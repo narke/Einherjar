@@ -35,8 +35,7 @@ void roentgenium_main(uint32_t magic, uint32_t address)
 
     (void)magic; // Avoid a useless warning ;-)
 
-    // For the memory manager
-    paddr_t physical_addresses_top;
+    // RAM size in bytes
     uint32_t ram_size;
 
     // Initrd
@@ -92,7 +91,6 @@ void roentgenium_main(uint32_t magic, uint32_t address)
 
     // Memory management: Physical memory management
     physical_memory_setup((mbi->mem_upper<<10) + (1<<20),
-		    &physical_addresses_top,
 		    initrd_start,
 		    initrd_end);
 

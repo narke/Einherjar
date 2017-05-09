@@ -64,7 +64,6 @@
  *
  */
 void physical_memory_setup(uint32_t ram_size,
-	paddr_t *kernel_top_address,
 	uint32_t initrd_start,
 	uint32_t initrd_end);
 

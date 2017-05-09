@@ -15,18 +15,7 @@ struct memory_range
 	TAILQ_ENTRY(memory_range) next;
 };
 
-uint32_t heap_start = 0x0;
-uint32_t heap_used  = 0x0;
-uint32_t heap_limit = 0x3fffff;
-
-struct physical_page_descriptor
-{
-	/** The physical address of the page */
-	uint32_t physical_address;
-
-	TAILQ_ENTRY(physical_page_descriptor) next;
-};
-
+uint32_t heap = 0x0;
 
 // Kernel beginning marker  @see linker.ld
 extern char __kernel_start;
@@ -36,31 +25,27 @@ extern char __kernel_end;
 
 
 void physical_memory_setup(uint32_t ram_size,
-	paddr_t *kernel_top_address,
 	uint32_t initrd_start,
 	uint32_t initrd_end)
 {
 	struct memory_range *r1, *r2, *r3, *r4, *r5, *r6, *r7, *r8;
+	paddr_t *kernel_top_address = (paddr_t *)&initrd_end;
 
 	TAILQ_INIT(&free_memory_ranges);
 	TAILQ_INIT(&used_memory_ranges);
 
-	*kernel_top_address = initrd_end
-		+ PAGE_ALIGN_UP((ram_size >> X86_PAGE_SHIFT)
-				* sizeof(struct physical_page_descriptor));
-
-	heap_start = PAGE_ALIGN_UP(*kernel_top_address);
+	heap = PAGE_ALIGN_UP(*kernel_top_address);
 
 	// Reserved : 0 ... base
-	r1 = (struct memory_range *)heap_start;
-	heap_start += sizeof(struct memory_range);
+	r1 = (struct memory_range *)heap;
+	heap += sizeof(struct memory_range);
 
 	r1->base_address = X86_PAGE_SIZE;
 	r1->size = X86_PAGE_SIZE;
 
 	// Free : base ... BIOS
-	r2 = (struct memory_range *)heap_start;
-	heap_start += sizeof(struct memory_range);
+	r2 = (struct memory_range *)heap;
+	heap += sizeof(struct memory_range);
 
 	r2->base_address = r2->base_address;
 	r2->size = BIOS_VIDEO_START - r2->base_address;
@@ -68,8 +53,8 @@ void physical_memory_setup(uint32_t ram_size,
 	TAILQ_INSERT_TAIL(&free_memory_ranges, r2, next);
 
 	// Used : BIOS
-	r3 = (struct memory_range *)heap_start;
-	heap_start += sizeof(struct memory_range);
+	r3 = (struct memory_range *)heap;
+	heap += sizeof(struct memory_range);
 
 	r3->base_address = BIOS_VIDEO_START;
 	r3->size = BIOS_VIDEO_END - BIOS_VIDEO_START;
@@ -77,8 +62,8 @@ void physical_memory_setup(uint32_t ram_size,
 	TAILQ_INSERT_TAIL(&free_memory_ranges, r3, next);
 
 	// Free : BIOS ... kernel
-	r4 = (struct memory_range *)heap_start;
-	heap_start += sizeof(struct memory_range);
+	r4 = (struct memory_range *)heap;
+	heap += sizeof(struct memory_range);
 
 	r4->base_address = BIOS_VIDEO_END;
 	r4->size = (uint32_t)(&__kernel_start) - BIOS_VIDEO_END;
@@ -86,8 +71,8 @@ void physical_memory_setup(uint32_t ram_size,
 	TAILQ_INSERT_TAIL(&free_memory_ranges, r4, next);
 
 	// Used: Initrd
-	r5 = (struct memory_range *)heap_start;
-	heap_start += sizeof(struct memory_range);
+	r5 = (struct memory_range *)heap;
+	heap += sizeof(struct memory_range);
 
 	r5->base_address = initrd_start;
 	r5->size = initrd_end - initrd_start;
@@ -95,23 +80,23 @@ void physical_memory_setup(uint32_t ram_size,
 	TAILQ_INSERT_TAIL(&free_memory_ranges, r5, next);
 
 	// Used : Kernel code/data/bss + physcal page descr array
-	r6 = (struct memory_range *)heap_start;
-	heap_start += sizeof(struct memory_range);
+	r6 = (struct memory_range *)heap;
+	heap += sizeof(struct memory_range);
 
-	r6->base_address = (uint32_t)(& __kernel_start);
-	r6->size = (uint32_t)(& __kernel_end);
+	r6->base_address = (paddr_t)(& __kernel_start);
+	r6->size = (paddr_t)(& __kernel_end);
 
 	TAILQ_INSERT_TAIL(&free_memory_ranges, r6, next);
 
 	// Free : first page of descr ... end of RAM
-	r7 = (struct memory_range *)heap_start;
-	heap_start += sizeof(struct memory_range);
+	r7 = (struct memory_range *)heap;
+	heap += sizeof(struct memory_range);
 
-	r7->base_address = (uint32_t)(&__kernel_end);
-	r7->size = initrd_start - (uint32_t)(&__kernel_end);
+	r7->base_address = (paddr_t)(&__kernel_end);
+	r7->size = initrd_start - (paddr_t)(&__kernel_end);
 
-	r8 = (struct memory_range *)heap_start;
-	heap_start += sizeof(struct memory_range);
+	r8 = (struct memory_range *)heap;
+	heap += sizeof(struct memory_range);
 
 	// Ensure that the RAM size is page aligned
 	ram_size = PAGE_ALIGN_DOWN(ram_size);
@@ -121,16 +106,12 @@ void physical_memory_setup(uint32_t ram_size,
 
 	TAILQ_INSERT_TAIL(&free_memory_ranges, r7, next);
 	TAILQ_INSERT_TAIL(&free_memory_ranges, r8, next);
-
-	// FIXME
-	heap_used = heap_used + sizeof(struct memory_range);
 }
 
 
 void *heap_alloc(size_t size)
 {
 	struct memory_range *mem_range, *place;
-	uint32_t address;
 
 	if (size == 0 || TAILQ_EMPTY(&free_memory_ranges))
 		return NULL;
@@ -156,34 +137,17 @@ void *heap_alloc(size_t size)
 			mem_range->size = mem_range->size - size;
 
 			// Allocate a new chunk
-			place = (struct memory_range *)heap_start + heap_used;
-			heap_used += sizeof(struct memory_range);
+			place = (struct memory_range *)heap;
+			heap += sizeof(struct memory_range);
 
 			place->base_address = mem_range->base_address + mem_range->size;
-			place->size			= size;
+			place->size = size;
 
 			// Update the list
 			TAILQ_INSERT_TAIL(&used_memory_ranges, place, next);
 
 			return (void *)place->base_address;
 		}
-	}
-
-	// At the end of the used memory
-	if ((heap_used + size) < heap_limit)
-	{
-		place = (struct memory_range *)heap_start + heap_used;
-		heap_used += sizeof(struct memory_range);
-
-		address = heap_start + heap_used;
-		heap_used += size;
-
-		place->base_address = address;
-		place->size = size;
-
-		TAILQ_INSERT_TAIL(&used_memory_ranges, place, next);
-
-		return (void *)place->base_address;
 	}
 
 	return NULL;
