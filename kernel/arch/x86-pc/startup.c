@@ -1,6 +1,6 @@
 /**
  * @author Konstantin Tcholokachvili
- * @date 2013, 2014
+ * @date 2013, 2014, 2017
  * @license MIT License
  *
  * Roentgenium's kernel's main file
@@ -35,9 +35,6 @@ void roentgenium_main(uint32_t magic, uint32_t address)
 
     (void)magic; // Avoid a useless warning ;-)
 
-    // RAM size in bytes
-    uint32_t ram_size;
-
     // Initrd
     uint32_t initrd_start;
     uint32_t initrd_end;
@@ -45,37 +42,17 @@ void roentgenium_main(uint32_t magic, uint32_t address)
     // Console
     struct console *cons = NULL;
 
-    // VGA scren setup
-    vga_clear();
-    vga_set_attributes(FG_BRIGHT_BLUE | BG_BLACK );
-    vga_set_position(34, 0);
-
-    printf("Roentgenium\n");
-
-    // RAM size
-    ram_size = (unsigned int)mbi->mem_upper;
-
-    printf("RAM is %dMB\n", (ram_size >> 10) + 1);
-
     // GDT
     x86_gdt_setup();
-
-    printf("CPU: GDT");
 
     // IDT
     x86_idt_setup();
 
-    printf(" | IDT");
-
     // ISRs: Exceptions
     x86_isr_setup();
 
-    printf(" | Exceptions");
-
     // IRQs
     x86_irq_setup();
-
-    printf(" | IRQs\n");
 
     // Timer: Raise IRQ0 at 100 Hz rate
     retval = x86_pit_set_frequency(100);
@@ -94,20 +71,14 @@ void roentgenium_main(uint32_t magic, uint32_t address)
 		    initrd_start,
 		    initrd_end);
 
-    printf("Memory Manager: Physical memory");
-
     // Kernel threads
     threading_setup();
-
-    printf("Kernel threads\n");
 
     // Scheduler
     scheduler_setup();
 
     // Enable interrupts
     asm volatile("sti");
-
-    printf("Initrd\n");
 
     // Console
     console_setup(&cons, vga_display_character);
