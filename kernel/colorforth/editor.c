@@ -68,66 +68,53 @@ do_cmd(char *word)
 
 static void handle_input(uchar_t scancode)
 {
-	static bool_t ctrl = FALSE;
-	static bool_t alt  = FALSE;
-	static uint8_t i   = 0;
+	static bool_t escape = FALSE;
+	static uint8_t i = 0;
 	static char word[32];
 
-	if (scancode == KEY_LEFT_CTRL)
+	if (scancode == KEY_ESCAPE)
 	{
-		ctrl = TRUE;
+		escape = TRUE;
 		return;
 	}
-	else if (scancode == KEY_LEFT_ALT)
+	else if (scancode == KEY_F2)
 	{
-		alt = TRUE;
+		is_command = TRUE;
+		run_block(nb_block);
+		dot_s();
+		command_prompt();
 		return;
 	}
 
-	if (alt)
+	if (escape)
 	{
+		escape = FALSE;
+
 		switch(keyboard_get_keymap(scancode))
 		{
 			case 'r':
 				vga_set_attributes(FG_RED | BG_BLACK);
-				break;
+				return;
 
 			case 'y':
 				vga_set_attributes(FG_YELLOW | BG_BLACK);
-				break;
+				return;
 
 			case 'g':
 				vga_set_attributes(FG_GREEN | BG_BLACK);
-				break;
+				return;
 
 			case 'c':
 				vga_set_attributes(FG_CYAN | BG_BLACK);
-				break;
+				return;
 
 			case 'm':
-			case 'p':
 				vga_set_attributes(FG_MAGENTA | BG_BLACK);
-				break;
+				return;
 
 			case 'w':
-			case 'o':
 				vga_set_attributes(FG_BRIGHT_WHITE | BG_BLACK);
-				break;
-
-			default:
-				;
-		}
-	}
-	else if (ctrl)
-	{
-		switch(keyboard_get_keymap(scancode))
-		{
-			case 'r':
-				is_command = TRUE;
-				run_block(nb_block);
-				dot_s();
-				command_prompt();
-				return; // Avoid displaying 'r'
+				return;
 
 			case 'e':
 				is_command = FALSE;
@@ -140,9 +127,6 @@ static void handle_input(uchar_t scancode)
 		}
 	}
 
-	ctrl = FALSE;
-	alt = FALSE;
-
 	switch(scancode)
 	{
 
@@ -150,7 +134,6 @@ static void handle_input(uchar_t scancode)
 			word[i] = '\0';
 			i = 0;
 
-			vga_update_position(1, 0);
 			vga_display_character(' ');
 
 			if (is_command)
@@ -218,8 +201,8 @@ cell_t pack(const char *word_name)
 	word_length = strlen(word_name);
 	assert(word_length != 0);
 
-	packed      = 0;
-	bits        = 28;
+	packed = 0;
+	bits   = 28;
 
 	for (i = 0; i < word_length; i++)
 	{
@@ -548,4 +531,3 @@ void editor(void *args)
 		handle_input(c);
 	}
 }
-

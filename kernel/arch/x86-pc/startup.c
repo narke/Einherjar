@@ -13,7 +13,6 @@
 #include <arch/x86/interrupts/isr.h>
 #include <arch/x86/interrupts/irq.h>
 #include <arch/x86-pc/timer/pit.h>
-#include <arch/x86-pc/io/keyboard.h>
 #include <lib/libc.h>
 #include <arch/x86-pc/bootstrap/multiboot.h>
 #include <memory/physical-memory.h>
@@ -21,7 +20,6 @@
 #include <threading/scheduler.h>
 #include <io/console.h>
 #include <colorforth/colorforth.h>
-#include <test-suite/initrd-test.h>
 
 
 /**
@@ -59,14 +57,14 @@ void roentgenium_main(uint32_t magic, uint32_t address)
 
     assert(retval == KERNEL_OK);
 
-    // Timer interrupt, momentarily disabled
+    // Timer interrupt
     x86_irq_set_routine(IRQ_TIMER, timer_interrupt_handler);
 
     // Initrd: Initial Ram Disk
     initrd_start = *((uint32_t *)mbi->mods_addr);
     initrd_end   = *(uint32_t *)(mbi->mods_addr + 4);
 
-    // Memory management: Physical memory management
+    // Physical memory management
     physical_memory_setup((mbi->mem_upper<<10) + (1<<20),
 		    initrd_start,
 		    initrd_end);
