@@ -32,7 +32,6 @@ OBJECTS = $(BOOTLOADER_PATH)/multiboot.o        \
 	io/console.o                            \
 	colorforth/editor.o                     \
 	colorforth/compiler.o                   \
-	test-suite/initrd-test.o                \
 	arch/x86-pc/startup.o
 
 KERNEL          = $(BUILD_PATH)/roentgenium.elf

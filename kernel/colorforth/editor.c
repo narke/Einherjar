@@ -16,7 +16,7 @@
 #define BLOCK_SIZE 1024
 
 #define INTERPRET_NUMBER_TAG 8
-#define INTERPRET_WORD_TAG   1
+#define INTERPRET_WORD_TAG   0x00000001
 
 cell_t *blocks;
 cell_t nb_block;
@@ -49,12 +49,13 @@ do_cmd(char *word)
 	else
 	{
 		vga_set_position(0, 18);
-		packed = pack(word) + INTERPRET_WORD_TAG;
+		packed = (pack(word) & 0xfffffff0 ) | INTERPRET_WORD_TAG;
 
 		if (!lookup_word(packed, FORTH_DICTIONARY))
 		{
 			// Not found!
 			vga_set_position(0, 22);
+			vga_set_attributes(FG_PINK | BG_BLACK);
 			printf("Error: Word not found!");
 			command_prompt();
 			return;
@@ -80,8 +81,6 @@ static void handle_input(uchar_t scancode)
 	else if (scancode == KEY_F2)
 	{
 		is_command = TRUE;
-		run_block(nb_block);
-		dot_s();
 		command_prompt();
 		return;
 	}
