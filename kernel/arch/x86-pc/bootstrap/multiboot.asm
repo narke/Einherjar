@@ -7,7 +7,7 @@ extern roentgenium_main	; this is our kernel's entry point
 MBALIGN		equ	1<<0		; align loaded modules on page boundaries
 MEMINFO		equ	1<<1		; provide memory map
 FLAGS		equ	MBALIGN | MEMINFO	; this is the Multiboot 'flag' field
-MAGIC		equ	0x1BADB002	; 'magic number' lets bootloader find the header
+MAGIC		equ	0x1BADB002		; 'magic number' lets bootloader find the header
 CHECKSUM	equ	-(MAGIC + FLAGS)	; checksum required to prove that we are multiboot
 STACK_SIZE	equ	0x4000		; our stack size is 16KiB
 
@@ -28,30 +28,19 @@ section .text
 
 global multiboot_entry
 multiboot_entry:
-	mov esp, stack + STACK_SIZE		; set up the stack
-	mov [magic], ebx				; multiboot magic number
-	mov [multiboot_info], eax		; multiboot data structure
+	mov esp, stack + STACK_SIZE	; set up the stack
+	mov [magic], ebx		; multiboot magic number
+	mov [multiboot_info], eax	; multiboot data structure
 
-	call roentgenium_main			; calling the kernel
+	call roentgenium_main		; calling the kernel
 
 hang:
-	hlt			; something bad happened, machine halted
+	hlt				; something bad happened, machine halted
 	jmp hang
 
 
 section .bss nobits align=4
 ; Reserve initial kernel stack space
-stack:			resb STACK_SIZE	; reserve 16 KiB stack
-multiboot_info:	resd 1			; we will use this in kernel's main
-magic:			resd 1			; we will use this in kernel's main
-
-
-section .data
-
-global x86_kernel_stack_bottom
-x86_kernel_stack_bottom:
-	dd stack
-
-global x86_kernel_stack_size
-x86_kernel_stack_size:
-	dd STACK_SIZE
+stack:          resb STACK_SIZE ; reserve 16 KiB stack
+multiboot_info: resd 1          ; we will use this in kernel's main
+magic:          resd 1          ; we will use this in kernel's main

@@ -25,8 +25,8 @@ uint32_t total_blocks;
 
 static void command_prompt(void);
 static void command_prompt_erase(void);
-bool_t is_command = FALSE;
 
+bool_t is_command = FALSE;
 bool_t is_first_definition;
 
 /* Prototype of a later implemented function */

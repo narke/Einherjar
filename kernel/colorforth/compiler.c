@@ -366,9 +366,7 @@ void dot(void)
 
 void i_word(void)
 {
-	cell_t n;
-
-	n = rpop();
+	cell_t n = rpop();
 	stack_push(n);
 }
 
@@ -541,13 +539,13 @@ insert_builtins_into_macro_dictionary(void)
 {
 	struct word_entry *_rdrop, *_ne, *_swap, *_if, *_then, *_for, *_next;
 
-	_rdrop = malloc(sizeof(struct word_entry));
-	_ne = malloc(sizeof(struct word_entry));
-	_swap = malloc(sizeof(struct word_entry));
-	_if = malloc(sizeof(struct word_entry));
-	_then = malloc(sizeof(struct word_entry));
-	_for = malloc(sizeof(struct word_entry));
-	_next = malloc(sizeof(struct word_entry));
+	_rdrop	= malloc(sizeof(struct word_entry));
+	_ne	= malloc(sizeof(struct word_entry));
+	_swap	= malloc(sizeof(struct word_entry));
+	_if	= malloc(sizeof(struct word_entry));
+	_then	= malloc(sizeof(struct word_entry));
+	_for	= malloc(sizeof(struct word_entry));
+	_next	= malloc(sizeof(struct word_entry));
 
 	_rdrop->name               = pack("rdrop");
 	_rdrop->code_address       = rdrop;
