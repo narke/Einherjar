@@ -28,6 +28,7 @@ static void command_prompt_erase(void);
 
 bool_t is_command = FALSE;
 bool_t is_first_definition;
+extern bool_t is_hex;
 
 /* Prototype of a later implemented function */
 static void display_block(cell_t n);
@@ -76,6 +77,16 @@ static void handle_input(uchar_t scancode)
 	if (scancode == KEY_ESCAPE)
 	{
 		escape = TRUE;
+		return;
+	}
+	else if (scancode == KEY_F1)
+	{
+		if (is_hex)
+			is_hex = FALSE;
+		else
+			is_hex = TRUE;
+
+		dot_s();
 		return;
 	}
 	else if (scancode == KEY_F2)

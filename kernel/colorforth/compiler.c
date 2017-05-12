@@ -46,6 +46,7 @@ unsigned long *h;			// Code is inserted here
 bool_t         selected_dictionary;
 extern cell_t *blocks;			// Manage looping over the code contained in blocks
 unsigned long *IP;			// Instruction Pointer
+bool_t is_hex = FALSE;
 
 LIST_HEAD(, word_entry) forth_dictionary;
 LIST_HEAD(, word_entry) macro_dictionary;
@@ -261,7 +262,12 @@ void dot_s(void)
 	printf("\nStack: ");
 
 	for (i = 1; i < nb_items + 1; i++)
-		printf("%d ", (int)stack[i]);
+	{
+		if (is_hex)
+			printf("%x ", (int)stack[i]);
+		else
+			printf("%d ", (int)stack[i]);
+	}
 	printf("\n");
 }
 
