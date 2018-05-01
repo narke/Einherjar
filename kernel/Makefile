@@ -5,7 +5,7 @@ include messages.make
 
 CC      = gcc
 PWD    := $(shell pwd)
-CFLAGS  = -Wall -Wextra -m32 -Wa,--32 -nostdlib -nostdinc -ffreestanding -I$(PWD)
+CFLAGS  = -Wall -Wextra -m32 -Wa,--32 -nostdlib -nostdinc -ffreestanding -fgnu89-inline -I$(PWD)
 LDFLAGS = --warn-common -melf_i386 --strip-all
 
 BOOTLOADER_PATH = arch/x86-pc/bootstrap
