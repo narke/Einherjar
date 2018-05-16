@@ -27,7 +27,6 @@ static void command_prompt(void);
 static void command_prompt_erase(void);
 
 bool_t is_command = FALSE;
-bool_t is_first_definition;
 extern bool_t is_hex;
 
 /* Prototype of a later implemented function */
@@ -52,7 +51,14 @@ do_cmd(char *word)
 		vga_set_position(0, 18);
 		packed = (pack(word) & 0xfffffff0 ) | INTERPRET_WORD_TAG;
 
-		if (!lookup_word(packed, FORTH_DICTIONARY))
+		struct colorforth_word w = lookup_word(packed, FORTH_DICTIONARY);
+
+		if (w.name == 0)
+		{
+			w = lookup_word(packed, BUILTINS_DICTIONARY);
+		}
+
+		if (w.name == 0)
 		{
 			// Not found!
 			vga_set_position(0, 22);
@@ -63,12 +69,13 @@ do_cmd(char *word)
 		}
 	}
 
-	do_word(packed);
+	dispatch_word(packed);
 	dot_s();
 	command_prompt();
 }
 
-static void handle_input(uchar_t scancode)
+static void
+handle_input(uchar_t scancode)
 {
 	static bool_t escape = FALSE;
 	static uint8_t i = 0;
@@ -144,10 +151,10 @@ static void handle_input(uchar_t scancode)
 			word[i] = '\0';
 			i = 0;
 
-			vga_display_character(' ');
-
 			if (is_command)
 				do_cmd(word);
+			else
+				vga_display_character(' ');
 			break;
 
 		case KEY_UP:
@@ -198,13 +205,15 @@ static void handle_input(uchar_t scancode)
  */
 char *code = " rtoeanismcylgfwdvpbhxuq0123456789j-k.z/;:!+@*,?";
 
-static int get_code_index(const char letter)
+static int
+get_code_index(const char letter)
 {
 	// Get the index of a character in the 'code' sequence.
 	return strchr(code, letter) - code;
 }
 
-cell_t pack(const char *word_name)
+cell_t
+pack(const char *word_name)
 {
 	unsigned int word_length, i, bits, length, letter_code, packed;
 
@@ -227,7 +236,8 @@ cell_t pack(const char *word_name)
 	return packed;
 }
 
-char *unpack(cell_t word)
+char *
+unpack(cell_t word)
 {
 	unsigned char nibble;
 	static char text[16];
@@ -269,7 +279,8 @@ char *unpack(cell_t word)
 	return text;
 }
 
-static void print_hex(unsigned int i)
+static void
+print_hex(unsigned int i)
 {
 	int n = 8, f = 0;
 
@@ -295,7 +306,8 @@ static void print_hex(unsigned int i)
 	}
 }
 
-static void print_dec(int i)
+static void
+print_dec(int i)
 {
 	int j, k, f = 0;
 
@@ -329,7 +341,8 @@ static void print_dec(int i)
 	}
 }
 
-static void print_number(cell_t word, bool_t is_hex)
+static void
+print_number(cell_t word, bool_t is_hex)
 {
 	if (is_hex)
 		print_hex(word >> 5);
@@ -338,7 +351,8 @@ static void print_number(cell_t word, bool_t is_hex)
 	vga_display_character(' ');
 }
 
-static void display_word(cell_t word)
+static void
+display_word(cell_t word)
 {
 	uint8_t color = word & 0x0000000f;
 	bool_t is_hex = FALSE;
@@ -366,11 +380,6 @@ static void display_word(cell_t word)
 			break;
 
 		case 3:
-			if (is_first_definition)
-				is_first_definition = FALSE;
-			else
-				printf("\n");
-
 			vga_set_attributes(FG_RED | BG_BLACK);
 			printf("%s ", unpack(word));
 			break;
@@ -441,6 +450,10 @@ static void display_word(cell_t word)
 			vga_display_character(' ');
 			break;
 
+		case 14:
+			printf("\n");
+			break;
+
 		case 15:
 			vga_set_attributes(FG_BRIGHT_WHITE | BG_BLACK);
 			if (word & 0x10)
@@ -455,7 +468,8 @@ static void display_word(cell_t word)
 	}
 }
 
-static void status_bar_update_block_number(cell_t n)
+static void
+status_bar_update_block_number(cell_t n)
 {
 	vga_set_position(65, 23);
 	vga_set_attributes(FG_BRIGHT_GREEN | BG_BLACK);
@@ -466,7 +480,8 @@ static void status_bar_update_block_number(cell_t n)
 	vga_update_cursor();
 }
 
-static void display_command_prompt(void)
+static void
+display_command_prompt(void)
 {
 	vga_set_position(0, 21);
 	vga_set_attributes(FG_BRIGHT_GREEN | BG_BLACK);
@@ -474,20 +489,22 @@ static void display_command_prompt(void)
 	dot_s();
 }
 
-static void command_prompt(void)
+static void
+command_prompt(void)
 {
 	vga_set_position(2, 21);
 	vga_set_attributes(FG_YELLOW | BG_BLACK);
 	vga_update_cursor();
 }
 
-static void command_prompt_erase(void)
+static void
+command_prompt_erase(void)
 {
 #define VGA_SCREEN 0xB8000
 #define VGA_NB_COLUMNS 80
 	uint8_t *video;
 
-	// Go to the prompt line (21) and erase the it along ther error
+	// Go to the prompt line (21) and erase it along ther error
 	// reporting area (22). Don't erase the prompt (hence 2).
 
 	for (video = (uint8_t *)VGA_SCREEN + 21 * VGA_NB_COLUMNS * 2 + 2;
@@ -501,7 +518,8 @@ static void command_prompt_erase(void)
 	vga_update_cursor();
 }
 
-static void display_block(cell_t n)
+static void
+display_block(cell_t n)
 {
 	unsigned long start, limit;
 
@@ -510,7 +528,6 @@ static void display_block(cell_t n)
 
 	vga_clear();
 
-	is_first_definition = TRUE;
 
 	for (word_index = start; word_index < limit; word_index++)
 	{
@@ -521,7 +538,8 @@ static void display_block(cell_t n)
 	status_bar_update_block_number(n);
 }
 
-void editor(void *args)
+void
+editor(void *args)
 {
 	uchar_t c;
 	struct editor_args *params;

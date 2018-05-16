@@ -1,24 +1,4 @@
 {block 0}
-define(num1) compileshort(4) compileword(;)
-define(num2) compileshort(3) compileshort(9) compileword(;)
-execute(num1)
-execute(num2)
-executeshort(1) executeshort(2) execute(+)
+execute(macro) display_macro(cr)
+define(;) hex_compileshort(c3) compileword(,) hex_executeshort(c3) execute(,)
 {block 1}
-{block 2}
-define(square) compileword(dup) compileword(*) compileword(;)
-executeshort(5) execute(square)
-{block 3}
-{block 4}
-variable(age) compileword(0)
-executeshort(42) execute(age) execute(!)
-execute(age) execute(@) execute(.)
-{block 5}
-{block 6}
-define(abc) compileshort(-1) compileword(if) compileshort(10) compileword(then) compileword(;)
-execute(abc)
-{block 7}
-{block 8}
-define(loop) compileshort(5) compileword(for) compileshort(3) compileword(next) compileword(;)
-execute(loop)
-{block 9}
