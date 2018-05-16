@@ -12,7 +12,6 @@
 #define HIGHBIT 0x80000000L
 #define MASK    0xffffffffL
 
-#define STACK_SIZE 8
 #define BLOCK_SIZE 1024
 
 #define INTERPRET_NUMBER_TAG 8

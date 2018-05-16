@@ -12,34 +12,16 @@
 /*
  * Context
  */
-typedef struct
-{
-	long *stack_ptr;		// Offset 0
-	unsigned char *code_here;	// Offset 4
-	unsigned char *data_here;	// Offset 8
-	unsigned char *code_heap;	// Offset 12
-	unsigned char *data_heap;	// Offset 16
-	long stack[STACK_SIZE];		// Offset 20
-} compiler_context_t;
+extern void stack_push(cell_t value);
+extern cell_t stack_pop(void);
 
-compiler_context_t ctx;
-
-typedef void (*FUNCTION_EXEC)(compiler_context_t *);
+typedef void (*FUNCTION_EXEC)(void);
 
 /*
  * Stack
  */
-static void
-stack_push(long value)
-{
-	*++ctx.stack_ptr = value;
-}
-
-static long
-stack_pop(void)
-{
-	return *ctx.stack_ptr--;
-}
+long stack[STACK_SIZE];
+unsigned short nb_stack_items = 0;
 
 /*
  * Global variables
@@ -54,7 +36,7 @@ bool_t is_hex = FALSE;
 /*
  * Prototypes
  */
-static void ignore(const cell_t word);
+void ignore(const cell_t word);
 static void interpret_forth_word(const cell_t word);
 static void interpret_big_number(const cell_t number);
 static void create_word(cell_t word);
@@ -62,7 +44,7 @@ static void compile_word(const cell_t word);
 static void compile_big_number(const cell_t number);
 static void compile_number(const cell_t number);
 static void compile_macro(const cell_t word);
-static void interpret_number(const cell_t number);
+void interpret_number(const cell_t number);
 static void variable_word(const cell_t word);
 
 /* Word extensions (0), comments (9, 10, 11, 15), compiler feedback (13)
@@ -128,20 +110,16 @@ void macro(void)
 
 void dot_s(void)
 {
-	int i, nb_items;
-
-	nb_items = ctx.stack_ptr - &ctx.stack[0];
-
 	vga_set_position(0, 22);
 	vga_set_attributes(FG_YELLOW | BG_BLACK);
 	printf("\nStack: ");
 
-	for (i = 1; i < nb_items + 1; i++)
+	for (int i = 0; i < nb_stack_items; i++)
 	{
 		if (is_hex)
-			printf("%x ", (int)ctx.stack[i]);
+			printf("%x ", stack[i]);
 		else
-			printf("%d ", (int)ctx.stack[i]);
+			printf("%d ", stack[i]);
 	}
 
 	printf("\n");
@@ -238,12 +216,6 @@ lookup_word(cell_t name, const bool_t force_dictionary)
  * Colorful words handling
  */
 static void
-ignore(const cell_t word)
-{
-	(void)word;
-}
-
-static void
 interpret_forth_word(const cell_t word)
 {
 	(void)word;
@@ -269,12 +241,6 @@ static void
 interpret_big_number(const cell_t number)
 {
 	(void)number;
-}
-
-static void
-interpret_number(const cell_t number)
-{
-	stack_push(number >> 5);
 }
 
 static void
@@ -330,8 +296,7 @@ colorforth_initialize(void)
 	h = code_here;
 
 	// Init stack
-	memset(&ctx, 0, sizeof(compiler_context_t));
-	ctx.stack_ptr = &ctx.stack[0];
+	memset(stack, 0, STACK_SIZE);
 
 	// FORTH is the default dictionary
 	forth();
