@@ -3,25 +3,31 @@
 
 #include "colorforth.h"
 
-#define HEAP_SIZE (1024 * 100)	// 100 Kb
-#define STACK_SIZE     42
+#define HEAP_SIZE	(1024 * 100)	// 100 Kb
+#define STACK_SIZE	42
 
 #define FORTH_TRUE -1      // In Forth world -1 means true
 #define FORTH_FALSE 0
 
-/*
- * Context
- */
-extern void stack_push(cell_t value);
-extern cell_t stack_pop(void);
-
 typedef void (*FUNCTION_EXEC)(void);
 
 /*
- * Stack
+ * Stack macros
  */
-long stack[STACK_SIZE];
-unsigned short nb_stack_items = 0;
+#define stack_push(x) *(++tos) = x
+#define stack_pop()   *(tos--)
+#define nos           tos[-1]	// Next On Stack
+#define rpush(x)      *(++rtos) = x
+#define rpop()        *(rtos--)
+#define start_of(x)   (&x[0])
+
+/* Data stack */
+cell_t stack[STACK_SIZE];
+cell_t *tos = start_of(stack);	// Top Of Stack
+
+/* Return stack */
+unsigned long rstack[STACK_SIZE];
+unsigned long *rtos = start_of(rstack);
 
 /*
  * Global variables
@@ -36,7 +42,7 @@ bool_t is_hex = FALSE;
 /*
  * Prototypes
  */
-void ignore(const cell_t word);
+static void ignore(const cell_t word);
 static void interpret_forth_word(const cell_t word);
 static void interpret_big_number(const cell_t number);
 static void create_word(cell_t word);
@@ -44,7 +50,7 @@ static void compile_word(const cell_t word);
 static void compile_big_number(const cell_t number);
 static void compile_number(const cell_t number);
 static void compile_macro(const cell_t word);
-void interpret_number(const cell_t number);
+static void interpret_number(const cell_t number);
 static void variable_word(const cell_t word);
 
 /* Word extensions (0), comments (9, 10, 11, 15), compiler feedback (13)
@@ -114,7 +120,9 @@ void dot_s(void)
 	vga_set_attributes(FG_YELLOW | BG_BLACK);
 	printf("\nStack: ");
 
-	for (int i = 0; i < nb_stack_items; i++)
+	int nb_items = tos - start_of(stack);
+
+	for (int i = 0; i < nb_items; i++)
 	{
 		if (is_hex)
 			printf("%x ", stack[i]);
@@ -154,7 +162,7 @@ run_block(const cell_t n)
 	}
 }
 
-struct colorforth_word builtins[7] =
+struct colorforth_word forth_dictionary[128] =
 {
 	{.name = 0xfc000000, .code_address = comma},
 	{.name = 0xa1ae0000, .code_address = load},
@@ -162,11 +170,6 @@ struct colorforth_word builtins[7] =
 	{.name = 0xb1896400, .code_address = forth},
 	{.name = 0x8ac84c00, .code_address = macro},
 	{.name = 0xea000000, .code_address = dot},
-	{0, 0},
-};
-
-struct colorforth_word forth_dictionary[128] =
-{
 	{0, 0},
 };
 
@@ -190,21 +193,12 @@ lookup_word(cell_t name, const bool_t force_dictionary)
 				return forth_dictionary[i];
 		}
 	}
-	else if (force_dictionary == MACRO_DICTIONARY)
+	else
 	{
 		for (i = 0; macro_dictionary[i].name; i++)
 		{
 			if (name == macro_dictionary[i].name)
 				return macro_dictionary[i];
-		}
-
-	}
-	else if (force_dictionary == BUILTINS_DICTIONARY)
-	{
-		for (i = 0; builtins[i].name; i++)
-		{
-			if (name == builtins[i].name)
-				return builtins[i];
 		}
 
 	}
@@ -215,6 +209,12 @@ lookup_word(cell_t name, const bool_t force_dictionary)
 /*
  * Colorful words handling
  */
+static void
+ignore(const cell_t word)
+{
+	(void)word; // Avoid an useless warning and do nothing!
+}
+
 static void
 interpret_forth_word(const cell_t word)
 {
@@ -259,6 +259,12 @@ static void
 compile_big_number(const cell_t number)
 {
 	(void)number;
+}
+
+static void
+interpret_number(const cell_t number)
+{
+	stack_push(number >> 5);
 }
 
 static void

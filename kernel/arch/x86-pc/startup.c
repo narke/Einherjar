@@ -3,7 +3,7 @@
  * @date 2013, 2014, 2017
  * @license MIT License
  *
- * Roentgenium's kernel's main file
+ * Einherjar's kernel's main file
  */
 
 #include <lib/status.h>
