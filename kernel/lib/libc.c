@@ -13,10 +13,9 @@
 
 bool_t is_number(char *ptr)
 {
-
-	while (*ptr++)
+	while (*ptr)
 	{
-		switch(*ptr)
+		switch(*ptr++)
 		{
 			case '0':
 			case '1':
