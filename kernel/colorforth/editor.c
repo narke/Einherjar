@@ -31,8 +31,10 @@ extern bool_t is_hex;
 /* Prototype of a later implemented function */
 static void display_block(cell_t n);
 
-char hex[] = {'0', '1', '2', '3', '4', '5', '6', '7',
-       '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+char hex[] = {
+	'0', '1', '2', '3', '4', '5', '6', '7',
+	'8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
+};
 
 static void
 do_cmd(char *word)
@@ -51,11 +53,6 @@ do_cmd(char *word)
 		packed = (pack(word) & 0xfffffff0 ) | INTERPRET_WORD_TAG;
 
 		struct colorforth_word w = lookup_word(packed, FORTH_DICTIONARY);
-
-		if (w.name == 0)
-		{
-			w = lookup_word(packed, BUILTINS_DICTIONARY);
-		}
 
 		if (w.name == 0)
 		{
@@ -476,6 +473,27 @@ status_bar_update_block_number(cell_t n)
 	printf("Block: %d\n", n);
 
 	vga_set_position(0, 0);
+	vga_update_cursor();
+}
+
+void
+erase_stack(void)
+{
+#define VGA_SCREEN 0xB8000
+#define VGA_NB_COLUMNS 80
+	uint8_t *video;
+
+	// Go to the prompt line (23) and erase it along ther error
+	// reporting area (24). Don't erase the prompt (hence 2).
+
+	for (video = (uint8_t *)VGA_SCREEN + 23 * VGA_NB_COLUMNS * 2;
+		video <= (uint8_t *)VGA_SCREEN + 24 * VGA_NB_COLUMNS * 2;
+		video = video + 2)
+	{
+		*video = 0;
+	}
+
+	vga_set_position(2, 21);
 	vga_update_cursor();
 }
 

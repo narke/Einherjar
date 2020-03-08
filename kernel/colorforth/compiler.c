@@ -14,8 +14,8 @@ typedef void (*FUNCTION_EXEC)(void);
 /*
  * Stack macros
  */
-#define stack_push(x) *(++tos) = x
-#define stack_pop()   *(tos--)
+#define stack_push(x) *(tos++) = x
+#define stack_pop()   *(--tos)
 #define nos           tos[-1]	// Next On Stack
 #define rpush(x)      *(++rtos) = x
 #define rpop()        *(rtos--)
@@ -114,13 +114,29 @@ void macro(void)
 	selected_dictionary = MACRO_DICTIONARY;
 }
 
+void add(void)
+{
+	cell_t a = stack_pop();
+	cell_t b = stack_pop();
+	stack_push(a + b);
+}
+
+void divide(void)
+{
+	cell_t a = stack_pop();
+	cell_t b = stack_pop();
+	stack_push(b / a);
+}
+
 void dot_s(void)
 {
+	erase_stack();
 	vga_set_position(0, 22);
 	vga_set_attributes(FG_YELLOW | BG_BLACK);
-	printf("\nStack: ");
 
 	int nb_items = tos - start_of(stack);
+
+	printf("\nStack [%d]: ", nb_items);
 
 	for (int i = 0; i < nb_items; i++)
 	{
@@ -170,6 +186,8 @@ struct colorforth_word forth_dictionary[128] =
 	{.name = 0xb1896400, .code_address = forth},
 	{.name = 0x8ac84c00, .code_address = macro},
 	{.name = 0xea000000, .code_address = dot},
+	{.name = 0xf6000000, .code_address = add},
+	{.name = 0xee000000, .code_address = divide},
 	{0, 0},
 };
 
@@ -206,6 +224,13 @@ lookup_word(cell_t name, const bool_t force_dictionary)
 	return (struct colorforth_word){0, 0};
 }
 
+static void
+execute(const struct colorforth_word word)
+{
+	IP = word.code_address;
+	((FUNCTION_EXEC)word.code_address)();
+}
+
 /*
  * Colorful words handling
  */
@@ -218,23 +243,12 @@ ignore(const cell_t word)
 static void
 interpret_forth_word(const cell_t word)
 {
-	(void)word;
-	/*struct colorforth_word found_word = lookup_word(word, FORTH_DICTIONARY);
+	struct colorforth_word found_word = lookup_word(word, FORTH_DICTIONARY);
 
 	if (found_word.name)
 	{
-		stack_push((cell_t)found_word.code_address);
-		//((FUNCTION_EXEC)COLORFORTH_EXEC)(&ctx);
+		execute(found_word);
 	}
-	else
-	{
-		found_word = lookup_word(word, BUILTINS_DICTIONARY);
-
-		if (found_word.name)
-		{
-			//((FUNCTION_EXEC)found_word.code_address)(&ctx);
-		}
-	}*/
 }
 
 static void

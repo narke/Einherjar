@@ -37,3 +37,4 @@ void dispatch_word(cell_t word);
 struct colorforth_word lookup_word(cell_t name, const bool_t force_dictionary);
 void colorforth_initialize(void);
 void colorforth_finalize(void);
+void erase_stack(void);
