@@ -61,22 +61,6 @@ void (*color_word_action[16])() = {ignore, interpret_forth_word,
 	ignore, ignore, ignore, variable_word, ignore, ignore, ignore};
 
 /*
- * Packing and unpacking words
- */
-char *codes = " rtoeanismcylgfwdvpbhxuq0123456789j-k.z/;:!+@*,?";
-
-int
-get_code_index(const char letter)
-{
-	// Get the index of a character in the 'codes' sequence.
-	return strchr(codes, letter) - codes;
-}
-
-#define HIGHBIT 0x80000000L
-#define MASK    0xffffffffL
-
-
-/*
  * Built-in words
  */
 void comma(void)
