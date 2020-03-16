@@ -17,20 +17,34 @@
  *
  * @param expression The expression to evaluate
  */
-#define assert(expression)												\
-	({																	\
-		int result = (int)(expression);									\
-		if (!result)													\
-		{																\
-			/* Disable interrupts on x86 */								\
-			asm("cli\n");												\
+#define assert(expression)								\
+	({										\
+		int result = (int)(expression);						\
+		if (!result)								\
+		{									\
+			/* Disable interrupts on x86 */					\
+			asm("cli\n");							\
 			printf("%s@%s:%d Assertion: " # expression " - failed\n",	\
-				__PRETTY_FUNCTION__, __FILE__, __LINE__);				\
-			/* Infinite loop and x86 processor halting */				\
-			while (1) asm("hlt");										\
+				__PRETTY_FUNCTION__, __FILE__, __LINE__);		\
+			/* Infinite loop and x86 processor halting */			\
+			while (1) asm("hlt");						\
 		}																\
 	})
 
+/**
+ * Panic
+ *
+ * @param msg Display a message
+ */
+#define panic(msg)								\
+	({									\
+		/* Disable interrupts on x86 */					\
+		asm("cli\n");							\
+		printf("%s@%s:%d " # msg " \n",					\
+			__PRETTY_FUNCTION__, __FILE__, __LINE__);		\
+		/* Infinite loop and x86 processor halting */			\
+		while (1) asm("hlt");						\
+	})
 
 /**
  * Determines if a string can be converted to a number
@@ -47,7 +61,6 @@ bool_t is_number(char *ptr);
  * @return Converted string
  */
 int atoi(const char *ptr);
-
 
 /**
  * Formatted display of numbers and strings

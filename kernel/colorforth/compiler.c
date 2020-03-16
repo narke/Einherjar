@@ -151,18 +151,16 @@ dispatch_word(const cell_t word)
 void
 run_block(const cell_t n)
 {
-	unsigned long start, limit, i;
+	unsigned long start = n * 256;     // Start executing block from here...
+	unsigned long limit = (n+1) * 256; // ...to this point.
 
-	start = n * 256;     // Start executing block from here...
-	limit = (n+1) * 256; // ...to this point.
-
-	for (i = start; i < limit-1; i++)
+	for (unsigned long i = start; i < limit-1; i++)
 	{
 		dispatch_word(blocks[i]);
 	}
 }
 
-struct colorforth_word forth_dictionary[128] =
+word_t forth_dictionary[128] =
 {
 	{.name = 0xfc000000, .code_address = comma},
 	{.name = 0xa1ae0000, .code_address = load},
@@ -175,21 +173,19 @@ struct colorforth_word forth_dictionary[128] =
 	{0, 0},
 };
 
-struct colorforth_word macro_dictionary[32] =
+word_t macro_dictionary[32] =
 {
 	{0, 0}
 };
 
-struct colorforth_word
+word_t
 lookup_word(cell_t name, const bool_t force_dictionary)
 {
-	int i;
-
 	name &= 0xfffffff0; // Don't care about the color byte
 
 	if (force_dictionary == FORTH_DICTIONARY)
 	{
-		for (i = 0; forth_dictionary[i].name; i++)
+		for (int i = 0; forth_dictionary[i].name; i++)
 		{
 			if (name == forth_dictionary[i].name)
 				return forth_dictionary[i];
@@ -197,7 +193,7 @@ lookup_word(cell_t name, const bool_t force_dictionary)
 	}
 	else
 	{
-		for (i = 0; macro_dictionary[i].name; i++)
+		for (int i = 0; macro_dictionary[i].name; i++)
 		{
 			if (name == macro_dictionary[i].name)
 				return macro_dictionary[i];
@@ -205,11 +201,11 @@ lookup_word(cell_t name, const bool_t force_dictionary)
 
 	}
 
-	return (struct colorforth_word){0, 0};
+	return (word_t){0, 0};
 }
 
 static void
-execute(const struct colorforth_word word)
+execute(const word_t word)
 {
 	IP = word.code_address;
 	((FUNCTION_EXEC)word.code_address)();
@@ -227,7 +223,7 @@ ignore(const cell_t word)
 static void
 interpret_forth_word(const cell_t word)
 {
-	struct colorforth_word found_word = lookup_word(word, FORTH_DICTIONARY);
+	word_t found_word = lookup_word(word, FORTH_DICTIONARY);
 
 	if (found_word.name)
 	{
@@ -293,8 +289,7 @@ colorforth_initialize(void)
 
 	if (!code_here)
 	{
-		printf("Error: Not enough memory!\n");
-		// FIXME exit();
+		panic("Error: Not enough memory!\n");
 	}
 
 	h = code_here;
@@ -304,10 +299,4 @@ colorforth_initialize(void)
 
 	// FORTH is the default dictionary
 	forth();
-}
-
-void
-colorforth_finalize(void)
-{
-	free(code_here);
 }
